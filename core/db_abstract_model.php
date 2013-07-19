@@ -1,7 +1,9 @@
 <?php
+
 	include_once('../adodb/adodb.inc.php');
 	include_once('../adodb/adodb-pager.inc.php');
 	include_once('../adodb/tohtml.inc.php');
+
 session_start();
 abstract class DBAbstractModel {
 
@@ -18,11 +20,7 @@ abstract class DBAbstractModel {
     public $mensaje ='';
     public $error ='';
 
-    # métodos abstractos para ABM de clases que hereden    
-   /* abstract protected function get();
-    abstract protected function set();
-    abstract protected function edit();*/
-    
+   
     
     # los siguientes métodos pueden definirse con exactitud y no son abstractos
 	# Conectar a la base de datos
