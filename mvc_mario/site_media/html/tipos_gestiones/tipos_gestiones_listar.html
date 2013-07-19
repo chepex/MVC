@@ -1,0 +1,46 @@
+<h4>Listado de Parametros</h4><br/>
+<div style="width:75%;" align='center'>
+<a href='controller_pvc_explosiones.php?filtro=1' class='btn pull-right'>3 Meses</a>
+<a href='controller_pvc_explosiones.php?filtro=2' class='btn pull-right'>8 Meses</a>
+<a href='controller_pvc_explosiones.php?filtro=3' class='btn pull-right'>12 Meses</a>
+	<table id="tblreq" style='font-size:13px;' class='table'>
+		<thead>
+			<tr>
+				<th>
+					ID
+				</th>
+				<th>
+					NOMBRE
+				</th>
+				<th>
+					DESCRIPCION
+				</th>				
+				<th>
+					*
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+				{Detalle}
+		
+</div>
+<br/><br/>
+<script type="text/javascript">
+$(document).ready(function(){
+	
+
+/**TABLA FORMATO**/
+oTable =    $('#tblreq').dataTable( {      
+        "sDom": '<"H"Tfr>t<"F"ip>',
+        "bJQueryUI": true,
+        "bSort": false,
+        "sPaginationType": "full_numbers"  ,
+        "oTableTools": {"aButtons": ["copy","print",
+                                {  "sExtends":    "collection",
+                                    "sButtonText": "Export...",
+                                    "aButtons":    [ "xls", "pdf" ] }
+                            ]}
+    } );	
+});
+</script>
+

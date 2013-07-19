@@ -1,0 +1,27 @@
+<br/>
+<br/>
+<div>
+	<form id="frmrequisicion" action="{SET}" method="POST">
+        <div class="item_requerid">Producto</div>
+        <div class="form_requerid">
+			<select name="COD_PROD" id="COD_PROD" class="chzn-select input-xxlarge">
+					{ID}
+			</select>
+		</div>
+        <div class="item_requerid">Medida</div>
+        <div class="form_requerid">
+			<select name="CODIGO_UNIDAD" id="CODIGO_UNIDAD" class="chzn-select input-xlarge">
+					{NAME}
+					{name}
+			</select>
+		</div>
+		<div class="item_requerid">Cantidad</div>
+        <div class="form_requerid">
+			<input type="text" name="CANTIDAD" id="CANTIDAD" class="input-mini">
+		</div>
+        <div class="form_button">
+				<input type="submit" name="enviar" id="enviar" value="Agregar">
+		</div>
+    </form>
+</div> 
+

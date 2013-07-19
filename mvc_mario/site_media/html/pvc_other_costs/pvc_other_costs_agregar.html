@@ -1,0 +1,39 @@
+<br/>
+<br/>
+<div>
+	<form id="frmrequisicion" action="{SET}" method="POST">
+        <div class="item_requerid">ID</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="ID" id="ID">
+		</div>
+        <div class="item_requerid">Nombre</div>
+        <div class="form_requerid">
+			<input type="text" name="NAME" id="NAME">
+		</div>
+		<div class="item_requerid">Valor</div>
+		<div class="form_requerid">
+			<input type="text" name="VALUE_ITEM" id="VALUE_ITEM">
+		</div>
+        <div class="item_requerid">Creado</div>
+        <div class="form_requerid">
+			<input type="text" name="CREATED_AT" id="CREATED_AT">
+		</div>
+        <div class="item_requerid">Modificado</div>
+        <div class="form_requerid">
+			<input type="text" name="UPDATED_AT" id="UPDATED_AT">
+		</div>
+		<div class="item_requerid">Calculado</div>
+        <div class="form_requerid">
+			<input type="text" name="CALCULATED" id="CALCULATED">
+		</div>
+		<div class="item_requerid">Empleado</div>
+        <div class="form_requerid">
+			<select id='COD_EMP' name='COD_EMP' class="chzn-select input-xlarge">
+				{lstempleados}
+			</select>
+		</div>
+        <div class="form_button">
+				<input type="submit" name="enviar" id="enviar" value="Agregar">
+		</div>
+    </form>
+</div> 
