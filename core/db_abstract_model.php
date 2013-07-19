@@ -385,9 +385,26 @@ public function lis2($class,$id=0,$at="0"){
 	}
 	
 	#Crea Objetos de la Entidad Solicitada, devuelve un Arreglo
-	 protected function crea_objeto($tableName='' , $condicion=array()){
+	 protected function crea_objeto($tablesNames=array() , $joinstables=array(), $condicion=array()){
 		$this->rows = array();
-		$sizecondicion=count($condicion);
+		if(count($joinstables) > 0){
+			$tablesjoins =  implode(' AND ',$joinstables); 
+		}
+		if(count($tablesNames) > 1){
+			if(count($condicion) > 0){
+				$criterios = implode(' AND ', $condicion );
+				$this->query="SELECT * FROM ". implode(',',$tablesNames) . " WHERE ". $tablesjoins ." " . $criterios ;
+			}else{
+				$this->query="SELECT * FROM ". implode(',',$tablesNames) . " WHERE ". $tablesjoins ;
+			}
+		}else{
+			$this->query="SELECT * FROM ". implode(',',$tablesNames) ;
+		}
+		
+		$this->get_results_from_query();
+		
+		return $this->rows;
+		/*$sizecondicion=count($condicion);
 		$i=1;
 		if($sizecondicion > 0){
 			foreach ($condicion as $clave=>$valor){
@@ -398,14 +415,10 @@ public function lis2($class,$id=0,$at="0"){
 				}
 				$i++;
 			}
-			$this->query="SELECT * FROM ". $tableName . " WHERE ". $condi;
+			$this->query="SELECT * FROM ". implode(',',$tablesNames) . " WHERE ". . " ". ;
 		}else{
-			$this->query="SELECT * FROM ". $tableName ;
-		}
-		
-		$this->get_results_from_query();
-		
-		return $this->rows;
+			$this->query="SELECT * FROM ". implode(',',$tablesNames)  ;
+		}*/
 	}
 
 	#Devuelve Una Llave para condicionar en una consulta
