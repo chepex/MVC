@@ -1,0 +1,2 @@
+RewriteEngine on
+RewriteRule ^/webcaricia/caricia/181x/usuarios/ usuarios/controller.php

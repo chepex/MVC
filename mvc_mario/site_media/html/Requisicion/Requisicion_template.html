@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=charset=ISO-8859-1">
+<link rel="stylesheet" type="text/css" href="../site_media/css/base_template.css">
+<link rel='stylesheet' type='text/css' href='../site_media/css/bootstrap/css/bootstrap.css'/>
+<link rel="stylesheet" href="../site_media/css/demo_table.css" />
+<link rel="stylesheet" media="all" type="text/css" href="../site_media/css/jquery-ui.css" />
+<link rel="stylesheet" media="all" type="text/css" href="../site_media/css/jquery-ui-timepicker-addon.css" />
+<link rel="stylesheet" href="../site_media/css/chosen/chosen.css" />
+<style type="text/css" title="currentStyle">
+    @import "../site_media/css/demo1_table_jui.css";   
+</style>
+
+<script src="../site_media/js/jquery.js"></script>
+<script src="../site_media/js/chosen/chosen.jquery.js"></script>
+<script src="../site_media/js/jquery.dataTables.js"></script>	
+<script type="text/javascript" src="../site_media/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../site_media/js/jquery-ui-timepicker-addon.js"></script>
+<title>Requisiciones de Compras: {subtitulo}</title>
+</head>
+
+<body>
+<div id="cabecera">
+    <h3>Administrador de Requisiciones</h3>
+</div>
+<div id="menu">
+	<a href="../compras/controller_Requisicion.php?act=get_all" title="Listar Requisiciones">Listar Requisiciones</a>
+    <a href="../compras/controller_Requisicion.php?act=set" title="Nuevo Requisicion">Agregar Requisicion</a>
+    <a href="../compras/controller_Requisicion.php?act=get" title="Buscar Requisicion">Buscar/editar Requisicion</a>
+    <a href="../compras/controller_Requisicion.php?act=delete" title="Borrar Requisicion">Borrar Requisicion</a>
+</div>
+<div id="mensaje" style='display:none;'>
+    {mensaje}
+</div>
+<br/>
+<div id="formulario">
+	<fieldset>Encabezado Requisici&oacute;n</fieldset>
+    {formulario}
+</div>
+<div id="formulario">
+	<fieldset>Detalle Requisici&oacute;n</fieldset>
+    {formulario_details}
+</div>
+</body>
+
+</html>
+<script>
+	$(".chzn-select").chosen();
+	
+	if ($("#mensaje").html().length > 20){
+		$("#mensaje").show("slow").delay(3000).hide("slow");
+	}
+	else{
+		$("#mensaje").hide();   
+	}
+</script> 
+
