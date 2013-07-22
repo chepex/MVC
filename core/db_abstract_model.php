@@ -10,7 +10,7 @@ abstract class DBAbstractModel {
 	private static $db_host = '192.168.10.235';
 	private static $db_user = 'MMIXCO';
 	private static $db_pass = 'MARIO13';
-	public $debug = true;	
+	public $debug = false;	
     private static $db_name = 'DESA';
     protected $query;
     protected $rows = array();
@@ -377,48 +377,50 @@ public function lis2($class,$id=0,$at="0"){
 	}
 	
 	#Devuelve un String con la lista de options para un select html
-	 protected function get_htmloptions($Arraylist=array()){
+	 public function get_htmloptions($Arraylist=array()){
 		foreach($Arraylist as $fila=>$valor){
 			$html .= "<option value='".$Arraylist[$fila][0]."'> ".$Arraylist[$fila][0]." | ".$Arraylist[$fila][1]."</option>";
 		}
 		return $html;
 	}
 	
-	#Crea Objetos de la Entidad Solicitada, devuelve un Arreglo
-	 protected function crea_objeto($tablesNames=array() , $joinstables=array(), $condicion=array()){
+	#Crea Objetos Devuelve Un Arreglo de la Tablas o Tablas Solicitadas
+	#Fecha: 22/07/2013 Añadio: Daniel Romero
+	#Funcion creada con objetivo Retornar Registro en caso de no existir Modelo
+	#@parametros
+	#$tablesNames array() : Nombre de Tabla o Tablas Requeridas
+	#$joinstables array() : Si se envia Mas de Una Tabla debe enviarse las uniones
+	#$condicion array() : Condiciones para la obtencion del Registro, vacio los devuelve todos
+	#$campos array(): Lista de Campos solicitados, si esta vacio los devuelve todos
+	 public function crea_objeto($tablesNames=array() , $joinstables=array(), $condicion=array(), $campos=array()){
 		$this->rows = array();
+		if(count($campos) > 0){
+			$fields = implode(', ',$campos);
+		}else{
+			$fields=" * ";
+		}
 		if(count($joinstables) > 0){
 			$tablesjoins =  implode(' AND ',$joinstables); 
 		}
 		if(count($tablesNames) > 1){
 			if(count($condicion) > 0){
-				$criterios = implode(' AND ', $condicion );
-				$this->query="SELECT * FROM ". implode(',',$tablesNames) . " WHERE ". $tablesjoins ." " . $criterios ;
+				$criterios = implode(' AND ', $condicion);
+				$this->query="SELECT ".$fields." FROM ". implode(',',$tablesNames) . " WHERE ". $tablesjoins ." " . $criterios;
 			}else{
-				$this->query="SELECT * FROM ". implode(',',$tablesNames) . " WHERE ". $tablesjoins ;
+				$this->query="SELECT ".$fields." FROM ". implode(',',$tablesNames) . " WHERE ". $tablesjoins ;
 			}
 		}else{
-			$this->query="SELECT * FROM ". implode(',',$tablesNames) ;
+			if(count($condicion) > 0){
+				$criterios = implode(' AND ', $condicion);
+				$this->query="SELECT ".$fields." FROM ". implode(',',$tablesNames) . " WHERE ".$criterios;
+			}else{
+				$this->query="SELECT ".$fields." FROM ". implode(',',$tablesNames) ;
+			}
 		}
 		
 		$this->get_results_from_query();
 		
 		return $this->rows;
-		/*$sizecondicion=count($condicion);
-		$i=1;
-		if($sizecondicion > 0){
-			foreach ($condicion as $clave=>$valor){
-				if($sizecondicion != $i){
-					$condi .= $clave . " = " . $valor ." AND ";
-				}else{
-					$condi .= $clave . " = " . $valor ;
-				}
-				$i++;
-			}
-			$this->query="SELECT * FROM ". implode(',',$tablesNames) . " WHERE ". . " ". ;
-		}else{
-			$this->query="SELECT * FROM ". implode(',',$tablesNames)  ;
-		}*/
 	}
 
 	#Devuelve Una Llave para condicionar en una consulta

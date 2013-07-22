@@ -112,18 +112,17 @@ class controller_Requisicion extends Requisicion{
 		$parametros_data = $this->helper_parametros_data();
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$objciau = $parametros->crea_objeto(array("CIAS_X_USUARIO"), array("USUARIO"=> "'".$_SESSION['usuario']."'"));
-		$objemp = $parametros->crea_objeto(array("VWEMPLEADOS"), array("COD_EMP"=> $objciau[0]["COD_EMP"]));
-        $objdepto = $parametros->crea_objeto(array("DEPARTAMENTOS"), array("COD_DEPTO"=> $objemp[0]["COD_DEPTO"]));
-        $lstdptos = $parametros->get_lsoption("DEPARTAMENTOS", array("COD_DEPTO"=>"","NOM_DEPTO"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "COD_DEPTO"=>$objemp[0]['COD_DEPTO']));
+		$objciau = $parametros->crea_objeto(array("CIAS_X_USUARIO"), "", array("USUARIO='".$_SESSION['usuario']."'"));
+		$objemp = $parametros->crea_objeto(array("VWEMPLEADOS"), "",array("COD_EMP=". $objciau[0]["COD_EMP"]));
+        $objdepto = $parametros->crea_objeto(array("DEPARTAMENTOS"), "",array("COD_DEPTO=". $objemp[0]["COD_DEPTO"]));
+		$objunidamedida1 = $parametros->crea_objeto(array("UNIDADES"),"",array("1=1"),array("CODIGO_UNIDAD","DESCRIPCION"));
+		$objunidamedida2 = $parametros->crea_objeto(array("UNIDADES u","EQUIVALENCIAS e"),array("u.CODIGO_UNIDAD = e.CODIGO_EQUIVALENCIA"),"",array("e.CODIGO_UNIDAD","u.DESCRIPCION"));
+		$obunidadesmedidas= array_merge($objunidamedida1,$objunidamedida2);
+		$lstdptos = $parametros->get_lsoption("DEPARTAMENTOS", array("COD_DEPTO"=>"","NOM_DEPTO"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "COD_DEPTO"=>$objemp[0]['COD_DEPTO']));
         $lstempelado = $parametros->get_lsoption("VWEMPLEADOS", array("COD_EMP"=>"","NOMBRE_ISSS"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "STATUS"=>"'A'", "COD_DEPTO"=>$objemp[0]['COD_DEPTO']));
         $lstcategorias = $parametros->get_lsoption("CATEGORIAS", array("COD_CAT"=>"","NOM_CAT"=>""), array("COD_CIA"=>$_SESSION['cod_cia']));
         $lstproyectos =  $parametros->get_lsoption("PROYECTO", array("PROYECTO"=>"","NOMBRE"=>""), array("COD_CIA"=>$_SESSION['cod_cia'],"PROYECTO"=> "'".$objdepto[0]['PROYECTO']."'"));
-       $MARRAY= array("COD_CAT","NOM_CAT");
-       echo"<pre>";
-		print_r($MARRAY);
-		echo"</pre>";
-        //$lstunidamedida1 = $parametros->crea_objeto(array("")
+		$lstunidades = $parametros->get_htmloptions($obunidadesmedidas);
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['agregar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('agregar',get_class($parametros)), $obvista->html);
@@ -136,6 +135,7 @@ class controller_Requisicion extends Requisicion{
 		$obvista->html = str_replace('{descia}', $_SESSION['nom_cia'] , $obvista->html);
 		$obvista->html = str_replace('{anio}', date('Y') , $obvista->html);
 		$obvista->html = str_replace('{mensaje}', ' ', $obvista->html);
+		$obvista->html = str_replace('{lstunimedida}', $lstunidades , $obvista->html);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
 		$obvista->retornar_vista();
