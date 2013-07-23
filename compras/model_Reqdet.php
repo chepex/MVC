@@ -7,46 +7,44 @@ error_reporting(E_ALL);
 require_once('../core/db_abstract_model.php');
 
 
-class Requisicion extends DBAbstractModel {
+class Reqdet extends DBAbstractModel {
 
 
 
     ############################### PROPIEDADES ################################
     public $COD_CIA;
-    protected $NUM_REQ;
-    public $CODDEPTO_SOL;
-    public $EMP_SOL;
-    public $COD_EMP_ELAB;
-    public $OBSERVACIONES;
-    public $PROYECTO;
-    public $AUTORIZADO_POR;
-    public $FECHA_AUTORIZADO;
+    public $NUM_REQ;
     public $ANIO;
-    public $STATUS;
-    public $CODIGO_GRUPO;
-    public $USUARIO;
-    public $FECHA_ING;
-    public $NO_FORMULARIO;
-    public $COD_CAT;
-    public $TIPO_REQ;
-    public $COMENT_COMPRAS;
+    public $COD_PROD;
+    public $NOMBRE;
+    public $CODIGO_UNIDAD;
+    public $CANTIDAD;  
     public $CREATED_AT;
     public $UPDATED_AT;
-    
-    
 
     ############################### ATRIBUTOS ################################
         public function atributos()
     {
-        $masx= array('COD_CIA','NUM_REQ','CODDEPTO_SOL','EMP_SOL','COD_EMP_ELAB','OBSERVACIONES','PROYECTO','AUTORIZADO_POR','FECHA_AUTORIZADO','ANIO','STATUS','CODIGO_GRUPO','USUARIO','FECHA_ING','NO_FORMULARIO','COD_CAT','TIPO_REQ','COMENT_COMPRAS','CREATED_AT','UPDATED_AT');
+        $masx= array('COD_CIA','NUM_REQ','ANIO','COD_PROD','NOMBRE','CODIGO_UNIDAD','CANTIDAD','CREATED_AT','UPDATED_AT');
         $masx=implode($masx, ",");
         return $masx;
+    }
+    
+    public function relaciones(){
+         $masx ="AND ".$this->tableName().".COD_CIA = PRODUCTOS.COD_CIA
+                 AND ".$this->tableName().".COD_PROD = PRODUCTOS.COD_PROD";
+         return $masx;                
+    }
+
+    public function relacione_tablas(){
+         $masx= 'PRODUCTOS';
+         return $masx;                
     }
 
 
         public function tableName()
     {
-        return 'Requisicion';
+        return 'Reqdet';
     }
     
     public function Modulo()
@@ -57,16 +55,9 @@ class Requisicion extends DBAbstractModel {
 
     public function llave()
     {
-        return array('COD_CIA','NUM_REQ','ANIO');
+        return array('COD_CIA','NUM_REQ','ANIO','COD_PROD');
 
     }
-
-    public function has_many()
-    {
-        return array('ID');
-
-    }
-
 
     ################################# MÉTODOS ##################################
     # Traer datos de un Requisicion

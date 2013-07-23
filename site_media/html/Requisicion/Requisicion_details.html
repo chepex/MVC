@@ -1,7 +1,7 @@
 <br/>
 <br/>
 <div>
-	<form id="frmrequisicion" action="{SET}" method="POST">
+	<form id="frmrequisiciondet" action="{SET}" method="POST">
         <div class="item_requerid">Producto</div>
         <div class="form_requerid">
 			<select name="COD_PROD" id="COD_PROD" class="chzn-select input-xxlarge">
@@ -19,8 +19,32 @@
 			<input type="text" name="CANTIDAD" id="CANTIDAD" class="input-mini">
 		</div>
         <div class="form_button">
-				<input type="submit" name="enviar" id="enviar" value="Agregar">
+				<input type="submit" name="enviar" id="btn-savedet" value="Agregar">
 		</div>
     </form>
 </div> 
+<div id="formulariox">
+	
+</div>
+<script>
+$("#btn-savedet").click(function(){
+		$.ajax({
+				url : 'controller_Reqdet.php?' + $("#frmrequisiciondet").serialize() + '&' + $("#frmrequisicion").serialize() ,     
+				data : { act : 'insert' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$('#formulariox').fadeIn("slow").html(resp);
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	      	  	});
+		return false;
+});
+</script>
 

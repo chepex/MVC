@@ -3,10 +3,9 @@
 
 error_reporting(E_ALL);
 ini_set("display_errors", 0);
-require_once('model_Requisicion.php');
 require_once('model_Reqdet.php');
 require_once('../core/render_view_generic.php');
-class controller_Requisicion extends Requisicion{
+class controller_Reqdet extends Reqdet{
 	
 	protected $diccionario = array(
 		'subtitle'=>array('agregar'=>'Crear Nueva Requisicion',
@@ -41,7 +40,7 @@ class controller_Requisicion extends Requisicion{
 			}
 			$peticiones = array('set', 'get', 'delete', 'edit',
                         'agregar', 'buscar', 'borrar', 
-                        'update','get_all','listar','insert','get_ajax');
+                        'update','get_all','listar','insert');
 			foreach ($peticiones as $peticion) {
 				if( $uri == $peticion)  {
 					$event = $peticion;
@@ -72,7 +71,7 @@ class controller_Requisicion extends Requisicion{
 				break;
 			case 'insert':
 				$this->insert();
-				//$this->set();
+				$this->set();
 				//$this->get_all($this->msg);
 				break;	
 			case 'get_all':
@@ -83,43 +82,15 @@ class controller_Requisicion extends Requisicion{
 				break;
 		}
 	}
-	
-	/*public function helper_parametros_data() {
-		$parametros_data = array();
-		if(isset($_REQUEST)) {
-			if(array_key_exists('NUM_REQ', $_REQUEST)) { 
-				$parametros_data['NUM_REQ'] = $_REQUEST['NUM_REQ']; 
-			}
-			if(array_key_exists('COD_CIA', $_REQUEST)) { 
-				$parametros_data['COD_CIA'] = $_REQUEST['COD_CIA']; 
-			}
-			if(array_key_exists('ANIO', $_REQUEST)) { 
-				$parametros_data['ANIO'] = $_REQUEST['ANIO']; 
-			}
-		} else if($_REQUEST) {
-			if(array_key_exists('NUM_REQ', $_REQUEST)) {
-				$parametros_data = $_REQUEST['NUM_REQ'];
-			}
-		}
-		// print_r( $requisicion_data);
-		return $parametros_data;
-	}*/
 
 	public function set_obj() {
-		$obj = new Requisicion();
-		return $obj;
-	}
-	
-	public function set_obj_details() {
 		$obj = new Reqdet();
 		return $obj;
 	}
 	
 	public function set(){
-		//$parametros_data = $this->helper_parametros_data();
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$nre=$parametros->get_correl_key('REQUISICION',array("COD_CIA=".$_SESSION['cod_cia'],"ANIO=".date('Y')),"NUM_REQ");
 		$objciau = $parametros->crea_objeto(array("CIAS_X_USUARIO"), "", array("USUARIO='".$_SESSION['usuario']."'"));
 		$objemp = $parametros->crea_objeto(array("VWEMPLEADOS"), "",array("COD_EMP=". $objciau[0]["COD_EMP"]));
         $objdepto = $parametros->crea_objeto(array("DEPARTAMENTOS"), "",array("COD_DEPTO=". $objemp[0]["COD_DEPTO"]));
@@ -134,13 +105,12 @@ class controller_Requisicion extends Requisicion{
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['agregar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('agregar',get_class($parametros)), $obvista->html);
-		$obvista->html = str_replace('{formulario_details}', $obvista->get_template('details',get_class($parametros)), $obvista->html); 
+		//$obvista->html = str_replace('{formulario_details}', $obvista->get_template('details',get_class($parametros)), $obvista->html); 
 		$obvista->html = str_replace('{lstemp}', $lstempelado , $obvista->html); 
 		$obvista->html = str_replace('{lstdepto}', $lstdptos , $obvista->html);
 		$obvista->html = str_replace('{lstcategorias}', $lstcategorias , $obvista->html);
 		$obvista->html = str_replace('{lstproyecto}',$lstproyectos , $obvista->html);
 		$obvista->html = str_replace('{codcia}', $_SESSION['cod_cia'] , $obvista->html);
-		$obvista->html = str_replace('{NUM_REQ}', $nre[0][0] , $obvista->html);
 		$obvista->html = str_replace('{descia}', $_SESSION['nom_cia'] , $obvista->html);
 		$obvista->html = str_replace('{anio}', date('Y') , $obvista->html);
 		$obvista->html = str_replace('{mensaje}', ' ', $obvista->html);
@@ -151,7 +121,6 @@ class controller_Requisicion extends Requisicion{
 	}
 	
 	public function get(){
-		//$parametros_data = $this->helper_parametros_data();
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
 		
@@ -161,7 +130,7 @@ class controller_Requisicion extends Requisicion{
 	}
 	
 	public function delete(){
-		//$parametros_data = $this->helper_parametros_data();
+		$parametros_data = $this->helper_parametros_data();
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
 		$parametros->delete('pvc_other_costs',$parametros_data);
@@ -169,7 +138,6 @@ class controller_Requisicion extends Requisicion{
 	}
 	
 	public function update(){
-		//$parametros_data = $this->helper_parametros_data();
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
 		
@@ -186,7 +154,6 @@ class controller_Requisicion extends Requisicion{
 	}
 	
 	public function edit(){
-	//	$parametros_data = $this->helper_parametros_data();
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
 		$parametros->update(get_class($parametros));
@@ -195,31 +162,15 @@ class controller_Requisicion extends Requisicion{
 	
 	public function insert(){
 		$parametros = $this->set_obj();
-		$detailsReq = $this->set_obj_details();
-		$objciasxu = $parametros->crea_objeto(array("CIAS_X_USUARIO"),"",array("USUARIO='".$_SESSION['usuario']."'"));
-		$_REQUEST['COD_EMP_ELAB']= $objciasxu[0]["COD_EMP"];
-		$_REQUEST['AUTORIZADO_POR']= 'NULL';
-		$_REQUEST['FECHA_AUTORIZADO']= 'NULL';
-		$_REQUEST['STATUS']= 'G';
-		$_REQUEST['CODIGO_GRUPO']= 'NULL';
-		$_REQUEST['USUARIO']= $_SESSION['usuario'];
-		$_REQUEST['FECHA_ING']= 'SYSDATE';
-		$_REQUEST['NO_FORMULARIO']= 'NULL';
-		$_REQUEST['COMENT_COMPRAS']= 'NULL';
-		$_REQUEST['CREATED_AT']= SYSDATE;
-		$_REQUEST['UPDATED_AT']= SYSDATE;
 		$parametros->save(get_class($parametros));
-		//$detailsReq->save(get_class($detailsReq));
-		$this->msg=$detailsReq->mensaje;
+		$this->msg = $parametros->mensaje;
+	
 	}
 	
 	public function get_all($mensaje=''){
-		//$parametros_data = $this->helper_parametros_data();
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$_REQUEST["COD_CIA"] = $_SESSION['cod_cia']; 
-		$_REQUEST["ANIO"] = date('Y');//2012;
-		$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','COMENT_COMPRAS');
+		$mcampos = array('COD_CIA','NUM_REQ','COD_PROD','CANTIDAD','PROYECTO','ANIO','COD_CAT','TIPO_REQ','COMENT_COMPRAS');
         $masx=implode($mcampos, ",");
 		$data = $parametros->lis(get_class($parametros), 1, $masx);
 		$rendertable = $parametros->render_table_crud(get_class($parametros));
@@ -234,26 +185,14 @@ class controller_Requisicion extends Requisicion{
 	}
 	
 	public function get_ajax(){
-		$parametros = $this->set_obj();
-		if($_REQUEST['opt']=="COD_CAT"){
-				$lstproducto = $parametros->get_lsoption("PRODUCTOS", array("COD_PROD"=>"","NOMBRE"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "COD_CAT"=>"'".$_REQUEST['data']."'"));
-		}
-		if($_REQUEST['opt']=="COD_PROD"){
-				$lstproducto = $parametros->get_lsoption("PRODUCTOS", array("COD_PROD"=>"","NOMBRE"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "COD_CAT"=>"'".$_REQUEST['data']."'"));
-		}
-		
 		echo $lstproducto;
 	}
 
 }
-$objecon =  new controller_Requisicion();
-$objecon->handler();
-/*$objecon =  new controller_Requisicion();
-if(!isset($_REQUEST['get_ajax'])){
+
+$objecon =  new controller_Reqdet();
 	$objecon->handler();
-}else{
-	$objecon->handler($_REQUEST['get_ajax']);
-}*/
+
 
 
 
