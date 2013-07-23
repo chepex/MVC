@@ -19,7 +19,7 @@ class controller_Requisicion extends Requisicion{
 						'VIEW_EDIT_USER'=>'compras/controller_requisicion.php?act=modificar',
 						'VIEW_DELETE_USER'=>'compras/controller_requisicion.php?act=borrar'),
 		'form_actions'=>array(
-							'SET'=>'../compras/controller_requisicion.php?act=insert',
+							'SET'=>'../compras/controller_Requisicion.php?act=insert',
 							'GET'=>'../compras/controller_requisicion.php',
         'DELETE'=>'../compras/controller_requisicion.php?act=delete',
         'EDIT'=>'../compras/controller_requisicion.php?act=edit',
@@ -126,7 +126,7 @@ class controller_Requisicion extends Requisicion{
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['agregar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('agregar',get_class($parametros)), $obvista->html);
-		$obvista->html = str_replace('{formulario_details}', $obvista->get_template('details',get_class($parametros)), $obvista->html); 
+		//$obvista->html = str_replace('{formulario_details}', $obvista->get_template('details',get_class($parametros)), $obvista->html); 
 		$obvista->html = str_replace('{lstemp}', $lstempelado , $obvista->html); 
 		$obvista->html = str_replace('{lstdepto}', $lstdptos , $obvista->html);
 		$obvista->html = str_replace('{lstcategorias}', $lstcategorias , $obvista->html);
@@ -188,7 +188,20 @@ class controller_Requisicion extends Requisicion{
 		$parametros_data = $this->helper_parametros_data();
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		
+		$objciasxu = $parametros->crea_objeto(array("CIAS_X_USUARIO"),"",array("USUARIO='".$_SESSION['usuario']."'"));
+		$nre=$parametros->get_correl_key('REQUISICION',array("COD_CIA=".$_SESSION['cod_cia'],"ANIO=".date('Y')),"NUM_REQ");
+		$_REQUEST['NUM_REQ']= $nre[0][0];
+		$_REQUEST['COD_EMP_ELAB']= $objciasxu[0]["COD_EMP"];
+		$_REQUEST['AUTORIZADO_POR']= 'NULL';
+		$_REQUEST['FECHA_AUTORIZADO']= 'NULL';
+		$_REQUEST['STATUS']= 'G';
+		$_REQUEST['CODIGO_GRUPO']= 'NULL';
+		$_REQUEST['USUARIO']= "".$_SESSION['usuario']."";
+		$_REQUEST['FECHA_ING']= 'SYSDATE';
+		$_REQUEST['NO_FORMULARIO']= 'NULL';
+		$_REQUEST['COMENT_COMPRAS']= 'NULL';
+		$_REQUEST['CREATED_AT']= SYSDATE;
+		$_REQUEST['UPDATED_AT']= SYSDATE;
 		$parametros->save(get_class($parametros));
 		$this->msg=$parametros->mensaje;
 	

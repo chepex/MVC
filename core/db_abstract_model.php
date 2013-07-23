@@ -236,7 +236,7 @@ public function lis2($class,$id=0,$at="0"){
 		$campos =$cl->atributos();
 		$lista = explode(',', $campos);
 		for($i=0;$i<count($lista);$i++){			
-			$array[$i]="'".$_REQUEST[$lista[$i]]."'";
+			$array[$i]= $_REQUEST[$lista[$i]] == 'SYSDATE' || $_REQUEST[$lista[$i]] == 'NULL' ? $_REQUEST[$lista[$i]] : "'".$_REQUEST[$lista[$i]]."'" ;
 		}
 		
 			$xx=implode(",", $array);
@@ -324,16 +324,18 @@ public function lis2($class,$id=0,$at="0"){
 
 	#Devuelve el correlativo de la Tabla Solicitada
 	 protected function get_correl_key($table='', $compuestkey=array(), $fieldmax=''){
+		$this->rows = array();
 		$sizearray = count($compuestkey);
 		$i=1;
-		foreach ($compuestkey as $clave=>$valor){
+		$condicion= implode(" AND ", $compuestkey);
+		/*foreach ($compuestkey as $clave=>$valor){
 			if($sizearray != $i){
 				$condicion .= $clave . " = " . $valor ." AND ";
 			}else{
 				$condicion .= $clave . " = " . $valor ;
 			}
 			$i++;
-		}
+		}*/
 		$this->query="SELECT 
 							nvl(MAX(to_number(".$fieldmax.")),0) + 1  as nexval
 					   FROM ". $table ." 

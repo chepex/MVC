@@ -65,6 +65,15 @@ body {
     clear: left;
     text-align: right;
 }
+.item_requerid_textarea {
+    width: 150px;
+    height: 68px;
+    padding-right: 4px;
+    font-weight: bold;
+    float: left;
+    clear: left;
+    text-align: right;
+}
 
 .form_requerid {
     height: 30px;

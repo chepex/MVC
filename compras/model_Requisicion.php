@@ -34,7 +34,7 @@ class Requisicion extends DBAbstractModel {
     ############################### ATRIBUTOS ################################
         public function atributos()
     {
-        $masx= array('COD_CIA','NUM_REQ','CODDEPTO_SOL','COD_EMP_ELAB','OBSERVACIONES','PROYECTO','AUTORIZADO_POR','FECHA_AUTORIZADO','ANIO','STATUS','USUARIO','FECHA_ING','NO_FORMULARIO','COD_CAT','TIPO_REQ','COMENT_COMPRAS');
+        $masx= array('COD_CIA','NUM_REQ','CODDEPTO_SOL','EMP_SOL','COD_EMP_ELAB','OBSERVACIONES','PROYECTO','AUTORIZADO_POR','FECHA_AUTORIZADO','ANIO','STATUS','CODIGO_GRUPO','USUARIO','FECHA_ING','NO_FORMULARIO','COD_CAT','TIPO_REQ','COMENT_COMPRAS','CREATED_AT','UPDATED_AT');
         $masx=implode($masx, ",");
         return $masx;
     }
