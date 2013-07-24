@@ -10,7 +10,7 @@ abstract class DBAbstractModel {
 	private static $db_host = '192.168.10.235';
 	private static $db_user = 'MMIXCO';
 	private static $db_pass = 'MARIO13';
-	public $debug = true;	
+	public $debug = false;	
     private static $db_name = 'DESA';
     protected $query;
     protected $rows = array();
@@ -102,7 +102,11 @@ public function lis2($class,$id=0,$at="0"){
 		if($id==2){
 			$campos2 = explode(',',$campos);		
 			$where = " WHERE ". $this->get_fields($campos2);		
-		} 	
+		}
+		if($id==3){
+			$foreignkey = $cl->foreignkey();
+			$where = " WHERE ". $this->get_key($foreignkey,$tabla);
+		}	 	
 		if($_REQUEST["filtro"]=="")$_REQUEST["filtro"]=1;
 		if($_REQUEST["filtro"]>0){
 			if ($_REQUEST["filtro"]==1){
@@ -160,7 +164,8 @@ public function lis2($class,$id=0,$at="0"){
 	#Ejecutar un select 
 	# OPCION 0  SIN FILTROS
 	# OPCION 1 FILTRO DE CAMPOS DE LLAVE PRIMARIA
-	# OPCION 2 FILTRA POR LOS CAMPOS ENVIADOS	
+	# OPCION 2 FILTRA POR LOS CAMPOS ENVIADOS
+	# OPCION 3 FILTRA POR LOS CAMPOS FORANEOS DE LA TABLA	
 	public function lis($class,$id=0,$at="0"){
 
 		$this->open_connection(); 		
@@ -182,7 +187,11 @@ public function lis2($class,$id=0,$at="0"){
 			$campos2 = explode(',',$campos);		
 			$where = " WHERE ". $this->get_fields($campos2);
 		
-		} 	
+		} 
+		if($id==3){
+			$foreignkey = $cl->foreignkey();
+			$where = " WHERE ". $this->get_key($foreignkey);
+		}	
 		if($_REQUEST["filtro"]=="")$_REQUEST["filtro"]=1;
 		if($_REQUEST["filtro"]>0){
 			if ($_REQUEST["filtro"]==1){
@@ -426,10 +435,14 @@ public function lis2($class,$id=0,$at="0"){
 	}
 
 	#Devuelve Una Llave para condicionar en una consulta
-	protected function get_key($compuestkey){
+	protected function get_key($compuestkey,$tablename=''){
 	 	 foreach ($compuestkey as $clave){
 			if(isset($_REQUEST[$clave])){
-				$condicion[]=$clave." =".$_REQUEST[$clave];
+				if(empty($tablename)){
+					$condicion[]=$clave." =".$_REQUEST[$clave];
+				}else{
+					$condicion[]=$tablename.".".$clave." =".$_REQUEST[$clave];
+				}
 			}
 	 	 }
 		 $campos= implode(' AND ',$condicion);	 	
@@ -437,13 +450,16 @@ public function lis2($class,$id=0,$at="0"){
 	}	
 	
 	#Devuelve Una Llave para condicionar en una consulta
-	protected function get_fields($compuestkey){
+	protected function get_fields($compuestkey,$tablename=''){
 	
 	 	 foreach ($compuestkey as $clave){
 	
 			if(isset($_REQUEST[$clave])){
-	
-				$condicion[]=$clave." =".$_REQUEST[$clave];
+				if(empty($tablename)){
+					$condicion[]=$clave." =".$_REQUEST[$clave];
+				}else{
+					$condicion[]=$tablename.".".$clave." =".$_REQUEST[$clave];
+				}
 			}
 	 	 }
 		 $campos= implode(' AND ',$condicion);	 	

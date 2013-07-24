@@ -34,7 +34,7 @@ $("#btn-savedet").click(function(){
 				type : 'POST',     
 				success : 
 						function(resp) {
-							$('#formulariox').fadeIn("slow").html(resp);
+							$('#formulariox').fadeOut("slow").fadeIn("slow").html(resp);
 						},
 				error : 
 						function(xhr, status) {

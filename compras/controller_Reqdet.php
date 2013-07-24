@@ -71,8 +71,8 @@ class controller_Reqdet extends Reqdet{
 				break;
 			case 'insert':
 				$this->insert();
-				$this->set();
-				//$this->get_all($this->msg);
+				//$this->set();
+				$this->get_all($this->msg);
 				break;	
 			case 'get_all':
 				$this->get_all();
@@ -168,17 +168,14 @@ class controller_Reqdet extends Reqdet{
 	}
 	
 	public function get_all($mensaje=''){
+		$_REQUEST["filtro"]='NO';
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$mcampos = array('COD_CIA','NUM_REQ','COD_PROD','CANTIDAD','PROYECTO','ANIO','COD_CAT','TIPO_REQ','COMENT_COMPRAS');
+		$mcampos = array($parametros->tableName().'.NUM_REQ',$parametros->tableName().'.COD_PROD', 'PRODUCTOS.NOMBRE',$parametros->tableName().'.CANTIDAD');
         $masx=implode($mcampos, ",");
-		$data = $parametros->lis(get_class($parametros), 1, $masx);
+		$data = $parametros->lis2(get_class($parametros), 3, $masx);
 		$rendertable = $parametros->render_table_crud(get_class($parametros));
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html);  
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
+		$obvista->html = $obvista->get_template('listar',get_class($parametros)); 
 		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
 		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
 		$obvista->retornar_vista();

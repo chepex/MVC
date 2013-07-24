@@ -58,6 +58,9 @@ class Reqdet extends DBAbstractModel {
         return array('COD_CIA','NUM_REQ','ANIO','COD_PROD');
 
     }
+    public function foreignkey(){
+		return array('COD_CIA','NUM_REQ','ANIO');
+	}
 
     ################################# MÉTODOS ##################################
     # Traer datos de un Requisicion
