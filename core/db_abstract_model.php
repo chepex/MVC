@@ -10,7 +10,7 @@ abstract class DBAbstractModel {
 	private static $db_host = '192.168.10.235';
 	private static $db_user = 'MMIXCO';
 	private static $db_pass = 'MARIO13';
-	public $debug = false;	
+	public $debug = true;	
     private static $db_name = 'DESA';
     protected $query;
     protected $rows = array();
@@ -319,15 +319,15 @@ public function lis2($class,$id=0,$at="0"){
 				
 			}	
             $html .= "<td>						
-                        <a class= 'btn-del btn btn-small btn-danger' type= 'button' href='../".$cl->Modulo()."/controller_".$class.".php?act=delete&".$this->getkey_str_url($llave, $this->rows, $fila)."'><i title = 'Eliminar' class='icon-trash'></i></a>
-                        <a class= 'btn-upd btn btn-small' type= 'button' href='../".$cl->Modulo()."/controller_".$class.".php?act=update&".$this->getkey_str_url($llave, $this->rows, $fila)."'> <i title = 'Actualizar' class='icon-pencil'></i></a>
-                        <a class= 'btn-vie btn btn-small' type= 'button' href='../".$cl->Modulo()."/controller_".$class.".php?act=view&".$this->getkey_str_url($llave, $this->rows, $fila)."'> <i title = 'Ver' class='icon-eye-open'></i></a>
+                        <a class= 'btn-del btn btn-small btn-danger' type= 'button' href='../".$cl->Modulo()."/?ctl=controller_".$class."&act=delete&".$this->getkey_str_url($llave, $this->rows, $fila)."'><i title = 'Eliminar' class='icon-trash'></i></a>
+                        <a class= 'btn-upd btn btn-small' type= 'button' href='../".$cl->Modulo()."/?ctl=controller_".$class."&act=update&".$this->getkey_str_url($llave, $this->rows, $fila)."'> <i title = 'Actualizar' class='icon-pencil'></i></a>
+                        <a class= 'btn-vie btn btn-small' type= 'button' href='../".$cl->Modulo()."/?ctl=controller_".$class."&act=view&".$this->getkey_str_url($llave, $this->rows, $fila)."'> <i title = 'Ver' class='icon-eye-open'></i></a>
                       </td>    
 					</tr>";
 			$fila++;
 		}
 		$html.="<tbody></table>";
-		$html.="<a class= 'btn btn-primary pull-right btn' type= 'button' href='../".$cl->Modulo()."/controller_".$class.".php?act=set'>Crear</a>";
+		$html.="<a class= 'btn btn-primary pull-right btn' type= 'button' href='../".$cl->Modulo()."/?ctl=controller_".$class."&act=set'>Crear</a>";
 		return $html;
 	} 
 
@@ -486,11 +486,6 @@ public function lis2($class,$id=0,$at="0"){
 	}
 
 
-
-
-
-
-
 public function menu1()
 	{
 
@@ -565,28 +560,44 @@ $menu =  "<div class='navbar navbar-fixed-top'>
 <li>
 <a> <i class='icon-align-left' id= 'home'></i>   </a>
 </li>
-</ul>
-			<ul class='nav'>";
+
+
+";
+$x=0;
 while (!$rs->EOF) 
 		{		
 			$hijo=substr($rs->fields[1], 0, 4);
-			if($rs->fields[2]=="01"){
-				if($padre>0){
-				$menu.="</ul></li>";		
-				}
+			if($rs->fields[2]=="01"  and $x==0 ){
+				$menu.="<li class='dropdown'>
+				<a class='dropdown-toggle' data-toggle='dropdown' href='#'>
+				".$rs->fields[3] ."
+				<b class='caret'></b>
+				</a>
+				<ul class='dropdown-menu' style = >";
+
+			}
+			if($rs->fields[2]=="01" or $rs->fields[2]==$x ){
+
+				$x=$rs->fields[2];
 				
-				$menu .= "<li class='dropdown' ><a class= 'dropdown-toggle' data-toggle='dropdown' href= '".$rs->fields[4]."'>".$rs->fields[3] ." <b class='caret'></b></a>";	
-				$menu .= "<ul class='dropdown-menu' >";
-				$padre= $rs->fields[1];
+				
+				$menu .= "<li class='dropdown' >
+							<a  href= '".$rs->fields[4]."'>
+							".$rs->fields[3] ." 
+							</a>";				
+					$menu.="</li>";		
+			}else{
+				$menu.= "</ul>
+				<li class='dropdown '>
+				<a class='dropdown-toggle' data-toggle='dropdown' href='".$rs->fields[4]."'>
+				".$rs->fields[3]."
+				<b class='caret'></b>
+				</a>				
+				<ul class='dropdown-menu' style = >				
+				<li ><a padre='$$padre' hijo= '$hijo' href= '".$rs->fields[4]."'>".$rs->fields[3] ."</a></li>";
 			}
 			
-				if($padre==$hijo){
-					$menu.= "<li ><a padre='$$padre' hijo= '$hijo' href= '".$rs->fields[4]."'>".$rs->fields[3] ."</a></li>";
-
-				}else{
-						
-
-				} 			
+				 			
 			$rs->MoveNext(); 			
 		} 
 		//$menu.="</ul></li><lu class='nav pull-right'><a href='#'>Link</a></lu>";
@@ -602,6 +613,7 @@ while (!$rs->EOF)
 		return $menu;
 		
 	}	
+
 }
 
 ?>

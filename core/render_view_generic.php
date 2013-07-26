@@ -11,6 +11,12 @@ class view_Parametros extends DBAbstractModel{
 		return $template;
 	}
 	
+	public function get_grafico($nombre='barras') {
+		$file = '../site_media/html/graficos/'.$nombre.'.html';    
+		$template = file_get_contents($file);
+		return $template;
+	}
+	
 	public function render_dinamic_data($html, $data) {
 		foreach ($data as $clave=>$valor) {
 			$html = str_replace('{'.$clave.'}', $valor, $html);

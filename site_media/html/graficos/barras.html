@@ -1,0 +1,67 @@
+<script src="http://code.highcharts.com/modules/exporting.js"></script>
+
+<div id="container"></div>
+
+<script>
+$(function () {
+        $('#container').highcharts({
+            chart: {
+                type: 'spline',
+                margin: [ 50, 50, 100, 80]
+            },
+            title: {
+                text: '{titulo_grafico}'
+            },
+            xAxis: {
+                categories: [
+                    {series_x}
+                ],
+                labels: {
+                    rotation: -45,
+                    align: 'right',
+                    style: {
+                        fontSize: '13px',
+                        fontFamily: 'Verdana, sans-serif'
+                    }
+                },
+                title: {
+                    text: '{AxisX}'
+                }
+            },
+            yAxis: {
+                min: 0,
+                title: {
+                    text: '{AxisY}'
+                }
+            },
+            legend: {
+                enabled: false
+            },
+            tooltip: {
+                formatter: function() {
+                    return '<b>{popup-labelx}'+ this.x +'</b><br/>'+
+                        '{popup-labely}: '+ Highcharts.numberFormat(this.y, 1);
+                }
+            },
+            series: [{
+                name: 'Population',
+                data: [{series_y}],
+                dataLabels: {
+                    enabled: true,
+                    rotation: -90,
+                    color: '#FFFFFF',
+                    align: 'right',
+                    x: 4,
+                    y: 10,
+                    style: {
+                        fontSize: '13px',
+                        fontFamily: 'Verdana, sans-serif'
+                    }
+                }
+            }]
+        });
+    });
+    
+
+    
+</script>

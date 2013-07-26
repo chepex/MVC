@@ -1,0 +1,118 @@
+<br/>
+<br/>
+<table border='0'>
+	<tr>
+		<td style="width:40%;">
+			<div>
+	<form id="frmrequisicion" action="{SET}" method="POST">
+        <div class="item_requerid">Compa&ntilde;ia</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+		</div>
+        <div class="item_requerid">Num Req.</div>
+        <div class="form_requerid">
+			<input type="text" name="NUM_REQ" id="NUM_REQ" class="input-small" readonly="readonly" value='{NUM_REQ}'>
+			<input type="text" name="ANIO" id="ANIO" class="input-mini" value="{anio}" readonly="readonly">
+		</div>
+		<div class="item_requerid">Tipo Req.</div>
+        <div class="form_requerid">
+				<select name="TIPO_REQ" id="TIPO_REQ" class="chzn-select input-medium">
+					<option value="E">EXTERNA</option>
+					<option value="G">GLOBAL</option>
+				</select>
+		</div>
+        <div class="item_requerid">Dpto. Solic.</div>
+        <div class="form_requerid">
+				<select name="CODDEPTO_SOL" id="CODDEPTO_SOL" class="chzn-select input-xlarge">
+					{lstdepto}
+				</select>
+		</div>
+        <div class="item_requerid">Emple. Sol.</div>
+        <div class="form_requerid">
+			<select name="EMP_SOL" id="EMP_SOL" class="chzn-select input-xlarge">
+				{lstemp}
+			</select>
+		</div>
+		<div class="item_requerid">Categoria</div>
+        <div class="form_requerid">
+			<select name="COD_CAT" id="COD_CAT" class="chzn-select input-xlarge">
+				{lstcategorias}
+			</select>
+		</div>
+		<div class="item_requerid">C.C</div>
+        <div class="form_requerid">
+			<select name="PROYECTO" id="PROYECTO" class="chzn-select input-xlarge">
+				{lstproyecto}
+			</select>
+		</div>
+		<div class="item_requerid_textarea">Observaciones</div>
+		<div class="form_requerid">
+			<textarea name="OBSERVACIONES" id="OBSERVACIONES" rows='2' cols='10' maxlength='1000'></textarea>
+		</div>
+        <div class="form_button">
+				<input type="submit" name="enviar" id="btn-save-enc" value="Agregar">
+		</div>
+    </form>
+</div> 
+		</td>
+		<td style="width:60%;">
+			<div style='margin-left:50px;'>
+				{grafico}
+			</div>
+		</td>
+	</tr>
+</table>
+<script>
+	$("#btn-save-enc").click(function(){
+		$('#btn-savedet').removeAttr("disabled"); 
+		$.ajax({
+				url : 'controller_Requisicion.php?' + $("#frmrequisicion").serialize() ,     
+				data : { act : 'insert' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$('#btn-save-enc').attr("disabled", true);
+							$('#COD_CAT').attr("disabled", true);
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	      	  	});
+		return false;
+	});
+	
+	
+	$("#COD_CAT").change(function(){
+		var catid= $("#COD_CAT").val();
+		llenarproducto(catid,'COD_CAT');
+	});
+	
+	function llenarproducto(id, optdata){
+		$.ajax({
+				url : 'controller_Requisicion.php',     
+				data : { act : 'get_ajax' , data : id, opt: optdata},
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$("#COD_PROD").empty();
+							$("#COD_PROD").append(resp);	
+							$('#COD_PROD').trigger("liszt:updated");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	      	  	});
+	}
+	$(document).ready(function(){
+		$('#btn-savedet').attr("disabled", true);
+	});
+</script>
