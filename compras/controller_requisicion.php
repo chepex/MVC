@@ -2,7 +2,7 @@
 
 
 error_reporting(E_ALL);
-ini_set("display_errors", 1);
+ini_set("display_errors", 0);
 require_once('model_requisicion.php');
 require_once('model_reqdet.php');
 require_once('controller_reqdet.php');
@@ -202,17 +202,29 @@ class controller_requisicion extends requisicion{
 		$_REQUEST['CREATED_AT']= SYSDATE;
 		$_REQUEST['UPDATED_AT']= SYSDATE;
 		$parametros->save(get_class($parametros));
+		$listaemail = $parametros->correos_compras();
+		$destinatario = $listaemail[0]['CORREO_USUARIO'];
+		$asunto = 'Ingreso de Requisicion No.'. $_REQUEST['NUM_REQ'];
+		$tipo_requisicion= $_REQUEST['TIPO_REQ']=='G' ? 'GLOBAL' : 'EXTERNA';
+		$bodymsg="Se ha ingresado una Nueva Requisicion de Compra de tipo: ". $tipo_requisicion . " Verificarla";
+		$parametros->sendemail('ingresorequisiciones@caricia.com', $destinatario, $asunto, $bodymsg);
+		/*echo"<pre>";
+			print_r($listaemail);
+		echo"</pre>";*/
 		$this->msg=$detailsReq->mensaje;
 	}
 	
 	public function get_all($mensaje=''){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
+		$objciau = $parametros->crea_objeto(array("CIAS_X_USUARIO"), "", array("USUARIO='".$_SESSION['usuario']."'"));
+		$objemp = $parametros->crea_objeto(array("VWEMPLEADOS"), "",array("COD_EMP=". $objciau[0]["COD_EMP"]));
 		$_REQUEST["COD_CIA"] = $_SESSION['cod_cia']; 
 		$_REQUEST["ANIO"] = date('Y');//2012;
+		$_REQUEST["CODDEPTO_SOL"] = $objemp[0]["COD_DEPTO"];
 		$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ');
         $masx=implode($mcampos, ",");
-		$data = $parametros->lis(get_class($parametros), 1, $masx);
+		$data = $parametros->lis(get_class($parametros), 2, $masx);
 		$rendertable = $parametros->render_table_crud(get_class($parametros));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
@@ -229,7 +241,6 @@ class controller_requisicion extends requisicion{
 		$parametros = $this->set_obj();
 		$detreq = new controller_reqdet();
 		$obvista = new view_Parametros();
-		$_REQUEST["filtro"]='NO';
 		$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ');
         $masx=implode($mcampos, ",");
 		$data = $parametros->lis(get_class($parametros), 1, $masx);

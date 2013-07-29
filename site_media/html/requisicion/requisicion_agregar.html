@@ -67,7 +67,7 @@
 	$("#btn-save-enc").click(function(){
 		$('#btn-savedet').removeAttr("disabled"); 
 		$.ajax({
-				url : 'controller_Requisicion.php?' + $("#frmrequisicion").serialize() ,     
+				url : 'index.php?ctl=controller_requisicion&' + $("#frmrequisicion").serialize() ,     
 				data : { act : 'insert' },
 				type : 'POST',     
 				success : 
@@ -94,7 +94,7 @@
 	
 	function llenarproducto(id, optdata){
 		$.ajax({
-				url : 'controller_Requisicion.php',     
+				url : 'index.php?ctl=controller_requisicion',     
 				data : { act : 'get_ajax' , data : id, opt: optdata},
 				type : 'POST',     
 				success : 

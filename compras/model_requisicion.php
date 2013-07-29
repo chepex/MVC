@@ -84,6 +84,10 @@ class requisicion extends DBAbstractModel {
         }
     }
     
+    #Define Un Arreglo con las Axis 'X' y Axis 'Y' para un grafico
+    /*
+     * Este Metodo debe ser definido segun la necesidad del Grafico
+     * */
     public function get_datagrafico(){
 		$this->rows=array();
 		$this->query = "  SELECT   CATEGORIAS.COD_CAT,
@@ -122,6 +126,25 @@ class requisicion extends DBAbstractModel {
 			}
 			$datagrafico = array("categorias"=>implode(",",$categorias), "disponible"=>implode(",",$saldisponible));
             return $datagrafico;
+	}
+	
+	#Correos de Compras
+	public function correos_compras(){
+		$this->rows=array();
+		$this->query = "SELECT   
+								LTRIM (RTRIM (B.CORREO_DEPTO)) correo_usuario,
+								a.usuario
+						FROM   
+								FIRMASXTIPO_DOCTO A, CIAS_X_USUARIO B
+							WHERE       A.COD_CIA = ".$_SESSION['cod_cia']."
+								AND A.PRIORIDAD = 1
+								AND A.FIRMA_ACTIVO = 'S'
+								AND A.COD_TIPO_DOCTO = 'OCL'           
+								AND B.COD_CIA = A.COD_CIA
+								AND B.USUARIO = A.USUARIO
+								AND A.COD_DEPTO = 55";
+		$this->get_results_from_query();
+        return $this->rows;
 	}
 }
 ?>

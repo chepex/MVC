@@ -3,6 +3,7 @@
 	include_once('../adodb/adodb.inc.php');
 	include_once('../adodb/adodb-pager.inc.php');
 	include_once('../adodb/tohtml.inc.php');
+	include_once('class.SendEmail.php');
 
 session_start();
 abstract class DBAbstractModel {
@@ -10,7 +11,7 @@ abstract class DBAbstractModel {
 	private static $db_host = '192.168.10.235';
 	private static $db_user = 'MMIXCO';
 	private static $db_pass = 'MARIO13';
-	public $debug = true;	
+	public $debug = false;	
     private static $db_name = 'DESA';
     protected $query;
     protected $rows = array();
@@ -84,7 +85,7 @@ abstract class DBAbstractModel {
 	}
 
 	/*Lista especiales donde se depenete de varias tablas*/
-public function lis2($class,$id=0,$at="0"){
+	public function lis2($class,$id=0,$at="0"){
 
 		$this->open_connection(); 		
  		$cl= new $class;
@@ -95,20 +96,11 @@ public function lis2($class,$id=0,$at="0"){
 		}
 		
 		$tabla  =$cl->tableName(); 
-		$llave	=$cl->llave(); 		
-		if($id==1){
-			$where = " WHERE ". $this->get_key($llave);
-		} 
-		if($id==2){
-			$campos2 = explode(',',$campos);		
-			$where = " WHERE ". $this->get_fields($campos2);		
-		}
-		if($id==3){
-			$foreignkey = $cl->foreignkey();
-			$where = " WHERE ". $this->get_key($foreignkey,$tabla);
-		}	 	
+		$llave	=$cl->llave(); 	
+		
 		if($_REQUEST["filtro"]=="")$_REQUEST["filtro"]=1;
 		if($_REQUEST["filtro"]>0){
+			$conjuncion = " AND ";
 			if ($_REQUEST["filtro"]==1){
 				$where = "WHERE ".$tabla.".CREATED_AT > add_months(SYSDATE, -3)";
 			}
@@ -118,7 +110,21 @@ public function lis2($class,$id=0,$at="0"){
 			if ($_REQUEST["filtro"]==3){
 				$where = "WHERE  ".$tabla.".CREATED_AT > add_months(SYSDATE, -12)";
 			}			
+		}else{
+			$conjuncion = " WHERE ";
 		}	
+		if($id==1){
+			$where .= $conjuncion. $this->get_key($llave);
+		} 
+		if($id==2){
+			$campos2 = explode(',',$campos);		
+			$where .= $conjuncion. $this->get_fields($campos2);		
+		}
+		if($id==3){
+			$foreignkey = $cl->foreignkey();
+			$where .= $conjuncion. $this->get_key($foreignkey,$tabla);
+		}	 	
+		
 			
 		$i=0;
 		$j=0;		
@@ -168,6 +174,7 @@ public function lis2($class,$id=0,$at="0"){
 	# OPCION 3 FILTRA POR LOS CAMPOS FORANEOS DE LA TABLA	
 	public function lis($class,$id=0,$at="0"){
 
+		$this->rows = array();
 		$this->open_connection(); 		
  		$cl= new $class;
 		
@@ -179,19 +186,8 @@ public function lis2($class,$id=0,$at="0"){
 		
 		
 		$tabla  =$cl->tableName(); 
-		$llave	=$cl->llave(); 		
-		if($id==1){
-			$where = " WHERE ". $this->get_key($llave);
-		} 
-		if($id==2){
-			$campos2 = explode(',',$campos);		
-			$where = " WHERE ". $this->get_fields($campos2);
+		$llave	=$cl->llave(); 	
 		
-		} 
-		if($id==3){
-			$foreignkey = $cl->foreignkey();
-			$where = " WHERE ". $this->get_key($foreignkey);
-		}	
 		if($_REQUEST["filtro"]=="")$_REQUEST["filtro"]=1;
 		if($_REQUEST["filtro"]>0){
 			if ($_REQUEST["filtro"]==1){
@@ -203,6 +199,19 @@ public function lis2($class,$id=0,$at="0"){
 			if ($_REQUEST["filtro"]==3){
 				$where = "WHERE  CREATED_AT > add_months(SYSDATE, -12)";
 			}			
+		}	
+			
+		if($id==1){
+			$where .= " AND ". $this->get_key($llave);
+		} 
+		if($id==2){
+			$campos2 = explode(',',$campos);		
+			$where .= " AND ". $this->get_fields($campos2);
+		
+		} 
+		if($id==3){
+			$foreignkey = $cl->foreignkey();
+			$where .= " AND ". $this->get_key($foreignkey);
 		}		
 			
 		$i=0;
@@ -485,12 +494,9 @@ public function lis2($class,$id=0,$at="0"){
 		return $TagData;
 	}
 
-
-public function menu1()
-	{
-
-
-$sql= "select distinct roles_x_modulos.cod_modulo,modulos.descripcion
+	#comentario
+	public function menu1(){
+		$sql= "select distinct roles_x_modulos.cod_modulo,modulos.descripcion
                 from roles_x_modulos
                 left join admappli.modulos on
                 roles_x_modulos.cod_cia = modulos.cod_cia
@@ -507,35 +513,27 @@ $sql= "select distinct roles_x_modulos.cod_modulo,modulos.descripcion
                 and listado_roles.aplicacion = 'S'
                 )
                 order by roles_x_modulos.cod_modulo";
-$this->open_connection();
-$rs = $this->conn->Execute($sql);
+		$this->open_connection();
+		$rs = $this->conn->Execute($sql);
 
-$padre= 0;
-$menu =  "
-<br>
-<br>
-<div class='dropdown ' id= 'menu-modulo' style = 'display:none'> <ul class='dropdown-menu' style = 'display:block'>";
-while (!$rs->EOF) 
-		{		
-
-				$menu .= "<li class='dropdown-submenu' ><a href= 'page1.php?modulo=".$rs->fields[0]."'><b>".$rs->fields[1] ."</b></a></li>";	
-
-			
+		$padre= 0;
+		$menu =  "
+					<br>
+					<br>
+					<div class='dropdown ' id= 'menu-modulo' style = 'display:none'> <ul class='dropdown-menu' style = 'display:block'>";
+		while (!$rs->EOF){		
+			$menu .= "<li class='dropdown-submenu' ><a href= 'page1.php?modulo=".$rs->fields[0]."'><b>".$rs->fields[1] ."</b></a></li>";	
 			$rs->MoveNext(); 			
 		} 
 		$menu.="</ul>
-		
-		</div>";
+					</div>";
 		return $menu;
 		
 	}		
 
-
-	public function menu2()
-	{
-
-
-$sql= "select COD_MODULO,cod_menu,cod_menu_sup,descripcion,LOWER(archivo_destino)
+	#comentario
+	public function menu2(){
+		$sql= "select COD_MODULO,cod_menu,cod_menu_sup,descripcion,LOWER(archivo_destino)
 			from menu_x_modulo
 			where cod_cia = ".$_SESSION['cod_cia']."
 			and cod_modulo = '".$_SESSION['modulo']."'
@@ -549,23 +547,19 @@ $sql= "select COD_MODULO,cod_menu,cod_menu_sup,descripcion,LOWER(archivo_destino
 				and usuario = '".$_SESSION['usuario']."'
 			  )
 			)";
-$this->open_connection();
-$rs = $this->conn->Execute($sql);
-$padre= 0;
-$menu =  "<div class='navbar navbar-fixed-top'>
+		$this->open_connection();
+		$rs = $this->conn->Execute($sql);
+		$padre= 0;
+		$menu =  "<div class='navbar navbar-fixed-top'>
 			<div class='navbar-inner'>
 				<div class='container-fluid'>
 					<div class= 'nav-collapse collapse navbar-responsive-collapse'>
-<ul class='nav'>
-<li>
-<a> <i class='icon-align-left' id= 'home'></i>   </a>
-</li>
-
-
-";
-$x=0;
-while (!$rs->EOF) 
-		{		
+						<ul class='nav'>
+						<li>
+							<a> <i class='icon-align-left' id= 'home'></i>   </a>
+						</li>";
+		$x=0;
+		while (!$rs->EOF){		
 			$hijo=substr($rs->fields[1], 0, 4);
 			if($rs->fields[2]=="01"  and $x==0 ){
 				$menu.="<li class='dropdown'>
@@ -613,6 +607,27 @@ while (!$rs->EOF)
 		return $menu;
 		
 	}	
+	
+	#Envio de Correo Electronico
+	/*
+	 * @parametros
+	 * @remitente: cuenta de correo desde la cual se envia el email
+	 * @destinatario: cuenta de correo a la que se desea enviar el email
+	 * @asunto: Asunto del correo
+	 * @mensajebody : El cuerpo del mensaje, este puede contener etiquetas html
+	 * Informacion:
+	 * #Si se utiliza en el cuerpo una referencia a un archivo css, el cliente de correo debera
+	 * tener habilitada que muestre este estilo, la segunda opcion es poner en un <style></style> el css.
+	 * #
+	 * */
+	public function sendemail($remitente, $destinatario, $asunto, $mensajebody){
+		$clscorreo = New SendEmail();
+		$clscorreo->remitente = $remitente;
+		$clscorreo->destinatario = $destinatario;
+		$clscorreo->asunto = $asunto;
+		$clscorreo->msgboby = $mensajebody;
+		$clscorreo->EnviarByMailSMTP();
+	}
 
 }
 
