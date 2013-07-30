@@ -87,6 +87,7 @@ abstract class DBAbstractModel {
 	/*Lista especiales donde se depenete de varias tablas*/
 	public function lis2($class,$id=0,$at="0"){
 
+		$this->rows = array();
 		$this->open_connection(); 		
  		$cl= new $class;
 		
@@ -113,12 +114,12 @@ abstract class DBAbstractModel {
 		}else{
 			$conjuncion = " WHERE ";
 		}	
-		if($id==1){
-			$where .= $conjuncion. $this->get_key($llave);
+		if($id==1){ 
+			$where .= $conjuncion. $this->get_key($llave, $tabla);
 		} 
 		if($id==2){
-			$campos2 = explode(',',$campos);		
-			$where .= $conjuncion. $this->get_fields($campos2);		
+			$campos2 = explode(',',$campos);	
+			$where .= $conjuncion. $this->get_fields($campos2);	
 		}
 		if($id==3){
 			$foreignkey = $cl->foreignkey();
@@ -277,8 +278,12 @@ abstract class DBAbstractModel {
 			$campos =$cl->atributos();
 			$lista = explode(',', $campos);
 			for($i=0;$i<count($lista);$i++){
-				if ($llave!=$lista[$i]){				
-					$array[$i]=$lista[$i]." = '".$_REQUEST[$lista[$i]]."' ";					
+				if ($llave!=$lista[$i]){	
+					if(isset($_REQUEST[$lista[$i]])){
+						//$array[$i]=$lista[$i]." =". $_REQUEST[$lista[$i]] == 'SYSDATE' || $_REQUEST[$lista[$i]] == 'NULL' ? $_REQUEST[$lista[$i]] : "'".$_REQUEST[$lista[$i]]."'";
+						$valor = $_REQUEST[$lista[$i]] == 'SYSDATE' || $_REQUEST[$lista[$i]] == 'NULL' ? $_REQUEST[$lista[$i]] : "'".$_REQUEST[$lista[$i]]."' ";
+						$array[$i]=$lista[$i]." =". $valor;
+					}								
 				}
 			}
 			$where = " WHERE ". $this->get_key($llave);
@@ -532,68 +537,71 @@ abstract class DBAbstractModel {
 	}		
 
 	#comentario
-	public function menu2(){
-		$sql= "select COD_MODULO,cod_menu,cod_menu_sup,descripcion,LOWER(archivo_destino)
-			from menu_x_modulo
-			where cod_cia = ".$_SESSION['cod_cia']."
-			and cod_modulo = '".$_SESSION['modulo']."'
-			and cod_menu in (
-			  select cod_menu from opciones_x_role
-			  where cod_cia = ".$_SESSION['cod_cia']."
-			  and cod_modulo = '".$_SESSION['modulo']."'
-			  and role in (
-				select role from roles_x_usuario
-				where cod_cia = ".$_SESSION['cod_cia']."
-				and usuario = '".$_SESSION['usuario']."'
-			  )
-			)";
+	public function menu2(){   
+		$sql_padres= "select COD_MODULO,cod_menu,cod_menu_sup,descripcion,LOWER(archivo_destino)
+							from menu_x_modulo
+								where cod_cia = ".$_SESSION['cod_cia']."
+									and cod_modulo = '".$_SESSION['modulo']."'
+									and cod_menu in (
+													select cod_menu from opciones_x_role
+														where cod_cia = ".$_SESSION['cod_cia']."
+															and cod_modulo = '".$_SESSION['modulo']."'
+															and role in (
+																		select role from roles_x_usuario
+																			where cod_cia = ".$_SESSION['cod_cia']."
+																					and usuario = '".$_SESSION['usuario']."'
+																		)
+													) 
+									AND cod_menu IN(
+													SELECT COD_MENU_SUP FROM menu_x_modulo 
+													where cod_cia = ".$_SESSION['cod_cia']."
+													and cod_modulo = '".$_SESSION['modulo']."'
+													)";
 		$this->open_connection();
-		$rs = $this->conn->Execute($sql);
-		$padre= 0;
+		$rs = $this->conn->Execute($sql_padres);
+
 		$menu =  "<div class='navbar navbar-fixed-top'>
-			<div class='navbar-inner'>
-				<div class='container-fluid'>
-					<div class= 'nav-collapse collapse navbar-responsive-collapse'>
-						<ul class='nav'>
-						<li>
-							<a> <i class='icon-align-left' id= 'home'></i>   </a>
-						</li>";
-		$x=0;
-		while (!$rs->EOF){		
-			$hijo=substr($rs->fields[1], 0, 4);
-			if($rs->fields[2]=="01"  and $x==0 ){
-				$menu.="<li class='dropdown'>
-				<a class='dropdown-toggle' data-toggle='dropdown' href='#'>
-				".$rs->fields[3] ."
-				<b class='caret'></b>
-				</a>
-				<ul class='dropdown-menu' style = >";
-
-			}
-			if($rs->fields[2]=="01" or $rs->fields[2]==$x ){
-
-				$x=$rs->fields[2];
-				
-				
-				$menu .= "<li class='dropdown' >
-							<a  href= '".$rs->fields[4]."'>
-							".$rs->fields[3] ." 
-							</a>";				
-					$menu.="</li>";		
-			}else{
-				$menu.= "</ul>
-				<li class='dropdown '>
-				<a class='dropdown-toggle' data-toggle='dropdown' href='".$rs->fields[4]."'>
-				".$rs->fields[3]."
-				<b class='caret'></b>
-				</a>				
-				<ul class='dropdown-menu' style = >				
-				<li ><a padre='$$padre' hijo= '$hijo' href= '".$rs->fields[4]."'>".$rs->fields[3] ."</a></li>";
-			}
-			
-				 			
+					<div class='navbar-inner'>
+						<div class='container-fluid'>
+							<div class= 'nav-collapse collapse navbar-responsive-collapse'>
+								<ul class='nav'>
+									<li>
+										<a> 
+											<i class='icon-align-left' id= 'home'></i>
+										</a>
+									</li>";
+		while (!$rs->EOF){	
+			$menu.="<li class='dropdown '>
+						<a class='dropdown-toggle aa' data-toggle='dropdown' href='#'>
+							".$rs->fields[3] ."
+							<b class='caret'></b>
+						</a>
+						<ul class='dropdown-menu ' style ='' >";
+	
+			$sql_hijos= "select COD_MODULO,cod_menu,cod_menu_sup,descripcion,LOWER(archivo_destino)
+							from menu_x_modulo
+								where cod_cia = ".$_SESSION['cod_cia']."
+									and cod_modulo = '".$_SESSION['modulo']."'
+									and cod_menu in (
+													select cod_menu from opciones_x_role
+														where cod_cia = ".$_SESSION['cod_cia']."
+														and cod_modulo = '".$_SESSION['modulo']."'
+														and role in (
+																	select role from roles_x_usuario
+																		where cod_cia = ".$_SESSION['cod_cia']."
+																		and usuario = '".$_SESSION['usuario']."'
+																	)
+													) 
+									AND COD_MENU <> '".$rs->fields[2]."' AND COD_MENU_SUP='".$rs->fields[2]."'";
+			$rs_hijo = $this->conn->Execute($sql_hijos);
+			while(!$rs_hijo->EOF){
+				$menu .= "<li class='dropdown' ><a  href= '".$rs_hijo->fields[4]."'>".$rs_hijo->fields[3] ."</a>";				
+				$menu.="</li>";	
+				$rs_hijo->MoveNext(); 
+			} 
+			$menu.="</ul></li>";			
 			$rs->MoveNext(); 			
-		} 
+	} 
 		//$menu.="</ul></li><lu class='nav pull-right'><a href='#'>Link</a></lu>";
 		
 		$menu.="</ul></li>

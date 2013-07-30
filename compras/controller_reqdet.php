@@ -180,7 +180,7 @@ class controller_reqdet extends reqdet{
 		$_REQUEST["filtro"]='NO';
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.COD_PROD', 'PRODUCTOS.NOMBRE',$parametros->tableName().'.CANTIDAD',$parametros->tableName().'.ANIO');
+		$mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.COD_PROD', 'PRODUCTOS.NOMBRE',$parametros->tableName().'.CANTIDAD', 'UNIDADES.DESCRIPCION',$parametros->tableName().'.ANIO');
         $masx=implode($mcampos, ",");
 		$data = $parametros->lis2(get_class($parametros), 3, $masx);
 		$rendertable = $parametros->render_table_crud(get_class($parametros));

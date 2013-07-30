@@ -42,7 +42,7 @@ class controller_requisicion extends requisicion{
 			}
 			$peticiones = array('set', 'get', 'delete', 'edit',
                         'agregar', 'buscar', 'borrar', 
-                        'update','get_all','listar','insert','get_ajax','view');
+                        'update','get_all','listar','insert','get_ajax','view','view_rpt');
 			foreach ($peticiones as $peticion) {
 				if( $uri == $peticion)  {
 					$event = $peticion;
@@ -84,6 +84,9 @@ class controller_requisicion extends requisicion{
 				break;
 			case 'view':
 				$this->view();
+				break;
+			case 'view_rpt':
+				$this->view_rpt();
 				break;
 		}
 	}
@@ -173,6 +176,9 @@ class controller_requisicion extends requisicion{
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['modificar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('modificar',get_class($parametros)), $obvista->html);
 		$obvista->html = str_replace('{mensaje}', ' ', $obvista->html);
+		$obvista->html = str_replace('{NUM_REQ}', $_REQUEST['NUM_REQ'], $obvista->html);
+		$obvista->html = str_replace('{COD_CIA}', $_REQUEST['COD_CIA'], $obvista->html);
+		$obvista->html = str_replace('{ANIO}', $_REQUEST['ANIO'], $obvista->html);
 		$obvista->render_html($tagreplace);  
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
@@ -182,6 +188,22 @@ class controller_requisicion extends requisicion{
 	public function edit(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
+		if(isset($_REQUEST['CKAUTORIZADO'])){
+			if($_REQUEST['CKAUTORIZADO']=="1"){
+				$estado='AUTORIZADA';
+				$objciau = $parametros->crea_objeto(array("CIAS_X_USUARIO"), "", array("USUARIO='".$_SESSION['usuario']."'"));
+				$_REQUEST['FECHA_AUTORIZADO']="SYSDATE";
+				$_REQUEST['AUTORIZADO_POR']=$objciau[0]["COD_EMP"];
+			}else{
+				$estado='DECLINADA';
+			}
+			$listaemail = $parametros->correo_solicitante();
+			$destinatario = $listaemail[0]['CORREO_USUARIO'];
+			$asunto = 'La Requisicion No.'. $_REQUEST['NUM_REQ'];
+			$tipo_requisicion= $_REQUEST['TIPO_REQ']=='G' ? 'GLOBAL' : 'EXTERNA';
+			$bodymsg="La Requisicion No: ". $_REQUEST['NUM_REQ'] . " de Tipo " . $tipo_requisicion . " ha sido Procesada, y su estado es: ". $estado;
+			$parametros->sendemail('ingresorequisiciones@caricia.com', $destinatario, $asunto, $bodymsg);
+		}
 		$parametros->update(get_class($parametros));
 		$this->msg=$parametros->mensaje; 
 	}
@@ -199,8 +221,6 @@ class controller_requisicion extends requisicion{
 		$_REQUEST['FECHA_ING']= 'SYSDATE';
 		$_REQUEST['NO_FORMULARIO']= 'NULL';
 		$_REQUEST['COMENT_COMPRAS']= 'NULL';
-		$_REQUEST['CREATED_AT']= SYSDATE;
-		$_REQUEST['UPDATED_AT']= SYSDATE;
 		$parametros->save(get_class($parametros));
 		$listaemail = $parametros->correos_compras();
 		$destinatario = $listaemail[0]['CORREO_USUARIO'];
@@ -219,12 +239,12 @@ class controller_requisicion extends requisicion{
 		$obvista = new view_Parametros();
 		$objciau = $parametros->crea_objeto(array("CIAS_X_USUARIO"), "", array("USUARIO='".$_SESSION['usuario']."'"));
 		$objemp = $parametros->crea_objeto(array("VWEMPLEADOS"), "",array("COD_EMP=". $objciau[0]["COD_EMP"]));
-		$_REQUEST["COD_CIA"] = $_SESSION['cod_cia']; 
-		$_REQUEST["ANIO"] = date('Y');//2012;
-		$_REQUEST["CODDEPTO_SOL"] = $objemp[0]["COD_DEPTO"];
-		$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ');
+		$_REQUEST[$parametros->tableName().".COD_CIA"] = $_SESSION['cod_cia']; 
+		$_REQUEST[$parametros->tableName().".ANIO"] = date('Y');//2012;
+		$_REQUEST[$parametros->tableName().".CODDEPTO_SOL"] = $objemp[0]["COD_DEPTO"];
+		$mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.CODDEPTO_SOL','DEPARTAMENTOS.NOM_DEPTO',$parametros->tableName().'.FECHA_ING',$parametros->tableName().'.FECHA_AUTORIZADO',$parametros->tableName().'.OBSERVACIONES',$parametros->tableName().'.PROYECTO',$parametros->tableName().'.ANIO',$parametros->tableName().'.COD_CAT',$parametros->tableName().'.TIPO_REQ','PRIORIDADES.DESCRIPCION_PRIORIDAD');
         $masx=implode($mcampos, ",");
-		$data = $parametros->lis(get_class($parametros), 2, $masx);
+		$data = $parametros->lis2(get_class($parametros), 2, $masx);
 		$rendertable = $parametros->render_table_crud(get_class($parametros));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
@@ -241,9 +261,10 @@ class controller_requisicion extends requisicion{
 		$parametros = $this->set_obj();
 		$detreq = new controller_reqdet();
 		$obvista = new view_Parametros();
-		$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ');
+		//$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL', 'NOM_DEPTO','FECHA_ING','FECHA_AUTORIZADO','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','DESCRIPCION_PRIORIDAD');
+        $mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.CODDEPTO_SOL','DEPARTAMENTOS.NOM_DEPTO',$parametros->tableName().'.FECHA_ING',$parametros->tableName().'.FECHA_AUTORIZADO',$parametros->tableName().'.OBSERVACIONES',$parametros->tableName().'.PROYECTO',$parametros->tableName().'.ANIO',$parametros->tableName().'.COD_CAT',$parametros->tableName().'.TIPO_REQ','PRIORIDADES.DESCRIPCION_PRIORIDAD');
         $masx=implode($mcampos, ",");
-		$data = $parametros->lis(get_class($parametros), 1, $masx);
+		$data = $parametros->lis2(get_class($parametros), 1, $masx);
 		$rendertable = $parametros->render_table_crud(get_class($parametros));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
@@ -256,6 +277,27 @@ class controller_requisicion extends requisicion{
 		$obvista->retornar_vista();
 		$detreq->get_all();
 		
+	}
+	
+	public function view_rpt(){
+		$parametros = $this->set_obj();
+		$obvista = new view_Parametros();
+		$_REQUEST[$parametros->tableName().".COD_CIA"] = $_SESSION['cod_cia']; 
+		$_REQUEST[$parametros->tableName().".ANIO"] = date('Y');//2012;
+		//$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL','NOM_DEPTO','FECHA_ING','FECHA_AUTORIZADO','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','DESCRIPCION_PRIORIDAD');
+        $mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.CODDEPTO_SOL','DEPARTAMENTOS.NOM_DEPTO',$parametros->tableName().'.FECHA_ING',$parametros->tableName().'.FECHA_AUTORIZADO',$parametros->tableName().'.OBSERVACIONES',$parametros->tableName().'.PROYECTO',$parametros->tableName().'.ANIO',$parametros->tableName().'.COD_CAT',$parametros->tableName().'.TIPO_REQ','PRIORIDADES.DESCRIPCION_PRIORIDAD');
+        $masx=implode($mcampos, ",");
+		$data = $parametros->lis2(get_class($parametros), 2, $masx);
+		$rendertable = $parametros->render_table_crud(get_class($parametros));
+		$obvista->html = $obvista->get_template('template',get_class($parametros));
+		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
+		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html); 
+		$obvista->html = str_replace('{formulario_details}', '', $obvista->html);  
+		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
+		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
+		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
+		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
+		$obvista->retornar_vista();
 	}
 	
 	public function get_ajax(){

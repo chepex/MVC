@@ -1,13 +1,29 @@
     <form id="alta_usuario" action="{EDIT}" method="POST">
-        <div class="item_requerid">E-mail</div>
-        <div class="form_requerid"><input type="text" name="email" 
-         id="email" value="{email}" readonly></div>
-        <div class="item_requerid">Nombre</div>
-        <div class="form_requerid"><input type="text" name="nombre" 
-         id="nombre" value="{nombre}"></div>
-        <div class="item_requerid">Apellido</div>
-        <div class="form_requerid"><input type="text" name="apellido" 
-         id="apellido" value="{apellido}"></div>
-        <div class="form_button"><input type="submit" name="enviar" 
-         id="enviar" value="Guardar"></div>
+		<h5>Desea Autorizar Requisicion</h5>
+        <div class="item_requerid">NUM REQ.</div>
+        <div class="form_requerid">
+			<input type="text" name="NUM_REQ"  id="NUM_REQ" value="{NUM_REQ}" readonly>
+			<input type="hidden" name="COD_CIA"  id="COD_CIA" value="{COD_CIA}" readonly>
+			<input type="hidden" name="ANIO"  id="ANIO" value="{ANIO}" readonly>
+		</div>
+        <div class="item_requerid">AUTORIZAR</div>
+        <div class="form_requerid">
+			<table>
+				<tr>
+					<td style="width:75px;">
+						<input type="radio" name="CKAUTORIZADO" id="CKAUTORIZADO" value="1">SI
+					</td>
+					<td style="width:50px;">
+						<input type="radio" name="CKAUTORIZADO" id="CKAUTORIZADO" value="0">NO
+					</td>
+				</tr>
+			</table>
+		</div>
+		<div class="item_requerid_textarea">Comentario Compras</div>
+		<div class="form_requerid">
+			<textarea name="COMENT_COMPRAS" id="COMENT_COMPRAS" rows='2' cols='10' maxlength='1000'></textarea>
+		</div>
+        <div class="form_button">
+			<input type="submit" name="enviar" id="enviar" value="Guardar">
+		</div>
     </form>

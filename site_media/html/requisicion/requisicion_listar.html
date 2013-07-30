@@ -16,6 +16,15 @@
 					DEPTO SOL
 				</th>
 				<th>
+					DEPTO.
+				</th>
+				<th>
+					FECHA REQ.
+				</th>
+				<th>
+					FECHA AUT.
+				</th>
+				<th>
 					OBSERVACION
 				</th>
 				<th>
@@ -29,6 +38,9 @@
 				</th>
 				<th>
 					TIPO REQ
+				</th>
+				<th>
+					PRIORIDAD
 				</th>
 				<th>
 					*
@@ -51,7 +63,10 @@ oTable =    $('#tblreq').dataTable( {
                                 {  "sExtends":    "collection",
                                     "sButtonText": "Export...",
                                     "aButtons":    [ "xls", "pdf" ] }
-                            ]}
+                            ]},
+        "oLanguage": {
+			"sSearch": "Buscar Requisicion:"
+		}
     } );	
 });
 </script>

@@ -32,12 +32,13 @@ class reqdet extends DBAbstractModel {
     
     public function relaciones(){
          $masx ="AND ".$this->tableName().".COD_CIA = PRODUCTOS.COD_CIA
-                 AND ".$this->tableName().".COD_PROD = PRODUCTOS.COD_PROD";
+                 AND ".$this->tableName().".COD_PROD = PRODUCTOS.COD_PROD
+                 AND ".$this->tableName().".CODIGO_UNIDAD = UNIDADES.CODIGO_UNIDAD";
          return $masx;                
     }
 
     public function relacione_tablas(){
-         $masx= 'PRODUCTOS';
+         $masx= 'PRODUCTOS, UNIDADES';
          return $masx;                
     }
 

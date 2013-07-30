@@ -30,17 +30,29 @@ class requisicion extends DBAbstractModel {
     public $COD_CAT;
     public $TIPO_REQ;
     public $COMENT_COMPRAS;
-    public $CREATED_AT;
-    public $UPDATED_AT;
+    public $COD_PRIORIDAD;
     
     
 
     ############################### ATRIBUTOS ################################
         public function atributos()
     {
-        $masx= array('COD_CIA','NUM_REQ','CODDEPTO_SOL','EMP_SOL','COD_EMP_ELAB','OBSERVACIONES','PROYECTO','AUTORIZADO_POR','FECHA_AUTORIZADO','ANIO','STATUS','CODIGO_GRUPO','USUARIO','FECHA_ING','NO_FORMULARIO','COD_CAT','TIPO_REQ','COMENT_COMPRAS','CREATED_AT','UPDATED_AT');
+        $masx= array('COD_CIA','NUM_REQ','CODDEPTO_SOL','EMP_SOL','COD_EMP_ELAB','OBSERVACIONES','PROYECTO','AUTORIZADO_POR','FECHA_AUTORIZADO','ANIO','STATUS','CODIGO_GRUPO','USUARIO','FECHA_ING','NO_FORMULARIO','COD_CAT','TIPO_REQ','COMENT_COMPRAS','COD_PRIORIDAD');
         $masx=implode($masx, ",");
         return $masx;
+    }
+    
+     
+    public function relaciones(){
+         $masx ="AND ".$this->tableName().".COD_PRIORIDAD = PRIORIDADES.COD_PRIORIDAD
+				 AND ".$this->tableName().".CODDEPTO_SOL = DEPARTAMENTOS.COD_DEPTO
+				 AND ".$this->tableName().".COD_CIA = DEPARTAMENTOS.COD_CIA";
+         return $masx;                
+    }
+
+    public function relacione_tablas(){
+         $masx= 'PRIORIDADES, DEPARTAMENTOS';
+         return $masx;                
     }
 
 
@@ -143,6 +155,23 @@ class requisicion extends DBAbstractModel {
 								AND B.COD_CIA = A.COD_CIA
 								AND B.USUARIO = A.USUARIO
 								AND A.COD_DEPTO = 55";
+		$this->get_results_from_query();
+        return $this->rows;
+	}
+	
+	#Devuelve el Correo del Usuario Solicitante de la Requisicion
+	public function correo_solicitante(){
+		$this->rows=array();
+		$this->query = "SELECT   R.NUM_REQ, CXU.CORREO_USUARIO
+							FROM      REQUISICION R
+										INNER JOIN
+											CIAS_X_USUARIO CXU
+												ON R.COD_CIA = CXU.COD_CIA 
+												AND R.EMP_SOL = CXU.COD_EMP
+							WHERE   
+								R.NUM_REQ = ".$_REQUEST['NUM_REQ']." 
+								AND R.ANIO = ".$_REQUEST['ANIO']." 
+								AND R.COD_CIA = ". $_SESSION['cod_cia'];
 		$this->get_results_from_query();
         return $this->rows;
 	}
