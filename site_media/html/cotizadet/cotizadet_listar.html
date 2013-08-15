@@ -1,0 +1,52 @@
+<br/>
+<div style="width:75%;" align='center'>
+	<table id="tblreqdet" style='font-size:13px;' class='table'>
+		<thead>
+			<tr>
+				<th>
+					COD CIA
+				</th>
+				<th>
+					NUM REQ
+				</th>
+				<th>
+					COD PROD
+				</th>
+				<th>
+					NOMBRE
+				</th>
+				<th>
+					CANTIDAD
+				</th>
+				<th>
+					A&Ntilde;O
+				</th>
+				<th>
+					CORRELATIVO
+				</th>
+				<th>
+					*
+				</th>
+			</tr>
+		</thead>
+		<tbody>
+				{Detalle}
+</div>
+<br/><br/>
+<script type="text/javascript">
+$(document).ready(function(){
+/**TABLA FORMATO**/
+oTable =    $('#tblreqdet').dataTable( {      
+        "sDom": '<"H"Tfr>t<"F"ip>',
+        "bJQueryUI": true,
+        "bSort": false,
+        "sPaginationType": "full_numbers"  ,
+        "oTableTools": {"aButtons": ["copy","print",
+                                {  "sExtends":    "collection",
+                                    "sButtonText": "Export...",
+                                    "aButtons":    [ "xls", "pdf" ] }
+                            ]}
+    } );	
+});
+</script>
+

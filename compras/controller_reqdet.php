@@ -140,9 +140,6 @@ class controller_reqdet extends reqdet{
 		$obvista = new view_Parametros();
 		$parametros->delete(get_class($parametros));
 		$this->msg=$parametros->mensaje;
-		echo"<pre>";
-		print_r($_REQUEST);
-		echo"</pre>";
 		$xrequisicion->view();
 		
 	}

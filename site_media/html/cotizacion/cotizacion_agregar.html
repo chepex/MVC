@@ -1,0 +1,108 @@
+<br/>
+<br/>
+			<div>
+	<form id="frmcotizacion" action="{SET}" method="POST">
+        <div class="item_requerid">Compa&ntilde;ia</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+		</div>
+		<div class="item_requerid">A&ntilde;o</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="ANIO" id="ANIO" readonly="readonly" value="{anio}">
+		</div>
+		<div class="item_requerid">Correlativo</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="CORRELATIVO" id="CORRELATIVO" readonly="readonly" >
+		</div>
+		<div class="item_requerid">Fecha</div>
+        <div class="form_requerid">
+			<input type="text" class="input-small" name="FECHA" id="FECHA">
+		</div>
+        <div class="item_requerid">Requisicion</div>
+        <div class="form_requerid">
+			<select name="NUM_REQ" id="NUM_REQ" class="chzn-select input-xlarge">
+				{lstrequisicion}
+			</select>
+			<a href="#myModal" data-toggle="modal" class="btn" id='btnmodal' title="Listado de Requisiciones"  >
+				<i class="icon-eye-open"></i>
+			</a>
+		</div>
+		<div class="item_requerid">Proveedor</div>
+        <div class="form_requerid">
+			<select name="COD_PROV" id="COD_PROV" class="chzn-select input-xlarge">
+				{lstproveedores}
+			</select>
+		</div>
+        <div class="form_button">
+				<input type="submit" name="enviar" id="btn-save-enc" value="Agregar">
+		</div>
+    </form>
+</div> 
+		<div id="myModal" class="modal hide fade" data-backdrop="static">
+			<div class="modal-body" style='height:800px;'>
+				 <div class="modal-header">
+					 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">x</button>
+				  </div>
+				  {crud_requisicion}
+			</div>
+			<div class="modal-footer">
+				<a href="#" id="btncancel" class="btn" data-dismiss="modal" aria-hidden="true" >Cancelar</a>
+				<a href="#" id='btnsavecomp' class="btn btn-success"  data-dismiss="modal" aria-hidden="true">Guardar</a>
+			</div>
+		</div>
+<script>
+	$("#btn-save-enc").click(function(){
+		$('#btn-savedet').removeAttr("disabled"); 
+		$.ajax({
+				url : 'index.php?ctl=controller_cotizacion&' + $("#frmcotizacion").serialize() ,     
+				data : { act : 'insert' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$('#btn-save-enc').attr("disabled", true);
+							$('#COD_CAT').attr("disabled", true);
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	      	  	});
+		return false;
+	});
+	
+	$("#NUM_REQ").change(function(){
+		var catid= $("#NUM_REQ").val();
+		llenarproducto(catid,'NUM_REQ');
+	});
+	
+	function llenarproducto(id, optdata){
+		$.ajax({
+				url : 'index.php?ctl=controller_cotizacion',     
+				data : { act : 'get_ajax' , data : id, opt: optdata},
+				type : 'POST',
+				success : 
+						function(resp) {
+							var mivar = eval('(' + resp + ')');
+							$("#COD_PROD").empty();
+							$("#COD_PROD").append(mivar.lstpro);	
+							$('#COD_PROD').trigger("liszt:updated");
+							$("#CORRELATIVO").val(mivar.correl);
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	      	  	});
+	}
+	
+	$(document).ready(function(){
+		$('#btn-savedet').attr("disabled", true);
+	});
+</script>

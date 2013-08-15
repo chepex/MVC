@@ -1,56 +1,68 @@
 <h4>Listado de Requisiciones</h4><br/>
-<div style="width:75%;" align='center'>
-<a href='index.php?ctl=controller_requisicion&filtro=1' class='btn pull-right'>3 Meses</a>
-<a href='index.php?ctl=controller_requisicion&filtro=2' class='btn pull-right'>8 Meses</a>
-<a href='index.php?ctl=controller_requisicion&filtro=3' class='btn pull-right'>12 Meses</a>
-	<table id="tblreq" style='font-size:13px;' class='table'>
-		<thead>
-			<tr>
-				<th>
-					CIA
-				</th>
-				<th>
-					NUM<br/>REQ.
-				</th>
-				<th>
-					DEPTO SOL
-				</th>
-				<th>
-					DEPTO.
-				</th>
-				<th>
-					FECHA REQ.
-				</th>
-				<th>
-					FECHA AUT.
-				</th>
-				<th>
-					OBSERVACION
-				</th>
-				<th>
-					PROY
-				</th>
-				<th>
-					ANIO
-				</th>
-				<th>
-					COD CAT
-				</th>
-				<th>
-					TIPO REQ
-				</th>
-				<th>
-					PRIORIDAD
-				</th>
-				<th>
-					*
-				</th>
-			</tr>
-		</thead>
-		<tbody>
-				{Detalle}
-</div>
+			<div style="width:75%;" align='center'>
+				<a href='index.php?ctl=controller_requisicion&filtro=1' class='btn pull-right'>3 Meses</a>
+				<a href='index.php?ctl=controller_requisicion&filtro=2' class='btn pull-right'>8 Meses</a>
+				<a href='index.php?ctl=controller_requisicion&filtro=3' class='btn pull-right'>12 Meses</a>
+				<table id="tblreq" style='font-size:13px;' class='table'>
+					<thead>
+						<tr>
+							<th>
+								CIA
+							</th>
+							<th>
+								NUM<br/>REQ.
+							</th>
+							<th>
+								DEPTO SOL
+							</th>
+							<th>
+								DEPTO.
+							</th>
+							<th>
+								FECHA REQ.
+							</th>
+							<th>
+								FECHA AUT.
+							</th>
+							<th>
+								OBSERVACION
+							</th>
+							<th>
+								PROY
+							</th>
+							<th>
+								ANIO
+							</th>
+							<th>
+								COD CAT
+							</th>
+							<th>
+								TIPO REQ
+							</th>
+							<th>
+								PRIORIDAD
+							</th>
+							<th>
+								*
+							</th>
+					</tr>
+				</thead>
+				<tbody>
+					{Detalle}
+			</div>
 <br/><br/>
+<div>
+<table class= 'table' border='4'>
+	<tr class= 'error'>
+		<td style='width:75px;'>PENDIENTES</td>		
+		<td style='width:75px;'>36</td>
+	</tr>
+	<tr class= 'success'>
+		<td style='width:75px;'>ASIGNADOS</td>	
+		<td style='width:75px;'>156</td>
+	</tr>
+</table>
+</div>
 <script type="text/javascript">
 $(document).ready(function(){
 /**TABLA FORMATO**/

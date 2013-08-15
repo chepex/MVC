@@ -255,7 +255,7 @@ abstract class DBAbstractModel {
 		$campos =$cl->atributos();
 		$lista = explode(',', $campos);
 		for($i=0;$i<count($lista);$i++){			
-			$array[$i]= $_REQUEST[$lista[$i]] == 'SYSDATE' || $_REQUEST[$lista[$i]] == 'NULL' ? $_REQUEST[$lista[$i]] : "'".$_REQUEST[$lista[$i]]."'" ;
+			$array[$i]= $_REQUEST[$lista[$i]] == 'SYSDATE' || $_REQUEST[$lista[$i]] == 'NULL' || $_REQUEST[$lista[$i]] == 'USER' ? $_REQUEST[$lista[$i]] : "'".$_REQUEST[$lista[$i]]."'" ;
 		}
 		
 			$xx=implode(",", $array);
@@ -404,7 +404,7 @@ abstract class DBAbstractModel {
 	#Devuelve un String con la lista de options para un select html
 	 public function get_htmloptions($Arraylist=array()){
 		foreach($Arraylist as $fila=>$valor){
-			$html .= "<option value='".$Arraylist[$fila][0]."'> ".$Arraylist[$fila][0]." | ".$Arraylist[$fila][1]."</option>";
+			$html .= "<option value='".$Arraylist[$fila][0]."'> ".$Arraylist[$fila][0]." | ".$Arraylist[$fila][1]."</option>";//
 		}
 		return $html;
 	}

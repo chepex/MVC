@@ -71,11 +71,19 @@ class SendEmail{
 			//Password to use for SMTP authentication
 			$mail->Password   = "dromero";
 			//Set who the message is to be sent from
-			$mail->SetFrom($this->remitente);
+			$mail->SetFrom($this->remitente, $this->remitente);
 			//Set an alternative reply-to address
 			//$mail->AddReplyTo('replyto@example.com','First Last');
 			//Set who the message is to be sent to
-			$mail->AddAddress($this->destinatario, '');
+			
+			/*Enviar a varios remitentes */
+			$array1=split(",",$this->destinatario);			
+			foreach ($array1 as $value) {
+				if (filter_var($value, FILTER_VALIDATE_EMAIL)) {
+					$mail->AddAddress($value);	
+				}
+
+			}
 			//Copia a Mi Correo para Debug
 			$mail->AddAddress('dromero@caricia.com', 'Daniel Romero');
 			//Set the subject line

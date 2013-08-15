@@ -154,9 +154,9 @@ class controller_requisicion extends requisicion{
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
 		
-		$parametros->get($parametros_data);
+		/*$parametros->get($parametros_data);
 		$data = array('ID'=>$parametros->ID);            
-		$obvista->retornar_vista('buscar', $data);
+		$obvista->retornar_vista('buscar', $data);*/
 	}
 	
 	public function delete(){
@@ -313,8 +313,6 @@ class controller_requisicion extends requisicion{
 	}
 
 }
-/*$objecon =  new controller_requisicion();
-$objecon->handler();*/
 
 
 ?>

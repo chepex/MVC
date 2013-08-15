@@ -81,20 +81,7 @@ class requisicion extends DBAbstractModel {
 
 
     ################################# MÉTODOS ##################################
-    # Traer datos de un requisicion
-    public function get($ID=0) {
-        if($cod_cia != 0) {
-            $this->query = "SELECT   R.ID,
-									 R.NAME,
-									 R.VALUE_ITEM,
-									 R.CREATED_AT,
-									 R.UPDATED_AT,
-									 R.CALCULATED									 
-							FROM   PRODUC.PVC_OTHER_COSTS R
-							WHERE R.ID=".$ID;
-            $this->get_results_from_query();
-        }
-    }
+   
     
     #Define Un Arreglo con las Axis 'X' y Axis 'Y' para un grafico
     /*
@@ -175,5 +162,29 @@ class requisicion extends DBAbstractModel {
 		$this->get_results_from_query();
         return $this->rows;
 	}
+	
+	#Devuelve un array con las requisiciones del usuario que esta dentro
+	public function requisiciones_usuario($emp_sol, $anio , $deptosol){
+		$this->rows=array();
+		$this->query = "SELECT   RQ.NUM_REQ,
+								 PRI.DESCRIPCION_PRIORIDAD,
+								 RQ.FECHA_AUTORIZADO,
+								 VWE.NOMBRE_ISSS
+						FROM         REQUISICION RQ
+										INNER JOIN
+											PRIORIDADES PRI
+												ON RQ.COD_PRIORIDAD = PRI.COD_PRIORIDAD
+										INNER JOIN
+											VWEMPLEADOS VWE
+												ON RQ.COD_CIA = VWE.COD_CIA AND RQ.AUTORIZADO_POR = VWE.COD_EMP
+						WHERE       RQ.EMP_SOL = ".$emp_sol."
+							AND RQ.ANIO = ".$anio."
+							AND RQ.COD_CIA = ".$_SESSION['cod_cia']."
+							AND RQ.CODDEPTO_SOL = ".$deptosol."
+							AND VWE.STATUS = 'A'";
+		$this->get_results_from_query();
+        return $this->rows;
+	}
+	
 }
 ?>
