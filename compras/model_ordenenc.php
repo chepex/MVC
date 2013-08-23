@@ -7,37 +7,51 @@ error_reporting(E_ALL);
 require_once('../core/db_abstract_model.php');
 
 
-class requisicion extends DBAbstractModel {
+class ordenenc extends DBAbstractModel {
 
 
 
     ############################### PROPIEDADES ################################
+    public $NUM_ORDEN;
+    public $FECHA_ORDEN;
     public $COD_CIA;
-    protected $NUM_REQ;
-    public $CODDEPTO_SOL;
-    public $EMP_SOL;
-    public $COD_EMP_ELAB;
+    public $CODIGO_GRUPO;
+    public $COD_EMP;
+    public $SOLICITANTE;
+    public $NUM_PEDIDO;
+    public $COD_PROV;
+    public $FORMA_PAGO;
+    public $VIA;
+    public $NUM_DIAS;
     public $OBSERVACIONES;
     public $PROYECTO;
-    public $AUTORIZADO_POR;
-    public $FECHA_AUTORIZADO;
-    public $ANIO;
     public $STATUS;
-    public $CODIGO_GRUPO;
+    public $AUTORIZADO;
+    public $FECHAUTORIZADO;
+    public $ATENDIO;
+    public $ANULADO;
+    public $FECHAANULADO;
+    public $NUM_REQ;
+    public $ANIO;
+    public $CODDEPTO_SOL;
     public $USUARIO;
     public $FECHA_ING;
-    public $NO_FORMULARIO;
+    public $AUTORIZADA;
     public $COD_CAT;
-    public $TIPO_REQ;
-    public $COMENT_COMPRAS;
-    public $COD_PRIORIDAD;
-    
+    public $TIPO_ORDEN;
+    public $ZAPATERIA;	
+    public $PLANTA;
     
 
     ############################### ATRIBUTOS ################################
         public function atributos()
     {
-        $masx= array('COD_CIA','NUM_REQ','CODDEPTO_SOL','EMP_SOL','COD_EMP_ELAB','OBSERVACIONES','PROYECTO','AUTORIZADO_POR','FECHA_AUTORIZADO','ANIO','STATUS','CODIGO_GRUPO','USUARIO','FECHA_ING','NO_FORMULARIO','COD_CAT','TIPO_REQ','COMENT_COMPRAS','COD_PRIORIDAD');
+        $masx= array('NUM_ORDEN','FECHA_ORDEN','COD_CIA','CODIGO_GRUPO','COD_EMP',
+					'SOLICITANTE','NUM_PEDIDO','COD_PROV','FORMA_PAGO','VIA','NUM_DIAS',
+					'OBSERVACIONES','PROYECTO','FECHA_ING','STATUS','AUTORIZADO',
+					'FECHAUTORIZADO','ATENDIO','ANULADO','FECHAANULADO','NUM_REQ','ANIO','CODDEPTO_SOL',
+					'USUARIO','FECHA_ING','AUTORIZADA','COD_CAT',
+					'TIPO_ORDEN','ZAPATERIA','PLANTA');
         $masx=implode($masx, ",");
         return $masx;
     }
@@ -58,7 +72,7 @@ class requisicion extends DBAbstractModel {
 
         public function tableName()
     {
-        return 'requisicion';
+        return 'ordenenc';
     }
     
     public function Modulo()
@@ -69,7 +83,7 @@ class requisicion extends DBAbstractModel {
 
     public function llave()
     {
-        return array('COD_CIA','NUM_REQ','ANIO');
+        return array('COD_CIA','NUM_ORDEN');
 
     }
 
@@ -82,19 +96,46 @@ class requisicion extends DBAbstractModel {
 
     ################################# MÉTODOS ##################################
    
+   #Procedimiento que se encarga de Crear la Orden de Compra
+   public function generar_ordencompra(){
+
+	  $this->query="INSERT INTO ORDENENC
+						(NUM_ORDEN, FECHA_ORDEN, COD_CIA, CODIGO_GRUPO, COD_EMP, 
+						SOLICITANTE, NUM_PEDIDO, COD_PROV, 
+						FORMA_PAGO, VIA, NUM_DIAS, OBSERVACIONES,
+						PROYECTO, ATENDIO, NUM_REQ, 
+						ANIO, CODDEPTO_SOL, USUARIO, 
+						FECHA_ING, COD_CAT , TIPO_ORDEN) 
+					SELECT '".$_REQUEST['NUM_ORDEN']."', '".$_REQUEST['FECHA_ORDEN']."' , COD_CIA, CODIGO_GRUPO, COD_EMP_ELAB, EMP_SOL,
+							'".$_REQUEST['NUM_PEDIDO']."','120','".$_REQUEST['FORMA_PAGO']."',
+							'".$_REQUEST['VIA']."',".$_REQUEST['NUM_DIAS'].", OBSERVACIONES, 
+							PROYECTO, '".$_REQUEST['ATENDIO']."', NUM_REQ, ANIO, 
+							CODDEPTO_SOL, USUARIO,SYSDATE, COD_CAT,TIPO_REQ
+					FROM REQUISICION WHERE ANIO=". date('Y') . " AND NUM_REQ='".$_REQUEST['NUM_REQ']."' AND COD_CIA=".$_REQUEST['COD_CIA'];
+		$this->execute_single_query();
+	  /*$COTIZACION = $_REQUEST['ckporden'];
+	  foreach($COTIZACION as $lis){
+			print_r (explode("|",$lis));
+		}
+		echo "<pre>";
+			echo $this->query;
+			print_r($_REQUEST);
+		echo"</pre>";*/
+	}
+   
     
     #Define Un Arreglo con las Axis 'X' y Axis 'Y' para un grafico
     /*
      * Este Metodo debe ser definido segun la necesidad del Grafico
      * */
-    public function get_datagrafico(){
+    /*public function get_datagrafico(){
 		$this->rows=array();
 		$this->query = "  SELECT   CATEGORIAS.COD_CAT,
 								   CATEGORIAS.NOM_CAT,
 								   NVL (PRESUPUESTOS.VALOR, 0) VAL_PRESUPUESTADO,
-								   NVL (PRESUPUESTOS.SALDO, 0) SALDO
+								   NVL (PRESUPUESTOS.SALDO, 0) SA
+						  WHERE       PRESUPUESTOS.ANIO = ".date('Y')."LDO
 						  FROM   PRESUPUESTOS, CATEGORIAS
-						  WHERE       PRESUPUESTOS.ANIO = ".date('Y')."
 								AND PRESUPUESTOS.MES = ".date('m')."
 								AND PRESUPUESTOS.CCOSTO = '".$_SESSION['PROYECTO']."'
 								AND PRESUPUESTOS.TIPO = 'P'
@@ -201,7 +242,7 @@ class requisicion extends DBAbstractModel {
 			$repuesta = false;
 		}
         return $respuesta;
-	}
+	}*/
 	
 }
 ?>

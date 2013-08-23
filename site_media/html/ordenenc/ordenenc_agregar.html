@@ -1,0 +1,111 @@
+<br/>
+<br/>
+	<form id="frmordenenc" action="{SET}" method="POST">
+        <div class="item_requerid">Compa&ntilde;ia</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+		</div>
+        <div class="item_requerid">Num Orden.</div>
+        <div class="form_requerid">
+			<input type="text" name="NUM_ORDEN" id="NUM_ORDEN" class="input-small" readonly="readonly" value='{NUM_ORDEN}'>
+		</div>
+		 <div class="item_requerid">Fecha Orden.</div>
+        <div class="form_requerid">
+			<input type="text" name="FECHA_ORDEN" id="FECHA_ORDEN" class="input-small" >
+		</div>
+		 <div class="item_requerid">Num Pedido</div>
+        <div class="form_requerid">
+			<input type="text" name="NUM_PEDIDO" id="NUM_PEDIDO" class="input-small" >
+		</div>
+		<div class="item_requerid">VIA</div>
+        <div class="form_requerid">
+			<select name="VIA" id="VIA" class="chzn-select input-xlarge">
+				<option value='T'>TERRESTRES</option>
+				<option value='M'>MAR&Iacute;TIMA</option>
+				<option value='A'>AEREA</option>
+				<option value='L'>LOCAL</option>
+			</select>
+		</div>
+		<div class="item_requerid">Forma de Pago</div>
+        <div class="form_requerid">
+			<select name="FORMA_PAGO" id="FORMA_PAGO" class="chzn-select input-xlarge">
+				<option value='R'>CR&Eacute;DITO</option>
+				<option value='C'>CONTADO</option>
+			</select>
+		</div>
+		 <div class="item_requerid">D&iacute;as Cr&eacute;dito</div>
+        <div class="form_requerid">
+			<input type="text" name="NUM_DIAS" id="NUM_DIAS" class="input-small" >
+		</div>
+		 <div class="item_requerid">Persona Atendi&oacute;</div>
+        <div class="form_requerid">
+			<input type="text" name="ATENDIO" id="ATENDIO" class="input-xlarge" maxlength='30'>
+		</div>
+		<div class="item_requerid">Requisicion</div>
+        <div class="form_requerid">
+			<select name="NUM_REQ" id="NUM_REQ" class="chzn-select input-xlarge">
+				{lstrequisicion}
+			</select>
+		</div>
+		<br/><br/><br/><br/><br/><br/>
+		<br/><br/><br/><br/><br/><br/><br/><br/><br/>
+		<div id='det_compra'></div>
+        <div class="form_button">
+				<input type="submit" name="enviar" id="btn-save-enc" value="Generar Orden">
+		</div>
+	</form>
+
+<br/><br/>
+<script>
+	$("#btn-save-enc").click(function(){
+		//$('#btn-savedet').removeAttr("disabled");
+		$.ajax({
+				url : 'index.php?ctl=controller_ordenenc&' + $("#frmordenenc").serialize() ,     
+				data : { act : 'insert' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							//$('#btn-save-enc').attr("disabled", true);
+							//$('#COD_CAT').attr("disabled", true);
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	      	  	});
+		return false;
+	});
+	
+	
+	$("#NUM_REQ").change(function(){
+		var NUM_REQ= $("#NUM_REQ").val();
+		lista_cotizacion(NUM_REQ,'NUM_REQ');
+	});
+	
+	function lista_cotizacion(id, optdata){
+		$.ajax({
+				url : 'index.php?ctl=controller_ordenenc',     
+				data : { act : 'view_cotizacion' , NUM_REQ : id, opt: optdata},
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$("#det_compra").empty();
+							$("#det_compra").fadeIn("slow").html(resp);
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	      	  	});
+	}
+	$(document).ready(function(){
+		$('#btn-savedet').attr("disabled", true);
+	});
+</script>

@@ -11,7 +11,7 @@ abstract class DBAbstractModel {
 	private static $db_host = '192.168.10.235';
 	private static $db_user = 'MMIXCO';
 	private static $db_pass = 'MARIO13';
-	public $debug = false;	
+	public $debug = true;	
     private static $db_name = 'DESA';
     protected $query;
     protected $rows = array();
@@ -403,6 +403,7 @@ abstract class DBAbstractModel {
 	
 	#Devuelve un String con la lista de options para un select html
 	 public function get_htmloptions($Arraylist=array()){
+		 $html .= "<option selected='selected'>Seleccione una Opcion</option>";
 		foreach($Arraylist as $fila=>$valor){
 			$html .= "<option value='".$Arraylist[$fila][0]."'> ".$Arraylist[$fila][0]." | ".$Arraylist[$fila][1]."</option>";//
 		}

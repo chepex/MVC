@@ -87,6 +87,7 @@
 				success : 
 						function(resp) {
 							var mivar = eval('(' + resp + ')');
+							alert(mivar);
 							$("#COD_PROD").empty();
 							$("#COD_PROD").append(mivar.lstpro);	
 							$('#COD_PROD').trigger("liszt:updated");

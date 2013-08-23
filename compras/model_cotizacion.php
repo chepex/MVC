@@ -108,6 +108,40 @@ class cotizacion extends DBAbstractModel {
             $this->get_results_from_query();
             return $this->rows ;
     }
+    
+    public function definir_cotizaciones($NUM_REQ,$ANIO){
+		 $this->rows = array();
+		 $this->query = "  SELECT   CT.COD_CIA,
+									CT.NUM_REQ,
+									CT.ANIO,
+									CT.CORRELATIVO,
+									PROV.COD_PROV,
+									PROV.NOMBRE,
+									PR.COD_PROD,
+									PR.NOMBRE AS NOMBRE_PROD,
+									CTD.CANTIDAD,
+									CTD.PRECIOUNI,
+									CTD.VALORREQ
+							FROM            COTIZACION CT
+								INNER JOIN
+									COTIZADET CTD
+										ON     CT.COD_CIA = CTD.COD_CIA
+												AND CT.NUM_REQ = CTD.NUM_REQ
+												AND CT.ANIO = CTD.ANIO
+												AND CT.CORRELATIVO = CTD.CORRELATIVO
+								INNER JOIN
+									PRODUCTOS PR
+										ON PR.COD_CIA = CTD.COD_CIA 
+												AND PR.COD_PROD = CTD.COD_PROD
+								INNER JOIN
+									PROVEEDORES PROV
+										ON CTD.COD_CIA = PROV.COD_CIA 
+												AND CTD.COD_PROV = PROV.COD_PROV
+							WHERE   CT.NUM_REQ = '".$NUM_REQ."' AND CT.ANIO = ".$ANIO."
+								ORDER BY   CTD.COD_PROD";
+            $this->get_results_from_query();
+            return $this->rows ;
+    }
   
 	
 	

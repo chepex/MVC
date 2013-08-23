@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=charset=ISO-8859-1">
+<link rel="stylesheet" type="text/css" href="../site_media/css/base_template.css">
+<link rel='stylesheet' type='text/css' href='../site_media/css/bootstrap/css/bootstrap.css'/>
+<link rel="stylesheet" href="../site_media/css/demo_table.css" />
+<link rel="stylesheet" media="all" type="text/css" href="../site_media/css/jquery-ui.css" />
+<link rel="stylesheet" media="all" type="text/css" href="../site_media/css/jquery-ui-timepicker-addon.css" />
+<link rel="stylesheet" href="../site_media/css/chosen/chosen.css" />
+<style type="text/css" title="currentStyle">
+    @import "../site_media/css/demo1_table_jui.css";   
+</style>
+
+<script src="../site_media/js/jquery.js"></script>
+<script src="../site_media/js/chosen/chosen.jquery.js"></script>
+<script src="../site_media/js/jquery.dataTables.js"></script>	
+<script type="text/javascript" src="../site_media/js/jquery-ui.min.js"></script>
+<script type="text/javascript" src="../site_media/js/jquery-ui-timepicker-addon.js"></script>
+<script src="../site_media/js/highcharts3/highcharts.js"></script>
+<script src="../site_media/js/bootstrap-dropdown.js"></script>
+<title>Ordenes de Compras: {subtitulo}</title>
+</head>
+
+<body>
+{menu1}
+{menu2}
+
+<div id ="mensaje1" class='alert alert-success'>{mensaje} </div>
+<div id ="mensaje2" class='alert alert-error'> {error}</div>
+
+<br/>
+<div id="formulario">
+	<fieldset>Encabezado Orden de Compra</fieldset>
+    {formulario}
+</div>
+<div id="formulario_details">
+	<fieldset>Detalle Orden de Compra</fieldset>
+    {formulario_details}
+</div>
+</body>
+
+</html>
+<script>
+	$('#FECHA_ORDEN').datepicker({
+		dateFormat: 'dd/mm/yy'
+	});
+	$(".chzn-select").chosen();
+	
+	if ($("#mensaje1").html().length > 10){
+		$("#mensaje1").show("slow").delay(3000).hide("slow");
+	}
+	else{
+		$("#mensaje1").hide();   
+	}
+	if ($("#mensaje2").html().length > 10){
+		$("#mensaje2").show("slow");
+	}
+	else{
+		$("#mensaje2").hide();   
+	}
+	
+</script> 
+
