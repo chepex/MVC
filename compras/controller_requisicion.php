@@ -237,7 +237,8 @@ class controller_requisicion extends requisicion{
 				  <br/><br/>Att. Modulo de Compras
 				  <br/>Ingreso de Requisiciones";
 		$bodymsg.="<form name='datos' action='http://192.168.10.235/webcaricia/caricia/181x/mvc_daniel/MVC/compras/index.php?ctl=controller_ordenenc&act=set' method='get'>
-					<input type='text' name='nombre'/>
+					Autorizar:<input type='text' name='nombre'/>
+					Comentario:<textarea rows='4' cols='2'></textarea>
 					<input type='submit' value='Enviar'/>
 				  </form>";		  
 		$parametros->sendemail('ingresorequisiciones@caricia.com', $destinatario, $asunto, $bodymsg);
