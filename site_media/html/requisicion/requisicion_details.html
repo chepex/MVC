@@ -19,7 +19,8 @@
 			<input type="text" name="CANTIDAD" id="CANTIDAD" class="input-mini">
 		</div>
         <div class="form_button">
-				<input type="submit" name="enviar" id="btn-savedet" value="Agregar">
+				<input type="submit" name="enviar" id="btn-savedet" value="Agregar" class='btn'>
+				<input type="submit" name="btnfinalizar" id="btn-finalizar" value="Finalizar Requisicion" class='btn'>
 		</div>
     </form>
 </div> 
@@ -44,7 +45,29 @@ $("#btn-savedet").click(function(){
 							
 						}
 	      	  	});
+	     $('#btn-finalizar').removeAttr("disabled");
 		return false;
 });
+
+$("#btn-finalizar").click(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_requisicion&' + $("#frmrequisiciondet").serialize() + '&' + $("#frmrequisicion").serialize() ,     
+				data : { act : 'finalizar_req' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$('#formulariox').fadeOut("slow").fadeIn("slow");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	      	  	});
+		return false;
+});
+
 </script>
 

@@ -9,9 +9,9 @@ session_start();
 abstract class DBAbstractModel {
 
 	private static $db_host = '192.168.10.235';
-	private static $db_user = 'MMIXCO';
-	private static $db_pass = 'MARIO13';
-	public $debug = true;	
+	private static $db_user = 'DROMERO';
+	private static $db_pass = 'DROMERO';
+	public $debug = false;	
     private static $db_name = 'DESA';
     protected $query;
     protected $rows = array();
@@ -431,7 +431,7 @@ abstract class DBAbstractModel {
 		if(count($tablesNames) > 1){
 			if(count($condicion) > 0){
 				$criterios = implode(' AND ', $condicion);
-				$this->query="SELECT ".$fields." FROM ". implode(',',$tablesNames) . " WHERE ". $tablesjoins ." " . $criterios;
+				$this->query="SELECT ".$fields." FROM ". implode(',',$tablesNames) . " WHERE ". $tablesjoins ."  " . $criterios;
 			}else{
 				$this->query="SELECT ".$fields." FROM ". implode(',',$tablesNames) . " WHERE ". $tablesjoins ;
 			}
@@ -514,8 +514,8 @@ abstract class DBAbstractModel {
                 left join listado_roles on
                 roles_x_usuario.cod_cia = listado_roles.cod_cia
                 and roles_x_usuario.role = listado_roles.role
-                where roles_x_usuario.cod_cia = 1
-                and roles_x_usuario.usuario = 'MMIXCO'
+                where roles_x_usuario.cod_cia = ".$_SESSION['cod_cia']."
+                and roles_x_usuario.usuario = '".$_SESSION['usuario']."'
                 and listado_roles.aplicacion = 'S'
                 )
                 order by roles_x_modulos.cod_modulo";

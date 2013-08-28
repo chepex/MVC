@@ -203,5 +203,60 @@ class requisicion extends DBAbstractModel {
         return $respuesta;
 	}
 	
+	#Genera una tabla con el encabezado requisicion para ser enviada por email
+	public function create_msghtml_header($objrequisicion){
+		$html .="<table class='table table-bordered' border='0.5px'>
+						<tr>
+							<th colspan='9'>Requisici&oacute;n No.:".$objrequisicion[0]['NUM_REQ']."</th>
+						</tr>
+						<tr>
+							<th>Num<br/>Req.</th>
+							<th>Fecha<br/>Req.</th>
+							<th>Observaciones</th>
+							<th>Tipo<br/>Req.</th>
+							<th>Prioridad</th>
+							<th>Categoria</th>
+							<th>Solicitante</th>
+							<th>Departamento</th>
+							<th>*</th>
+						</tr>";
+			foreach ($objrequisicion as $mks){
+					$html .= "<tr class='tfl'>
+									<td>".$mks["NUM_REQ"]."</td>
+									<td>".$mks["FECHA_ING"]."</td>
+									<td>".$mks["OBSERVACIONES"]."</td>
+									<td>".$mks["TIPO_REQ"]."</td>
+									<td>".$mks["DESCRIPCION_PRIORIDAD"]."</td>
+									<td>".$mks["COD_CAT"]."||".$mks["NOM_CAT"]."</td>
+									<td>".$mks["COD_EMP"]."||".$mks["NOMBRE_ISSS"]."</td>
+									<td>".$mks["COD_DEPTO"]."||".$mks["NOM_DEPTO"]."</td>
+									<td>*</td>
+							  </tr>";
+			}
+		$html .= "</table>";	
+		return $html;
+	}
+	
+	#Genera una tabla con el Detalle requisicion para ser enviada por email
+	public function create_msghtml_details($objdetrequisicion){
+		$html .="<table class='table table-striped tbl' border='0.5px' bordercolor='#585858'>
+						<tr>
+							<th>COD<br/>PRODUCTO</th>
+							<th>NOMBRE</th>
+							<th>DESCRIPCION</th>
+							<th>CANTIDAD</th>
+						</tr>";
+			foreach ($objdetrequisicion as $mks){
+					$html .= "<tr class='tfl'>
+									<td>".$mks["COD_PROD"]."</td>
+									<td>".$mks["NOMBRE"]."</td>
+									<td>".$mks["DESCRIPCION"]."</td>
+									<td>".$mks["CANTIDAD"]."</td>
+							  </tr>";
+			}
+		$html .= "</table>";	
+		return $html;
+	}
+	
 }
 ?>

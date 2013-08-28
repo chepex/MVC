@@ -44,7 +44,7 @@ class controller_requisicion extends requisicion{
 			}
 			$peticiones = array('set', 'get', 'delete', 'edit',
                         'agregar', 'buscar', 'borrar', 
-                        'update','get_all','listar','insert','get_ajax','view','view_rpt');
+                        'update','get_all','listar','insert','get_ajax','view','view_rpt','finalizar_req');
 			foreach ($peticiones as $peticion) {
 				if( $uri == $peticion)  {
 					$event = $peticion;
@@ -90,6 +90,8 @@ class controller_requisicion extends requisicion{
 			case 'view_rpt':
 				$this->view_rpt();
 				break;
+			case 'finalizar_req':
+				$this->finalizar_req();
 		}
 	}
 	
@@ -225,23 +227,6 @@ class controller_requisicion extends requisicion{
 		$_REQUEST['NO_FORMULARIO']= 'NULL';
 		$_REQUEST['COMENT_COMPRAS']= 'NULL';
 		$parametros->save(get_class($parametros));
-		$tipo_requisicion= $_REQUEST['TIPO_REQ']=='G' ? 'GLOBAL' : 'EXTERNA';
-		$tipo_orden = $_REQUEST['TIPO_REQ']=='G' ? 'OCG' : 'OCL';
-		$listaemail = $parametros->correo_encargadodocumento($tipo_orden);
-		$destinatario = $listaemail[0]['CORREO_USUARIO'];
-		$asunto = 'Ingreso de Requisicion No.'. $_REQUEST['NUM_REQ'] . " <Correo Generado Automaticamente>";
-		$bodymsg="Se ha ingresado una Nueva Requisicion de Compra<br/>
-				  De tipo: <strong>". $tipo_requisicion . "</strong> 
-				  con N&uacute;mero: <strong>".$_REQUEST['NUM_REQ']."</strong> 
-				  <br/>Verificarla para su aprobacion, e ingreso de cotizaciones.
-				  <br/><br/>Att. Modulo de Compras
-				  <br/>Ingreso de Requisiciones";
-		$bodymsg.="<form name='datos' action='http://192.168.10.235/webcaricia/caricia/181x/mvc_daniel/MVC/compras/index.php?ctl=controller_ordenenc&act=set' method='get'>
-					Autorizar:<input type='text' name='nombre'/>
-					Comentario:<textarea rows='4' cols='2'></textarea>
-					<input type='submit' value='Enviar'/>
-				  </form>";		  
-		$parametros->sendemail('ingresorequisiciones@caricia.com', $destinatario, $asunto, $bodymsg);
 		$this->msg=$detailsReq->mensaje;
 	}
 	
@@ -309,6 +294,38 @@ class controller_requisicion extends requisicion{
 		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
 		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
 		$obvista->retornar_vista();
+	}
+	
+	public function finalizar_req(){
+		$parametros = $this->set_obj();
+		$objreq = $parametros->crea_objeto(array("REQUISICION RQ","CATEGORIAS CAT", "PRIORIDADES PRI","VWEMPLEADOS VWE","DEPARTAMENTOS DPTO"),
+										   array("RQ.COD_CIA = CAT.COD_CIA", "RQ.COD_CAT = CAT.COD_CAT", "RQ.COD_PRIORIDAD = PRI.COD_PRIORIDAD", "RQ.COD_CIA = VWE.COD_CIA","RQ.EMP_SOL = VWE.COD_EMP","RQ.COD_CIA = DPTO.COD_CIA","RQ.CODDEPTO_SOL = DPTO.COD_DEPTO"),
+										   array(" AND RQ.NUM_REQ='".$_REQUEST['NUM_REQ']."'","RQ.ANIO=".$_REQUEST['ANIO'], "RQ.COD_CIA=".$_REQUEST['COD_CIA']),
+										   array("RQ.NUM_REQ","RQ.FECHA_ING","RQ.OBSERVACIONES","DECODE (RQ.TIPO_REQ,'E','EXTERNA','G','GLOBAL') TIPO_REQ","RQ.COD_PRIORIDAD","PRI.DESCRIPCION_PRIORIDAD",
+												  "CAT.COD_CAT","CAT.NOM_CAT","VWE.COD_EMP","VWE.NOMBRE_ISSS","DPTO.COD_DEPTO","DPTO.NOM_DEPTO")
+											);
+		$objdetreq = $parametros->crea_objeto(array("REQDET RQD","PRODUCTOS PRO","UNIDADES UNI"),
+											  array("RQD.COD_CIA = PRO.COD_CIA","RQD.COD_PROD = PRO.COD_PROD","RQD.CODIGO_UNIDAD = UNI.CODIGO_UNIDAD"),
+											  array("AND RQD.NUM_REQ='".$_REQUEST['NUM_REQ']."'","RQD.ANIO=".$_REQUEST['ANIO'], "RQD.COD_CIA=".$_REQUEST['COD_CIA']),
+											  array("RQD.NUM_REQ","RQD.COD_PROD","PRO.NOMBRE","UNI.DESCRIPCION","RQD.CANTIDAD")
+											 );
+		$html ="<!DOCTYPE html>
+			<head>
+					<link rel='stylesheet' type='text/css' href='http://192.168.10.235/webcaricia/caricia/181x/mvc_daniel/MVC/site_media/css/bootstrap/css/bootstrap.css'/>
+					<meta charset='ISO-8859-15'>
+			</head>
+			<body>";
+		$html.="<h5>Se ha ingresado una Nueva Requisicion de Compra<br/>
+				  De tipo: <strong>". $objreq[0]['TIPO_REQ']. "</strong></h5>";
+		$html.=$parametros->create_msghtml_header($objreq);
+		$html.=$parametros->create_msghtml_details($objdetreq);
+		$html.="<h4>Desea Autorizar esta Requisici&oacute;n?</h4><a href=# class='btn'>SI</a>";
+		$html.="</body></html>";
+		$tipo_orden = $objreq[0]['TIPO_REQ']=='GLOBAL' ? 'OCG' : 'OCL';
+		$listaemail = $parametros->correo_encargadodocumento($tipo_orden);
+		$destinatario = $listaemail[0]['CORREO_USUARIO'];
+		$asunto = 'Ingreso de Requisicion No.'. $_REQUEST['NUM_REQ'] . " <Correo Generado Automaticamente>";
+		$parametros->sendemail('ingresorequisiciones@caricia.com', $destinatario, $asunto, $html);
 	}
 	
 	public function get_ajax(){

@@ -2,7 +2,7 @@
 
 
 error_reporting(E_ALL);
-ini_set("display_errors", 1);
+ini_set("display_errors", 0);
 require_once('model_reqdet.php');
 require_once('controller_requisicion.php');
 require_once('../core/render_view_generic.php');

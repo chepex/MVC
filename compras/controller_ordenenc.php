@@ -2,7 +2,7 @@
 
 
 error_reporting(E_ALL);
-ini_set("display_errors", 1);
+ini_set("display_errors", 0);
 require_once('model_requisicion.php');
 require_once('model_ordenenc.php');
 require_once('model_cotizacion.php');
@@ -208,30 +208,9 @@ class controller_ordenenc extends ordenenc{
 		$parametros = $this->set_obj();
 		$objciau = $parametros->crea_objeto(array("CIAS_X_USUARIO"), '',array("USUARIO='".$_SESSION['usuario']."'"));
 		$_REQUEST['COD_EMP']= $objciau[0]['COD_EMP'];
-		$this->generar_ordencompra();
-		/*echo"<pre>";
-			print_r($objciau);
-		echo"</pre>";
-		//$detailsReq = $this->set_obj_details();
-		/*$objciasxu = $parametros->crea_objeto(array("CIAS_X_USUARIO"),"",array("USUARIO='".$_SESSION['usuario']."'"));
-		$_REQUEST['COD_EMP_ELAB']= $objciasxu[0]["COD_EMP"];
-		$_REQUEST['AUTORIZADO_POR']= 'NULL';
-		$_REQUEST['FECHA_AUTORIZADO']= 'NULL';
-		$_REQUEST['STATUS']= 'G';
-		$_REQUEST['CODIGO_GRUPO']= 'NULL';
-		$_REQUEST['USUARIO']= $_SESSION['usuario'];
-		$_REQUEST['FECHA_ING']= 'SYSDATE';
-		$_REQUEST['NO_FORMULARIO']= 'NULL';
-		$_REQUEST['COMENT_COMPRAS']= 'NULL';
-		$parametros->save(get_class($parametros));
-		$tipo_requisicion= $_REQUEST['TIPO_REQ']=='G' ? 'GLOBAL' : 'EXTERNA';
-		$tipo_orden = $_REQUEST['TIPO_REQ']=='G' ? 'OCG' : 'OCL';
-		$listaemail = $parametros->correo_encargadodocumento($tipo_orden);
-		$destinatario = $listaemail[0]['CORREO_USUARIO'];
-		$asunto = 'Ingreso de Requisicion No.'. $_REQUEST['NUM_REQ'] . " <Correo Generado Automaticamente>";
-		$bodymsg="Se ha ingresado una Nueva Requisicion de Compra<br/> De tipo: <strong>". $tipo_requisicion . "</strong> con N&uacute;mero: <strong>".$_REQUEST['NUM_REQ']."</strong> <br/>Verificarla para su aprobacion, e ingreso de cotizaciones.<br/><br/>Att. Modulo de Compras<br/>Ingreso de Requisiciones";
-		$parametros->sendemail('ingresorequisiciones@caricia.com', $destinatario, $asunto, $bodymsg);
-		$this->msg=$detailsReq->mensaje;*/
+		if(isset($_REQUEST['NUM_REQ']) && isset($_REQUEST['ckporden'])){
+					$this->generar_ordencompra();
+		}
 	}
 	
 	public function get_all($mensaje=''){
@@ -330,7 +309,7 @@ class controller_ordenenc extends ordenenc{
 									<td>".number_format($mks["CANTIDAD"], 2, '.', '')."</td>
 									<td>$".number_format($mks["PRECIOUNI"], 2, '.', '')."</td>
 									<td>$".number_format($mks["VALORREQ"], 2, '.', '')."</td>
-									<td><input type='checkbox' name='ckporden[]' id='ckporden-".$mks["CORRELATIVO"]."' value='".$mks["CORRELATIVO"]."|".$mks["COD_PROD"]."' req='".$mks["NUM_REQ"]."'></td>
+									<td><input type='checkbox' name='ckporden[]' id='ckporden-".$mks["CORRELATIVO"]."' value='CTD.CORRELATIVO=".$mks["CORRELATIVO"]."|CTD.COD_PROD=".$mks["COD_PROD"]."|CTD.COD_PROV=".$mks["COD_PROV"]."' req='".$mks["NUM_REQ"]."'></td>
 							  </tr>";
 			}
 		$html .= "</table>";

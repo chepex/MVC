@@ -98,7 +98,7 @@ class ordenenc extends DBAbstractModel {
    
    #Procedimiento que se encarga de Crear la Orden de Compra
    public function generar_ordencompra(){
-
+	#Se Genera el Encabezado a partir de la Tabla de Requisiciones
 	  $this->query="INSERT INTO ORDENENC
 						(NUM_ORDEN, FECHA_ORDEN, COD_CIA, CODIGO_GRUPO, COD_EMP, 
 						SOLICITANTE, NUM_PEDIDO, COD_PROV, 
@@ -113,14 +113,34 @@ class ordenenc extends DBAbstractModel {
 							CODDEPTO_SOL, USUARIO,SYSDATE, COD_CAT,TIPO_REQ
 					FROM REQUISICION WHERE ANIO=". date('Y') . " AND NUM_REQ='".$_REQUEST['NUM_REQ']."' AND COD_CIA=".$_REQUEST['COD_CIA'];
 		$this->execute_single_query();
-	  /*$COTIZACION = $_REQUEST['ckporden'];
-	  foreach($COTIZACION as $lis){
-			print_r (explode("|",$lis));
+		$COTIZACION = $_REQUEST['ckporden'];
+		#Se Genera el Detalle a partir de los detalles de la cotizacion seleccionados
+		foreach($COTIZACION as $lis){
+			$condicion= implode(' AND ', explode("|",$lis));
+			$condicion ."<br/>";
+			$this->query="INSERT INTO DETORDEN
+									(NUM_ORDEN,COD_CIA,COD_PROD,
+									CODIGO_UNIDAD,CANTIDAD,
+									PRECIOUNI,VALORREQ)
+								SELECT  '".$_REQUEST['NUM_ORDEN']."',CTD.COD_CIA,
+									CTD.COD_PROD,
+									CTD.CODIGO_UNIDAD,
+									CTD.CANTIDAD,
+									CTD.PRECIOUNI,
+									CTD.VALORREQ
+							FROM      COTIZADET CTD
+								INNER JOIN
+									COTIZACION CT
+										ON     CTD.COD_CIA = CT.COD_CIA
+												AND CTD.NUM_REQ = CT.NUM_REQ
+												AND CTD.ANIO = CT.ANIO
+												AND CTD.CORRELATIVO = CT.CORRELATIVO
+							WHERE   CTD.NUM_REQ = '".$_REQUEST['NUM_REQ']."' AND ".$condicion;
+			$this->execute_single_query();
+			$this->query="UPDATE COTIZADET CTD SET CTD.ACEPTADA='S' WHERE CTD.NUM_REQ = '".$_REQUEST['NUM_REQ']."' AND ". $condicion;
+			$this->execute_single_query();
+			
 		}
-		echo "<pre>";
-			echo $this->query;
-			print_r($_REQUEST);
-		echo"</pre>";*/
 	}
    
     
