@@ -58,14 +58,12 @@ class ordenenc extends DBAbstractModel {
     
      
     public function relaciones(){
-         $masx ="AND ".$this->tableName().".COD_PRIORIDAD = PRIORIDADES.COD_PRIORIDAD
-				 AND ".$this->tableName().".CODDEPTO_SOL = DEPARTAMENTOS.COD_DEPTO
-				 AND ".$this->tableName().".COD_CIA = DEPARTAMENTOS.COD_CIA";
+         $masx ="";
          return $masx;                
     }
 
     public function relacione_tablas(){
-         $masx= 'PRIORIDADES, DEPARTAMENTOS';
+         $masx= 'dual';
          return $masx;                
     }
 

@@ -182,7 +182,7 @@ class controller_cotizacion extends cotizacion{
 		$mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.ANIO',$parametros->tableName().'.CORRELATIVO',$parametros->tableName().'.FECHA','PROVEEDORES.COD_PROV','PROVEEDORES.NOMBRE',$parametros->tableName().'.ACEPTADA',$parametros->tableName().'.FECHA_ING');
         $masx=implode($mcampos, ",");
 		$data = $parametros->lis2(get_class($parametros), 2, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros));
+		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("delete"=>"style='display:none;'","update"=>"style='display:none;'","set"=>"style='display:none;'"));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html); 

@@ -3,10 +3,10 @@
 
 error_reporting(E_ALL);
 ini_set("display_errors", 0);
-require_once('model_reqdet.php');
-require_once('controller_requisicion.php');
+require_once('model_detorden.php');
+require_once('controller_ordenenc.php');
 require_once('../core/render_view_generic.php');
-class controller_reqdet extends reqdet{
+class controller_detorden extends detorden{
 	
 	protected $diccionario = array(
 		'subtitle'=>array('agregar'=>'Crear Nueva Requisicion',
@@ -84,18 +84,18 @@ class controller_reqdet extends reqdet{
 	}
 
 	public function set_obj() {
-		$obj = new reqdet();
+		$obj = new detorden();
 		return $obj;
 	}
 	
 	public function set_obj_master() {
-		$obj = new requisicion();
+		$obj = new ordenenc();
 		return $obj;
 	}
 	
 	public function set(){
 		$parametros = $this->set_obj();
-		$obvista = new view_Parametros();
+		/*$obvista = new view_Parametros();
 		$objciau = $parametros->crea_objeto(array("CIAS_X_USUARIO"), "", array("USUARIO='".$_SESSION['usuario']."'"));
 		$objemp = $parametros->crea_objeto(array("VWEMPLEADOS"), "",array("COD_EMP=". $objciau[0]["COD_EMP"]));
         $objdepto = $parametros->crea_objeto(array("DEPARTAMENTOS"), "",array("COD_DEPTO=". $objemp[0]["COD_DEPTO"]));
@@ -122,31 +122,31 @@ class controller_reqdet extends reqdet{
 		$obvista->html = str_replace('{lstunimedida}', $lstunidades , $obvista->html);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->retornar_vista();
+		$obvista->retornar_vista();*/
 	}
 	
 	public function get(){
 		$parametros = $this->set_obj();
-		$obvista = new view_Parametros();
+		/*$obvista = new view_Parametros();
 		
 		$parametros->get($parametros_data);
 		$data = array('ID'=>$parametros->ID);            
-		$obvista->retornar_vista('buscar', $data);
+		$obvista->retornar_vista('buscar', $data);*/
 	}
 	
 	public function delete(){
 		$parametros = $this->set_obj();
-		$xrequisicion = $this->set_obj_master();
+		/*$xrequisicion = $this->set_obj_master();
 		$obvista = new view_Parametros();
 		$parametros->delete(get_class($parametros));
 		$this->msg=$parametros->mensaje;
-		$xrequisicion->view();
+		$xrequisicion->view();*/
 		
 	}
 	
 	public function update(){
 		$parametros = $this->set_obj();
-		$obvista = new view_Parametros();
+		/*$obvista = new view_Parametros();
 		$data = $parametros->lis(get_class($parametros),1);
 		$tagreplace = $parametros->render_etiquetas($data);
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
@@ -156,20 +156,20 @@ class controller_reqdet extends reqdet{
 		$obvista->render_html($tagreplace);  
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->retornar_vista();
+		$obvista->retornar_vista();*/
 	}
 	
 	public function edit(){
 		$parametros = $this->set_obj();
-		$obvista = new view_Parametros();
+		/*$obvista = new view_Parametros();
 		$parametros->update(get_class($parametros));
-		$this->msg=$parametros->mensaje; 
+		$this->msg=$parametros->mensaje; */
 	}
 	
 	public function insert(){
 		$parametros = $this->set_obj();
-		$parametros->save(get_class($parametros));
-		$this->msg = $parametros->mensaje;
+		/*$parametros->save(get_class($parametros));
+		$this->msg = $parametros->mensaje;*/
 	
 	}
 	
@@ -177,10 +177,10 @@ class controller_reqdet extends reqdet{
 		$_REQUEST["filtro"]='NO';
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.COD_PROD', 'PRODUCTOS.NOMBRE',$parametros->tableName().'.CANTIDAD', 'UNIDADES.DESCRIPCION',$parametros->tableName().'.ANIO');
+		$mcampos = array($parametros->tableName().'.NUM_ORDEN',$parametros->tableName().'.COD_PROD','PRODUCTOS.NOMBRE','UNIDADES.DESCRIPCION', $parametros->tableName().'.CANTIDAD',$parametros->tableName().'.PRECIOUNI',$parametros->tableName().'.VALORREQ');
         $masx=implode($mcampos, ",");
-		$data = $parametros->lis2(get_class($parametros), 3, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("delete"=>"style='display:none;'", "update"=>"style='display:none;'", "view"=>"style='display:none;'", "set"=>"style='display:none;'"));
+		$data = $parametros->lis2(get_class($parametros), "1", $masx);
+		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("set"=>"style='display:none;'"));
 		$obvista->html = $obvista->get_template('listar',get_class($parametros)); 
 		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
 		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
@@ -192,14 +192,6 @@ class controller_reqdet extends reqdet{
 	}
 
 }
-
-/*$objecon =  new controller_reqdet();
-	$objecon->handler();*/
-
-
-
-
-
 
 
 ?>

@@ -3,9 +3,11 @@
 
 error_reporting(E_ALL);
 ini_set("display_errors", 0);
-require_once('model_requisicion.php');
+//require_once('model_requisicion.php');
 require_once('model_ordenenc.php');
-require_once('model_cotizacion.php');
+//require_once('model_cotizacion.php');
+require_once('model_detorden.php');
+require_once('controller_detorden.php');
 require_once('../core/render_view_generic.php');
 class controller_ordenenc extends ordenenc{
 	
@@ -238,13 +240,22 @@ class controller_ordenenc extends ordenenc{
 	
 	public function view(){
 		$parametros = $this->set_obj();
-		/*$detreq = new controller_reqdet();
+		$detorden = new controller_detorden();
 		$obvista = new view_Parametros();
-		//$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL', 'NOM_DEPTO','FECHA_ING','FECHA_AUTORIZADO','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','DESCRIPCION_PRIORIDAD');
-        $mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.CODDEPTO_SOL','DEPARTAMENTOS.NOM_DEPTO',$parametros->tableName().'.FECHA_ING',$parametros->tableName().'.FECHA_AUTORIZADO',$parametros->tableName().'.OBSERVACIONES',$parametros->tableName().'.PROYECTO',$parametros->tableName().'.ANIO',$parametros->tableName().'.COD_CAT',$parametros->tableName().'.TIPO_REQ','PRIORIDADES.DESCRIPCION_PRIORIDAD');
+		$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL', 'NOM_DEPTO','FECHA_ING','FECHA_AUTORIZADO','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','DESCRIPCION_PRIORIDAD');
+        $mcampos = array($parametros->tableName().'.COD_CIA',
+						 $parametros->tableName().'.NUM_ORDEN',
+						 $parametros->tableName().'.FECHA_ORDEN',
+						 $parametros->tableName().'.SOLICITANTE',
+						 $parametros->tableName().'.COD_PROV',
+						 $parametros->tableName().'.OBSERVACIONES',
+						 $parametros->tableName().'.PROYECTO',
+						 $parametros->tableName().'.AUTORIZADO',
+						 $parametros->tableName().'.FECHAUTORIZADO'
+						);
         $masx=implode($mcampos, ",");
-		$data = $parametros->lis2(get_class($parametros), 1, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros));
+		$data = $parametros->lis2(get_class($parametros), "1", $masx);
+		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("set"=>"style='display:none;'"));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html);  
@@ -254,7 +265,7 @@ class controller_ordenenc extends ordenenc{
 		$obvista->html = str_replace('{formulario_details}', '', $obvista->html);
 		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
 		$obvista->retornar_vista();
-		$detreq->get_all();*/
+		$detorden->get_all();
 		
 	}
 	

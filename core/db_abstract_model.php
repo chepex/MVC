@@ -131,7 +131,7 @@ abstract class DBAbstractModel {
 		$j=0;		
 		
 		
-		if( empty ($cl->relacione_tablas) ){
+		if( empty($cl->relacione_tablas) ){
 			$sql = "SELECT ".$campos."	 FROM ".$tabla.", ".$cl->relacione_tablas()." ".$where." ".$cl->relaciones();
 		
 		}else{
@@ -316,7 +316,7 @@ abstract class DBAbstractModel {
 	}
 	
 	# Renderiza una Tabla Con todos sus Registros y el CRUD
-	public function render_table_crud($class='',$links){
+	public function render_table_crud($class='',$links,$bnts=array()){
 		$cl = new $class;
 		$llave = $cl->llave();
 		$fila=0;	
@@ -333,15 +333,15 @@ abstract class DBAbstractModel {
 				
 			}	
             $html .= "<td>						
-                        <a class= 'btn-del btn btn-small btn-danger' type= 'button' href='../".$cl->Modulo()."/?ctl=controller_".$class."&act=delete&".$this->getkey_str_url($llave, $this->rows, $fila)."'><i title = 'Eliminar' class='icon-trash'></i></a>
-                        <a class= 'btn-upd btn btn-small' type= 'button' href='../".$cl->Modulo()."/?ctl=controller_".$class."&act=update&".$this->getkey_str_url($llave, $this->rows, $fila)."'> <i title = 'Actualizar' class='icon-pencil'></i></a>
-                        <a class= 'btn-vie btn btn-small' type= 'button' href='../".$cl->Modulo()."/?ctl=controller_".$class."&act=view&".$this->getkey_str_url($llave, $this->rows, $fila)."'> <i title = 'Ver' class='icon-eye-open'></i></a>
+                        <a ".$bnts['delete']." class= 'btn-del btn btn-small btn-danger' type= 'button' href='../".$cl->Modulo()."/?ctl=controller_".$class."&act=delete&".$this->getkey_str_url($llave, $this->rows, $fila)."'><i title = 'Eliminar' class='icon-trash'></i></a>
+                        <a ".$bnts['update']." class= 'btn-upd btn btn-small' type= 'button' href='../".$cl->Modulo()."/?ctl=controller_".$class."&act=update&".$this->getkey_str_url($llave, $this->rows, $fila)."'> <i title = 'Actualizar' class='icon-pencil'></i></a>
+                        <a ".$bnts['view']." class= 'btn-vie btn btn-small' type= 'button' href='../".$cl->Modulo()."/?ctl=controller_".$class."&act=view&".$this->getkey_str_url($llave, $this->rows, $fila)."'> <i title = 'Ver' class='icon-eye-open'></i></a>
                       </td>    
 					</tr>";
 			$fila++;
 		}
 		$html.="<tbody></table>";
-		$html.="<a class= 'btn btn-primary pull-right btn' type= 'button' href='../".$cl->Modulo()."/?ctl=controller_".$class."&act=set'>Crear</a>";
+		$html.="<a ".$bnts['set']." class= 'btn btn-primary pull-right btn' type= 'button' href='../".$cl->Modulo()."/?ctl=controller_".$class."&act=set'>Crear</a>";
 		return $html;
 	} 
 
