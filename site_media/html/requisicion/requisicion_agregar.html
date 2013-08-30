@@ -80,6 +80,7 @@
 <script>
 	$("#btn-save-enc").click(function(){
 		$('#btn-savedet').removeAttr("disabled"); 
+		$('#btn-savedet').removeClass( "btn" ).addClass( "btn btn-primary" );
 		$.ajax({
 				url : 'index.php?ctl=controller_requisicion&' + $("#frmrequisicion").serialize() ,     
 				data : { act : 'insert' },

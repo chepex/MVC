@@ -1,0 +1,25 @@
+<br/>
+<br/>
+			<div>
+	<form id="frmrptordendecompra" action="{VIEW_RPT}" method="POST">
+        <div class="item_requerid">Compa&ntilde;ia</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+		</div>
+        <div class="item_requerid">Num Orden</div>
+        <div class="form_requerid">
+			<select name="NUM_ORDEN" id="NUM_ORDEN" class="chzn-select input-xlarge">
+				{lstnumorden}
+			</select>
+		</div>
+        <div class="form_button">
+				<input type="submit" name="enviar" id="btn-save-enc" value="Generar Reporte">
+		</div>
+    </form>
+</div> 
+<script>
+	$(document).ready(function(){
+		$('#btn-savedet').attr("disabled", true);
+	});
+</script>

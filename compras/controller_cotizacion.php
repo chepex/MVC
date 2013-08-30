@@ -182,7 +182,7 @@ class controller_cotizacion extends cotizacion{
 		$mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.ANIO',$parametros->tableName().'.CORRELATIVO',$parametros->tableName().'.FECHA','PROVEEDORES.COD_PROV','PROVEEDORES.NOMBRE',$parametros->tableName().'.ACEPTADA',$parametros->tableName().'.FECHA_ING');
         $masx=implode($mcampos, ",");
 		$data = $parametros->lis2(get_class($parametros), 2, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("delete"=>"style='display:none;'","update"=>"style='display:none;'","set"=>"style='display:none;'"));
+		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("delete"=>"style='display:none;'","update"=>"style='display:none;'"));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html); 
@@ -227,7 +227,7 @@ class controller_cotizacion extends cotizacion{
 					<title>LISTADO COMPARATIVOS DE PRECIOS</title>
 			</head>
 			<body>";
-		$html .="<br/><br/><br/><br/><div id='contenedor_pg' style='height:3000px;'>";
+		$html .="<br/><div id='contenedor_pg'>";
 		$html .="<table class='table table-striped tbl' border='0.5px' bordercolor='#585858'>
 						<tr>
 							<th colspan='9'>Listado Comparativo de Precios</th>
@@ -258,8 +258,8 @@ class controller_cotizacion extends cotizacion{
 			}
 		$html .= "</table></div><!-- Cierre div contenedor_pg -->
 				</body></html>";
-		//echo $html;
-		try{
+		echo $html;
+		/*try{
 			$html2pdf = new HTML2PDF('P','letter','es',false,'ISO-8859-15',3);
 			$html2pdf->pdf->SetDisplayMode('fullpage');
 			$html2pdf->writeHTML($html, isset($_GET['vuehtml']));
@@ -268,7 +268,7 @@ class controller_cotizacion extends cotizacion{
 		catch(HTML2PDF_exception $e) {
 			echo $e;
 			exit;
-		}
+		}*/
 		
 	}
 	

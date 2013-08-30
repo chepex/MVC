@@ -3,9 +3,9 @@
 
 error_reporting(E_ALL);
 ini_set("display_errors", 0);
-//require_once('model_requisicion.php');
+require_once('model_requisicion.php');
 require_once('model_ordenenc.php');
-//require_once('model_cotizacion.php');
+require_once('model_cotizacion.php');
 require_once('model_detorden.php');
 require_once('controller_detorden.php');
 require_once('../core/render_view_generic.php');
@@ -27,7 +27,8 @@ class controller_ordenenc extends ordenenc{
 							'GET'=>'../compras/?ctl=controller_ordenenc',
         'DELETE'=>'../compras/?ctl=controller_ordenenc&act=delete',
         'EDIT'=>'../compras/?ctl=controller_ordenenc&act=edit',
-        'GET_ALL'=>'../compras/?ctl=controller_ordenenc&act=get_all'
+        'GET_ALL'=>'../compras/?ctl=controller_ordenenc&act=get_all',
+        'VIEW_RPT'=>'../compras/?ctl=controller_ordenenc&act=render_pdf'
 		)
 	);
 	
@@ -44,7 +45,7 @@ class controller_ordenenc extends ordenenc{
 			}
 			$peticiones = array('set', 'get', 'delete', 'edit',
                         'agregar', 'buscar', 'borrar', 
-                        'update','get_all','listar','insert','get_ajax','view','view_rpt','view_cotizacion');
+                        'update','get_all','listar','insert','get_ajax','view','view_rpt','view_cotizacion','render_pdf');
 			foreach ($peticiones as $peticion) {
 				if( $uri == $peticion)  {
 					$event = $peticion;
@@ -92,6 +93,9 @@ class controller_ordenenc extends ordenenc{
 				break;
 			case 'view_cotizacion':
 				$this->view_cotizacion();
+				break;
+			case 'render_pdf':
+				$this->render_pdf();
 				break;
 		}
 	}
@@ -272,22 +276,174 @@ class controller_ordenenc extends ordenenc{
 	public function view_rpt(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$_REQUEST[$parametros->tableName().".COD_CIA"] = $_SESSION['cod_cia']; 
-		$_REQUEST[$parametros->tableName().".ANIO"] = date('Y');//2012;
-		//$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL','NOM_DEPTO','FECHA_ING','FECHA_AUTORIZADO','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','DESCRIPCION_PRIORIDAD');
-        $mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.CODDEPTO_SOL','DEPARTAMENTOS.NOM_DEPTO',$parametros->tableName().'.FECHA_ING',$parametros->tableName().'.FECHA_AUTORIZADO',$parametros->tableName().'.OBSERVACIONES',$parametros->tableName().'.PROYECTO',$parametros->tableName().'.ANIO',$parametros->tableName().'.COD_CAT',$parametros->tableName().'.TIPO_REQ','PRIORIDADES.DESCRIPCION_PRIORIDAD');
-        $masx=implode($mcampos, ",");
-		$data = $parametros->lis2(get_class($parametros), 2, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros));
+		$lstorden = $parametros->get_lsoption("ORDENENC", array("NUM_ORDEN"=>"","OBSERVACIONES"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "ANIO"=>date('Y')));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html); 
-		$obvista->html = str_replace('{formulario_details}', '', $obvista->html);  
+		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['agregar'], $obvista->html);
+		$obvista->html = str_replace('{formulario}', $obvista->get_template('ordencompras',get_class($parametros)), $obvista->html);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
-		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
-		$obvista->retornar_vista();*/
+		$obvista->html = str_replace('{formulario_details}', " ", $obvista->html); 
+		$obvista->html = str_replace('{lstnumorden}', $lstorden, $obvista->html);
+		$obvista->html = str_replace('{codcia}', $_SESSION['cod_cia'] , $obvista->html);
+		$obvista->html = str_replace('{descia}', $_SESSION['nom_cia'] , $obvista->html);
+		$obvista->retornar_vista();
+	}
+	
+	public function render_pdf(){
+		$parametros = $this->set_obj();
+		$obvista = new view_Parametros();
+		#Encabezado de Orden de Compra
+		$objorden = $parametros->crea_objeto(array("ordenenc ore","vwempleados vwe", "PROVEEDORES PR","DEPARTAMENTOS DEPT","CATEGORIAS CAT","GRUPO_INVENTARIO GINV", "vwempleados vwee"),
+										   array("ORE.COD_CIA = VWE.COD_CIA","ORE.SOLICITANTE = VWE.COD_EMP",
+												 "ORE.COD_CIA = PR.COD_CIA", "ORE.COD_PROV = PR.COD_PROV", 
+												 "ORE.COD_CIA = DEPT.COD_CIA","ORE.CODDEPTO_SOL = DEPT.COD_DEPTO", 
+												 "ORE.COD_CIA = CAT.COD_CIA", "ORE.COD_CAT = CAT.COD_CAT",
+												 "ORE.COD_CIA = GINV.COD_CIA","ORE.CODIGO_GRUPO = GINV.COD_GRUPO",
+												 "ORE.COD_CIA = VWEE.COD_CIA", "ORE.COD_EMP = VWEE.COD_EMP"),
+										   array(" AND ORE.NUM_ORDEN='".$_REQUEST['NUM_ORDEN']."'", "ORE.COD_CIA=".$_REQUEST['COD_CIA']),
+										   array("ORE.NUM_ORDEN","ORE.FECHA_ORDEN","GINV.COD_GRUPO",
+												 "GINV.NOM_GRUPO","PR.COD_PROV","PR.NOMBRE","PR.DIRECCION",
+												 "PR.TELEFONO","PR.FAX","ORE.ATENDIO","ORE.NUM_REQ",
+												 "DECODE (ORE.FORMA_PAGO,'R','CREDITO',
+																		'C',
+																			'CONTADO')FORMA_PAGO",
+												 "ORE.NUM_DIAS DIAS_CREDITO","DECODE (ORE.VIA,'T','TERRESTRE',
+																							  'L','LOCAL',
+																							  'M','MARITIMA',
+																							  'A','AEREA') VIA",
+												"VWE.NOMBRE_ISSS SOLICITANTE", "ORE.OBSERVACIONES", "ORE.ATENDIO",
+												"ORE.COD_CAT","CAT.NOM_CAT",
+												"DECODE (TIPO_ORDEN,'E','EXTERNA',
+																	'G','GLOBAL')TIPO_ORDEN",
+												"DEPT.COD_DEPTO","DEPT.NOM_DEPTO","VWEE.NOMBRE_ISSS ELABORADO","ORE.AUTORIZADO"
+												)
+											);
+		//$table= $parametros->create_msghtml_header($objorden);
+		$html ="<!DOCTYPE html>
+			<head>
+					<link rel='stylesheet' type='text/css' href='../site_media/css/bootstrap/css/bootstrap.css'/>
+					<meta charset='ISO-8859-15'>
+					<style type='text/css'>
+						.tbl {border-collapse:collapse}
+						.tfl {border:1px solid black}
+					</style>
+					<title>Impresion de Orden de Compra</title>
+			</head>
+			<body>";
+		$html .="<div id='contenedor_pg' style='margin-top:57px;margin-left:57px;margin-right:57px;'>";
+		$html .="<table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:11px;'>";
+			foreach ($objorden as $mks){
+					$html .= "<tr>
+									<td><strong>INDUSTRIAS CARICIA S.A. DE C.V.</strong></td>
+									<td><strong>ORDEN DE COMPRA GCO-FOR-002</strong></td>
+									<td>No. ".$mks["NUM_ORDEN"]."</td>
+							  </tr>";
+					$html .= "<tr>
+									<td colspan='2'>
+													Direcci&oacute;n: Km. 4 1/2 Blvd. del Ejercito Nacional, Soyapango<br/>
+													PBX(503)277-1333, FAX(503)227-1304, email: compras@caricia.com<br/>
+													Giro de Negocio: Fabrica de Calzado Registro:351-4 NIT:0614-191071-0017
+									</td>
+									<td>
+										<strong>Fecha:</strong> ".$mks["FECHA_ORDEN"]."<br/><strong>".$mks["NOM_GRUPO"]."</strong>
+									</td>
+							  </tr>";
+					$html .= "<tr>
+									<td colspan='2'>
+										Proveedor: <strong>".$mks["COD_PROV"]."&nbsp; ".$mks["NOMBRE"]."</strong>
+									</td>
+									<td>
+										Tel. ".$mks["TELEFONO"]."<br/>
+										Fax. ".$mks["FAX"]."
+									</td>
+							  </tr>";
+					$html .= "<tr>
+									<td colspan='3'>
+										<strong>TODA MERCADER&Iacute;A SER&Aacute; RECIBIDA CONTRA PRESENTACI&Oacute;N DE ESTA ORDEN DE COMPRA.</strong>
+									</td>
+							  </tr>";
+					$html .= "<tr>
+									<td colspan='2'>
+										Contacto: <strong>".$mks["ATENDIO"]."</strong>
+									</td>
+									<td>
+										Requisici&oacute;n: ".$mks["NUM_REQ"]."
+									</td>
+							  </tr>";
+					$html .= "<tr>
+									<td colspan='2'>
+										Forma de Pago: ".$mks["FORMA_PAGO"]."
+									</td>
+									<td>
+										Num d&iacute;as: ".$mks["DIAS_CREDITO"]."
+									</td>
+							  </tr>";
+					$html .= "<tr>
+									<td colspan='2'>
+										Atendi&oacute;: ".$mks["ATENDIO"]."
+									</td>
+									<td>
+										Transporte: ".$mks["VIA"]."
+									</td>
+							  </tr>";
+			}
+		$html .= "</table></div><!-- Cierre div contenedor_pg -->";
+		
+		#Detalle de Orden de Compra
+		$objdetorden = $parametros->crea_objeto(array("detorden ode","ordenenc oen", "requisicion rq","productos pro","UNIDADES UM"),
+										   array("ODE.COD_CIA = OEN.COD_CIA", "ODE.NUM_ORDEN = OEN.NUM_ORDEN",
+												 "OEN.COD_CIA = RQ.COD_CIA","OEN.NUM_REQ = RQ.NUM_REQ",
+												 "OEN.ANIO = RQ.ANIO","ODE.COD_CIA = PRO.COD_CIA", "ODE.COD_PROD = PRO.COD_PROD","ODE.CODIGO_UNIDAD = UM.CODIGO_UNIDAD"
+												),
+										   array(" AND ode.num_orden='".$_REQUEST['NUM_ORDEN']."'", "ode.COD_CIA=".$_REQUEST['COD_CIA']),
+										   array("trunc(RQ.FECHA_ING) REQUERIDO", "ODE.COD_PROD", 
+												 "ODE.CANTIDAD" ,"UM.DESCRIPCION","PRO.NOMBRE", 
+												 "ODE.PRECIOUNI", "ODE.VALORREQ")
+											);
+		$html .="<div id='detcontenedor_pg' style='margin-left:57px;margin-right:57px;'><table class='table table-bordered' border='0.5px' bordercolor='#585858' style='font-size:11px;'>";
+		$html.="<thead>
+					<tr>
+						<th>Requerido</th>
+						<th>C&oacute;digo</th>
+						<th>Cantidad</th>
+						<th>U/M</th>
+						<th>Descripci&oacute;n</th>
+						<th>Prec.unit.</th>
+						<th>TOTAL</th>
+					</tr>
+				</thead>";
+		foreach ($objdetorden as $mks){
+					$html.="<tbody><tr>";
+						$html.="<td>".$mks['REQUERIDO']."</td>";
+						$html.="<td>".$mks['COD_PROD']."</td>";
+						$html.="<td>".$mks['CANTIDAD']."</td>";
+						$html.="<td>".$mks['DESCRIPCION']."</td>";
+						$html.="<td>".$mks['NOMBRE']."</td>";
+						$html.="<td><div style='text-align:right'>".number_format($mks['PRECIOUNI'], 2, '.', ',')."</div></td>";
+						$html.="<td><div style='text-align:right'>".number_format($mks['VALORREQ'], 2, '.', '')."</div></td>";
+					$html.="</tr></tbody>";
+					$TOTAL_ORDEN = $TOTAL_ORDEN + $mks['VALORREQ'];
+		}
+			$html .= "<tfoot>
+						<tr>
+							<th colspan='6'><div style='text-align:right'>TOTAL</div></th>
+							<th><div style='text-align:right'>$".number_format($TOTAL_ORDEN, 2, '.', '')."</div></th>
+						</tr>
+						<tr>
+							<th colspan='7'>Observaciones: ".$objorden[0]["OBSERVACIONES"]."</th>
+						</tr>
+						<tr>
+							<th colspan='7'>Se utilizar&aacute; en Depto: ".$objorden[0]["NOM_DEPTO"]."</th>
+						</tr>
+						<tr>
+							<th colspan='7'>Elaborado por: ".$objorden[0]["ELABORADO"]."</th>
+						</tr>
+						<tr>
+							<th colspan='7'>Autorizado por: ".$objorden[0]["AUTORIZADO"]."</th>
+						</tr>
+					</tfoot>";
+		$html.="</table></div>";
+		$html .= "</body></html>";
+		echo $html;
 	}
 	
 	public function view_cotizacion(){
