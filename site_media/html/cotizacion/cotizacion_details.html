@@ -2,7 +2,7 @@
 <br/>
 <div>
 	<form id="frmcotizadet" action="{SET}" method="POST">
-        <div class="item_requerid">Producto</div>
+       <!-- <div class="item_requerid">Producto</div>
         <div class="form_requerid">
 			<select name="COD_PROD" id="COD_PROD" class="chzn-select input-xxlarge">
 					{lstproductos}
@@ -13,17 +13,19 @@
 			<select name="CODIGO_UNIDAD" id="CODIGO_UNIDAD" class="chzn-select input-xlarge">
 					{lstunimedida}
 			</select>
-		</div>
-		<div class="item_requerid">Cantidad</div>
+		</div>-->
+		<div id='det_req'></div>
+		<!--<div class="item_requerid">Cantidad</div>
         <div class="form_requerid">
 			<input type="text" name="CANTIDAD" id="CANTIDAD" class="input-mini">
-		</div>
+		</div>-->
 		<div class="item_requerid">Precio U.</div>
         <div class="form_requerid">
 			<input type="text" name="PRECIOUNI" id="PRECIOUNI" class="input-mini">
 		</div>
         <div class="form_button">
-				<input type="submit" name="enviar" id="btn-savedet" value="Agregar">
+				<input type="submit" name="enviar" id="btn-savedet" value="Agregar" class='btn'>
+				<button name="newcot" id="btn-newcot" class='btn' disabled='disabled'>Crear Nueva Cotizaci&oacute;n</button>
 		</div>
     </form>
 </div> 
@@ -39,6 +41,8 @@ $("#btn-savedet").click(function(){
 				success : 
 						function(resp) {
 							$('#formulariox').fadeOut("slow").fadeIn("slow").html(resp);
+							$('#btn-newcot').removeAttr("disabled");
+							$('#PRECIOUNI').val('');
 						},
 				error : 
 						function(xhr, status) {
@@ -49,6 +53,28 @@ $("#btn-savedet").click(function(){
 						}
 	      	  	});
 		return false;
+});
+$("#btn-newcot").click(function(){
+	$.ajax({
+				url : 'index.php?ctl=controller_cotizacion&' +  $("#frmcotizacion").serialize() ,     
+				data : { act : 'siguente_correl' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$('#CORRELATIVO').val(resp);
+							$('#btn-savedet').attr("disabled", true);
+							$('#btn-newcot').attr("disabled", true);
+							$('#btn-save-enc').removeAttr("disabled");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	      	  });
+	return false;
 });
 </script>
 

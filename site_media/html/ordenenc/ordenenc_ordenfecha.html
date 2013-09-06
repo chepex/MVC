@@ -1,17 +1,16 @@
 <br/>
 <br/>
 			<div>
-	<form id="frmrptordendecompra" action="{VIEW_RPT}" method="POST">
+	<form id="frmrptordendecompra" action="{RPT_ORDENCOMPRA}" method="POST">
         <div class="item_requerid">Compa&ntilde;ia</div>
         <div class="form_requerid">
 			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
 			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
 		</div>
-        <div class="item_requerid">Num Orden</div>
+        <div class="item_requerid">Fecha Orden</div>
         <div class="form_requerid">
-			<select name="NUM_ORDEN" id="NUM_ORDEN" class="chzn-select input-xlarge">
-				{lstnumorden}
-			</select>
+			<input type="text" class="input-small" name="fechainicial" id="fechainicial" placeholder="Fecha inicial">
+			<input type="text" class="input-small" name="fechafinal" id="fechafinal" placeholder="Fecha Final">
 		</div>
         <div class="form_button">
 				<input type="submit" name="enviar" id="btn-save-enc" value="Generar Reporte" class='btn'>

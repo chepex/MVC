@@ -403,7 +403,7 @@ abstract class DBAbstractModel {
 	
 	#Devuelve un String con la lista de options para un select html
 	 public function get_htmloptions($Arraylist=array()){
-		 $html .= "<option selected='selected'>Seleccione una Opcion</option>";
+		 //$html .= "<option selected='selected'>Seleccione una Opcion</option>";
 		foreach($Arraylist as $fila=>$valor){
 			$html .= "<option value='".$Arraylist[$fila][0]."'> ".$Arraylist[$fila][0]." | ".$Arraylist[$fila][1]."</option>";//
 		}

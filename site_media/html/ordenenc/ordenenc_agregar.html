@@ -14,10 +14,6 @@
         <div class="form_requerid">
 			<input type="text" name="FECHA_ORDEN" id="FECHA_ORDEN" class="input-small" >
 		</div>
-		 <div class="item_requerid">Num Pedido</div>
-        <div class="form_requerid">
-			<input type="text" name="NUM_PEDIDO" id="NUM_PEDIDO" class="input-small" >
-		</div>
 		<div class="item_requerid">VIA</div>
         <div class="form_requerid">
 			<select name="VIA" id="VIA" class="chzn-select input-xlarge">
@@ -48,11 +44,17 @@
 				{lstrequisicion}
 			</select>
 		</div>
+		<div class="item_requerid">Proveedor</div>
+        <div class="form_requerid">
+			<select name="COD_PROV" id="COD_PROV" class="chzn-select input-xlarge">
+				{lstprov}
+			</select>
+		</div>
 		<br/><br/><br/><br/><br/><br/>
 		<br/><br/><br/><br/><br/><br/><br/><br/><br/>
 		<div id='det_compra'></div>
         <div class="form_button">
-				<input type="submit" name="enviar" id="btn-save-enc" value="Generar Orden">
+				<input type="submit" name="enviar" id="btn-save-enc" value="Generar Orden" class='btn'>
 		</div>
 	</form>
 
@@ -66,8 +68,9 @@
 				type : 'POST',     
 				success : 
 						function(resp) {
-							//$('#btn-save-enc').attr("disabled", true);
-							//$('#COD_CAT').attr("disabled", true);
+							$('#mensaje1').html("Se ha ingresado Correctamente la Orden de Compra No." + $("#NUM_ORDEN").val());
+							$('#mensaje1').toggle();
+							$('#btn-save-enc').attr("disabled", true);
 						},
 				error : 
 						function(xhr, status) {

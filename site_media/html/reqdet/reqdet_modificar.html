@@ -1,0 +1,21 @@
+    <form id="alta_usuario" action="{EDIT}" method="POST">
+        <div class="item_requerid">NUM REQ.</div>
+        <div class="form_requerid">
+			<input type="text" name="NUM_REQ"  id="NUM_REQ" value="{NUM_REQ}" readonly>
+			<input type="hidden" name="COD_CIA"  id="COD_CIA" value="{COD_CIA}" readonly>
+			<input type="hidden" name="ANIO"  id="ANIO" value="{ANIO}" readonly>
+		</div>
+		<div class="item_requerid">PRODUCTO</div>
+		<div class="form_requerid">
+			<select name="COD_PROD" id="COD_PROD" class="chzn-select input-xxlarge">
+					{lstproducto}
+			</select>
+		</div>
+		<div class="item_requerid">CANTIDAD</div>
+		<div class="form_requerid">
+			<input type="text" name="CANTIDAD"  id="CANTIDAD" value="{CANTIDAD}">
+		</div>
+        <div class="form_button">
+			<input class='btn' type="submit" name="enviar" id="btn-modificar" value="Modificar">
+		</div>
+    </form>

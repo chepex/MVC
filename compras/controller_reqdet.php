@@ -20,10 +20,10 @@ class controller_reqdet extends reqdet{
 						'VIEW_EDIT_USER'=>'compras/controller_requisicion.php?act=modificar',
 						'VIEW_DELETE_USER'=>'compras/controller_requisicion.php?act=borrar'),
 		'form_actions'=>array(
-							'SET'=>'../compras/controller_Requisicion.php?act=insert',
+							'SET'=>'../compras/controller_requisicion.php?act=insert',
 							'GET'=>'../compras/controller_requisicion.php',
         'DELETE'=>'../compras/controller_requisicion.php?act=delete',
-        'EDIT'=>'../compras/controller_requisicion.php?act=edit',
+        'EDIT'=>'../compras/?ctl=controller_reqdet&act=edit',
         'GET_ALL'=>'../compras/controller_requisicion.php?act=get_all'
 		)
 	);
@@ -67,7 +67,7 @@ class controller_reqdet extends reqdet{
 				break;
 			case 'edit':
 				$this->edit();
-				$this->get_all($this->msg);
+				//$this->get_all($this->msg);
 				break;
 			case 'insert':
 				$this->insert();
@@ -147,13 +147,27 @@ class controller_reqdet extends reqdet{
 	public function update(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$data = $parametros->lis(get_class($parametros),1);
-		$tagreplace = $parametros->render_etiquetas($data);
+		$objdetreq=$parametros->crea_objeto(array('reqdet'),'',
+											array('COD_CIA='.$_REQUEST['COD_CIA'],
+												  'NUM_REQ='.$_REQUEST['NUM_REQ'],
+												  'ANIO='.$_REQUEST['ANIO'],
+												  'COD_PROD='.$_REQUEST['COD_PROD']
+												  ));
+												  
+		$lstproducto=$parametros->get_lsoption('PRODUCTOS',
+											array('COD_PROD'=>"",'NOMBRE'=>""),
+											array('COD_CIA'=>$_REQUEST['COD_CIA'],
+												  'COD_PROD'=>$_REQUEST['COD_PROD']
+												  ));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['modificar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('modificar',get_class($parametros)), $obvista->html);
+		$obvista->html = str_replace('{NUM_REQ}', $objdetreq[0]['NUM_REQ'], $obvista->html);
+		$obvista->html = str_replace('{COD_CIA}', $objdetreq[0]['COD_CIA'], $obvista->html);
+		$obvista->html = str_replace('{ANIO}', $objdetreq[0]['ANIO'], $obvista->html);
+		$obvista->html = str_replace('{CANTIDAD}', $objdetreq[0]['CANTIDAD'], $obvista->html);
+		$obvista->html = str_replace('{lstproducto}', $lstproducto, $obvista->html);
 		$obvista->html = str_replace('{mensaje}', ' ', $obvista->html);
-		$obvista->render_html($tagreplace);  
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
 		$obvista->retornar_vista();
@@ -161,9 +175,18 @@ class controller_reqdet extends reqdet{
 	
 	public function edit(){
 		$parametros = $this->set_obj();
+		$requisicion = new requisicion();
+		$xrequisicion = new controller_requisicion();
 		$obvista = new view_Parametros();
 		$parametros->update(get_class($parametros));
 		$this->msg=$parametros->mensaje; 
+		$listaemail = $requisicion->correo_solicitante();
+		$destinatario = $listaemail[0]['CORREO_USUARIO'];
+		$asunto = 'Modificacion de Requisicion No.'. $_REQUEST['NUM_REQ'];
+		$bodymsg="Estimado Usuario: <br/>La Requisicion No: <strong>". $_REQUEST['NUM_REQ'] . "</strong>
+					  <br/>ha sido Modificada por el solicitante, verificar para su revisi&oacute;n<br/>";
+		$parametros->sendemail('ingresorequisiciones@caricia.com', $destinatario, $asunto, $bodymsg);
+		$xrequisicion->view();
 	}
 	
 	public function insert(){
@@ -177,10 +200,10 @@ class controller_reqdet extends reqdet{
 		$_REQUEST["filtro"]='NO';
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.COD_PROD', 'PRODUCTOS.NOMBRE',$parametros->tableName().'.CANTIDAD', 'UNIDADES.DESCRIPCION',$parametros->tableName().'.ANIO');
+		$mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.COD_PROD', 'PRODUCTOS.NOMBRE',$parametros->tableName().'.CANTIDAD', 'UNIDADES.DESCRIPCION',$parametros->tableName().'.ESPECIFICACIONES',$parametros->tableName().'.ANIO');
         $masx=implode($mcampos, ",");
 		$data = $parametros->lis2(get_class($parametros), 3, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("delete"=>"style='display:none;'", "update"=>"style='display:none;'", "view"=>"style='display:none;'", "set"=>"style='display:none;'"));
+		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("delete"=>"style='display:none;'", "view"=>"style='display:none;'", "set"=>"style='display:none;'"));
 		$obvista->html = $obvista->get_template('listar',get_class($parametros)); 
 		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
 		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
@@ -192,14 +215,6 @@ class controller_reqdet extends reqdet{
 	}
 
 }
-
-/*$objecon =  new controller_reqdet();
-	$objecon->handler();*/
-
-
-
-
-
 
 
 ?>

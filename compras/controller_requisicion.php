@@ -185,6 +185,7 @@ class controller_requisicion extends requisicion{
 		$obvista->html = str_replace('{NUM_REQ}', $_REQUEST['NUM_REQ'], $obvista->html);
 		$obvista->html = str_replace('{COD_CIA}', $_REQUEST['COD_CIA'], $obvista->html);
 		$obvista->html = str_replace('{ANIO}', $_REQUEST['ANIO'], $obvista->html);
+		$obvista->html = str_replace('{formulario_details}', '', $obvista->html);
 		$obvista->render_html($tagreplace);  
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
@@ -207,7 +208,10 @@ class controller_requisicion extends requisicion{
 			$destinatario = $listaemail[0]['CORREO_USUARIO'];
 			$asunto = 'La Requisicion No.'. $_REQUEST['NUM_REQ'];
 			$tipo_requisicion= $_REQUEST['TIPO_REQ']=='G' ? 'GLOBAL' : 'EXTERNA';
-			$bodymsg="La Requisicion No: ". $_REQUEST['NUM_REQ'] . " de Tipo " . $tipo_requisicion . " ha sido Procesada, y su estado es: ". $estado;
+			$bodymsg="Estimado Usuario: <br/>La Requisicion No: <strong>". $_REQUEST['NUM_REQ'] . "</strong>
+					  <br/>Tipo " . $tipo_requisicion . " ha sido Procesada<br/>Su Estado es: ". $estado ."<br/>
+					  Comentario de Compras:".$_REQUEST['COMENT_COMPRAS'] ."
+					  <br/>Atte.MODULO DE COMPRAS<br/>Departamento de Informática.";
 			$parametros->sendemail('ingresorequisiciones@caricia.com', $destinatario, $asunto, $bodymsg);
 		}
 		$parametros->update(get_class($parametros));
@@ -331,7 +335,7 @@ class controller_requisicion extends requisicion{
 				  De tipo: <strong>". $objreq[0]['TIPO_REQ']. "</strong></h5>";
 		$html.=$parametros->create_msghtml_header($objreq);
 		$html.=$parametros->create_msghtml_details($objdetreq);
-		$html.="<h4>Desea Autorizar esta Requisici&oacute;n?</h4><a href=# class='btn'>SI</a>";
+		$html.="<h4>Desea Autorizar esta Requisici&oacute;n?</h4><a href='http://192.168.10.235/webcaricia/caricia/181x/mvc_daniel/MVC/compras/?ctl=controller_requisicion&act=update&COD_CIA=".$_REQUEST['COD_CIA']."&NUM_REQ=".$_REQUEST['NUM_REQ']."&ANIO=".$_REQUEST['ANIO']."' class='btn'>SI</a>";
 		$html.="</body></html>";
 		$tipo_orden = $objreq[0]['TIPO_REQ']=='GLOBAL' ? 'OCG' : 'OCL';
 		$listaemail = $parametros->correo_encargadodocumento($tipo_orden);
@@ -348,7 +352,6 @@ class controller_requisicion extends requisicion{
 		if($_REQUEST['opt']=="COD_PROD"){
 				$lstproducto = $parametros->get_lsoption("PRODUCTOS", array("COD_PROD"=>"","NOMBRE"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "COD_CAT"=>"'".$_REQUEST['data']."'"));
 		}
-		
 		echo $lstproducto;
 	}
 

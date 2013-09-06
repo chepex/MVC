@@ -28,7 +28,8 @@ class controller_ordenenc extends ordenenc{
         'DELETE'=>'../compras/?ctl=controller_ordenenc&act=delete',
         'EDIT'=>'../compras/?ctl=controller_ordenenc&act=edit',
         'GET_ALL'=>'../compras/?ctl=controller_ordenenc&act=get_all',
-        'VIEW_RPT'=>'../compras/?ctl=controller_ordenenc&act=render_pdf'
+        'VIEW_RPT'=>'../compras/?ctl=controller_ordenenc&act=render_pdf',
+        'RPT_ORDENCOMPRA'=>'../compras/?ctl=controller_ordenenc&act=rpt_ordencompra'
 		)
 	);
 	
@@ -45,7 +46,7 @@ class controller_ordenenc extends ordenenc{
 			}
 			$peticiones = array('set', 'get', 'delete', 'edit',
                         'agregar', 'buscar', 'borrar', 
-                        'update','get_all','listar','insert','get_ajax','view','view_rpt','view_cotizacion','render_pdf');
+                        'update','get_all','listar','insert','get_ajax','view','view_rpt','view_cotizacion','render_pdf', 'set_ocompra','rpt_ordencompra');
 			foreach ($peticiones as $peticion) {
 				if( $uri == $peticion)  {
 					$event = $peticion;
@@ -97,6 +98,12 @@ class controller_ordenenc extends ordenenc{
 			case 'render_pdf':
 				$this->render_pdf();
 				break;
+			case 'set_ocompra':
+				$this->set_rpt_ordencompra();
+				break;
+			case 'rpt_ordencompra':
+				$this->rpt_ordencompra();
+				break;
 		}
 	}
 	
@@ -105,10 +112,6 @@ class controller_ordenenc extends ordenenc{
 		return $obj;
 	}
 	
-	/*public function set_obj_details() {
-		$obj = new reqdet();
-		return $obj;
-	}*/
 	
 	public function set(){
 		$parametros = $this->set_obj();
@@ -119,20 +122,6 @@ class controller_ordenenc extends ordenenc{
 		$lstcategorias = $parametros->get_lsoption("CATEGORIAS", array("COD_CAT"=>"","NOM_CAT"=>""), array("COD_CIA"=>$_SESSION['cod_cia']));
 		$lstdptos = $parametros->get_lsoption("DEPARTAMENTOS", array("COD_DEPTO"=>"","NOM_DEPTO"=>""), array("COD_CIA"=>$_SESSION['cod_cia']));
 		$lstempelado = $parametros->get_lsoption("VWEMPLEADOS", array("COD_EMP"=>"","NOMBRE_ISSS"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "STATUS"=>"'A'"));
-		/*$objciau = $parametros->crea_objeto(array("CIAS_X_USUARIO"), "", array("USUARIO='".$_SESSION['usuario']."'"));
-		$objemp = $parametros->crea_objeto(array("VWEMPLEADOS"), "",array("COD_EMP=". $objciau[0]["COD_EMP"]));
-        $objdepto = $parametros->crea_objeto(array("DEPARTAMENTOS"), "",array("COD_CIA=".$_SESSION['cod_cia'],"COD_DEPTO=". $objemp[0]["COD_DEPTO"]));
-        $objproy = $parametros->crea_objeto(array("PROYECTO"), "",array("COD_CIA=". $_SESSION['cod_cia'],"PROYECTO='".$objdepto[0]['PROYECTO']."'"));
-        $_SESSION['CUENTA_PROYECTO']= $objproy[0]['ENCARGADO'];
-        $_SESSION['PROYECTO']=$objproy[0]['PROYECTO'];
-		$objunidamedida1 = $parametros->crea_objeto(array("UNIDADES"),"",array("1=1"),array("CODIGO_UNIDAD","DESCRIPCION"));
-		$objunidamedida2 = $parametros->crea_objeto(array("UNIDADES u","EQUIVALENCIAS e"),array("u.CODIGO_UNIDAD = e.CODIGO_EQUIVALENCIA"),"",array("e.CODIGO_UNIDAD","u.DESCRIPCION"));
-		$obunidadesmedidas= array_merge($objunidamedida1,$objunidamedida2);
-		$lstdptos = $parametros->get_lsoption("DEPARTAMENTOS", array("COD_DEPTO"=>"","NOM_DEPTO"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "COD_DEPTO"=>$objemp[0]['COD_DEPTO']));
-        $lstempelado = $parametros->get_lsoption("VWEMPLEADOS", array("COD_EMP"=>"","NOMBRE_ISSS"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "STATUS"=>"'A'", "COD_DEPTO"=>$objemp[0]['COD_DEPTO']));
-        $lstcategorias = $parametros->get_lsoption("CATEGORIAS", array("COD_CAT"=>"","NOM_CAT"=>""), array("COD_CIA"=>$_SESSION['cod_cia']));
-        $lstproyectos =  $parametros->get_lsoption("PROYECTO", array("PROYECTO"=>"","NOMBRE"=>""), array("COD_CIA"=>$_SESSION['cod_cia'],"PROYECTO"=> "'".$objdepto[0]['PROYECTO']."'"));
-		$lstunidades = $parametros->get_htmloptions($obunidadesmedidas);*/
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['agregar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('agregar',get_class($parametros)), $obvista->html);
@@ -222,11 +211,6 @@ class controller_ordenenc extends ordenenc{
 	public function get_all($mensaje=''){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$objciau = $parametros->crea_objeto(array("CIAS_X_USUARIO"), "", array("USUARIO='".$_SESSION['usuario']."'"));
-		$objemp = $parametros->crea_objeto(array("VWEMPLEADOS"), "",array("COD_EMP=". $objciau[0]["COD_EMP"]));
-		$_REQUEST[$parametros->tableName().".COD_CIA"] = $_SESSION['cod_cia']; 
-		$_REQUEST[$parametros->tableName().".ANIO"] = date('Y');//2012;
-		$_REQUEST[$parametros->tableName().".CODDEPTO_SOL"] = $objemp[0]["COD_DEPTO"];*/
 		$mcampos = array('COD_CIA','NUM_ORDEN','FECHA_ORDEN','SOLICITANTE','COD_PROV','OBSERVACIONES','PROYECTO','AUTORIZADO','FECHAUTORIZADO');
         $masx=implode($mcampos, ",");
 		$data = $parametros->lis(get_class($parametros), 0, $masx);
@@ -470,9 +454,9 @@ class controller_ordenenc extends ordenenc{
 									<td>".$mks["NUM_REQ"]."</td>
 									<td>".$mks["CORRELATIVO"]."</td>
 									<td>".$mks["COD_PROV"]."</td>
-									<td style='width:17%'>".$mks["NOMBRE"]."</td>
+									<td>".$mks["NOMBRE"]."</td>
 									<td>".$mks["COD_PROD"]."</td>
-									<td style='width:17%'>".$mks["NOMBRE_PROD"]."</td>
+									<td>".$mks["NOMBRE_PROD"]."</td>
 									<td>".number_format($mks["CANTIDAD"], 2, '.', '')."</td>
 									<td>$".number_format($mks["PRECIOUNI"], 2, '.', '')."</td>
 									<td>$".number_format($mks["VALORREQ"], 2, '.', '')."</td>
@@ -490,6 +474,59 @@ class controller_ordenenc extends ordenenc{
 			$lstproyectos =  $parametros->get_lsoption("PROYECTO", array("PROYECTO"=>"","NOMBRE"=>""), array("COD_CIA"=>$_SESSION['cod_cia'],"PROYECTO"=> "'".$objdepto[0]['PROYECTO']."'"));
 			echo $lstproyectos;
 		}
+	}
+	
+	public function set_rpt_ordencompra(){
+		$parametros = $this->set_obj();
+		$obvista = new view_Parametros();
+		$obvista->html = $obvista->get_template('template',get_class($parametros));
+		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['agregar'], $obvista->html);
+		$obvista->html = str_replace('{formulario}', $obvista->get_template('ordenfecha',get_class($parametros)), $obvista->html);
+		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
+		$obvista->html = str_replace('{formulario_details}', " ", $obvista->html);
+		$obvista->html = str_replace('{codcia}', $_SESSION['cod_cia'] , $obvista->html);
+		$obvista->html = str_replace('{descia}', $_SESSION['nom_cia'] , $obvista->html);
+		$obvista->retornar_vista();
+		
+	}
+	
+	public function rpt_ordencompra(){
+		$parametros = $this->set_obj();
+		$objcomp = $parametros->rpt_ordencomprabyfecha($_REQUEST['fechainicial'],$_REQUEST['fechafinal']);
+		$html ="<!DOCTYPE html>
+			<head>
+					<link rel='stylesheet' type='text/css' href='../site_media/css/bootstrap/css/bootstrap.css'/>
+					<meta charset='ISO-8859-15'>
+					<style type='text/css'>
+						.tbl {border-collapse:collapse}
+						.tfl {border:1px solid black}
+					</style>
+					<title>Impresion de Orden de Compra</title>
+			</head>
+			<body>";
+		$html .="<div id='contenedor_pg' style='margin-top:57px;margin-left:57px;margin-right:57px;'><table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:12px;'>
+						<tr>
+							<th colspan='5'><center>INDUSTRIAS CARICIAS<br/> Ordenes de Compras por Fecha<br/>Desde:".$_REQUEST['fechainicial']." Hasta: ".$_REQUEST['fechafinal']."</center></th>
+						</tr>
+						<tr>
+							<th>Num<br/>Orden.</th>
+							<th>Fecha Orden</th>
+							<th>Num Pedido</th>
+							<th>Proveedor</th>
+							<th>Valor</th>
+						</tr>";
+			foreach ($objcomp as $mks){
+					$html .= "<tr class='tfl'>
+									<td>".$mks["NUM_ORDEN"]."</td>
+									<td>".$mks["FECHA_ING"]."</td>
+									<td>".$mks["NUM_PEDIDO"]."</td>
+									<td>".$mks["NOMBRE"]."</td>
+									<td>".$mks["VALOR"]."</td>
+							  </tr>";
+			}
+		$html .= "</table>";
+		$html .="</div></body></html>";
+		echo $html;
 	}
 
 }

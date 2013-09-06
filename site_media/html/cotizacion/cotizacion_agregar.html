@@ -35,7 +35,7 @@
 			</select>
 		</div>
         <div class="form_button">
-				<input type="submit" name="enviar" id="btn-save-enc" value="Agregar">
+				<input type="submit" name="enviar" id="btn-save-enc" value="Agregar" class='btn'>
 		</div>
     </form>
 </div> 
@@ -54,6 +54,7 @@
 <script>
 	$("#btn-save-enc").click(function(){
 		$('#btn-savedet').removeAttr("disabled"); 
+		$('#btn-savedet').removeClass( "btn" ).addClass( "btn btn-primary" );
 		$.ajax({
 				url : 'index.php?ctl=controller_cotizacion&' + $("#frmcotizacion").serialize() ,     
 				data : { act : 'insert' },
@@ -75,22 +76,18 @@
 	});
 	
 	$("#NUM_REQ").change(function(){
-		var catid= $("#NUM_REQ").val();
-		llenarproducto(catid,'NUM_REQ');
-	});
-	
-	function llenarproducto(id, optdata){
 		$.ajax({
 				url : 'index.php?ctl=controller_cotizacion',     
-				data : { act : 'get_ajax' , data : id, opt: optdata},
+				data : { act : 'view_detrequisiciones' , NUM_REQ : $("#NUM_REQ").val(), COD_CIA: $("#COD_CIA").val(), ANIO : $("#ANIO").val()},
 				type : 'POST',
 				success : 
 						function(resp) {
 							var mivar = eval('(' + resp + ')');
-							alert(mivar);
-							$("#COD_PROD").empty();
+							$("#det_req").empty();
+							$("#det_req").fadeIn("slow").html(mivar.tbldetreq);
+							/*$("#COD_PROD").empty();
 							$("#COD_PROD").append(mivar.lstpro);	
-							$('#COD_PROD').trigger("liszt:updated");
+							$('#COD_PROD').trigger("liszt:updated");*/
 							$("#CORRELATIVO").val(mivar.correl);
 						},
 				error : 
@@ -101,7 +98,8 @@
 							
 						}
 	      	  	});
-	}
+	});
+	
 	
 	$(document).ready(function(){
 		$('#btn-savedet').attr("disabled", true);

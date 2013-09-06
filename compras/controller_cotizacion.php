@@ -4,10 +4,13 @@
 error_reporting(E_ALL);
 ini_set("display_errors", 0);
 require_once('model_cotizacion.php');
+require_once('model_reqdet.php');
 require_once('controller_requisicion.php');
 require_once('../core/render_view_generic.php');
 require_once('../core/html2pdf/html2pdf.class.php');
 class controller_cotizacion extends cotizacion{
+	
+	
 	
 	protected $diccionario = array(
 		'subtitle'=>array('agregar'=>'Crear Nueva Cotizacion',
@@ -43,7 +46,7 @@ class controller_cotizacion extends cotizacion{
 			}
 			$peticiones = array('set', 'get', 'delete', 'edit',
                         'agregar', 'buscar', 'borrar', 
-                        'update','get_all','listar','insert','get_ajax','view','view_rpt');
+                        'update','get_all','listar','insert','get_ajax','view','view_rpt','view_detrequisiciones','siguente_correl');
 			foreach ($peticiones as $peticion) {
 				if( $uri == $peticion)  {
 					$event = $peticion;
@@ -89,6 +92,12 @@ class controller_cotizacion extends cotizacion{
 			case 'view_rpt':
 				$this->view_rpt();
 				break;
+			case 'view_detrequisiciones':
+				$this->view_detrequisiciones();
+				break;
+			case 'siguente_correl':
+				$this->siguente_correl();
+				break;
 		}
 	}
 	
@@ -102,7 +111,6 @@ class controller_cotizacion extends cotizacion{
 		return $obj;
 	}
 	
-
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -224,13 +232,13 @@ class controller_cotizacion extends cotizacion{
 						.tbl {border-collapse:collapse}
 						.tfl {border:1px solid black}
 					</style>
-					<title>LISTADO COMPARATIVOS DE PRECIOS</title>
+					<title>MATRIZ DE COTIZACIONES</title>
 			</head>
 			<body>";
 		$html .="<br/><div id='contenedor_pg'>";
 		$html .="<table class='table table-striped tbl' border='0.5px' bordercolor='#585858'>
 						<tr>
-							<th colspan='9'>Listado Comparativo de Precios</th>
+							<th colspan='9'>Matriz de Cotizaciones, Comparativo de Precios</th>
 						</tr>
 						<tr>
 							<th>Num<br/>Req.</th>
@@ -282,7 +290,54 @@ class controller_cotizacion extends cotizacion{
 			echo json_encode($data);
 		}
 	}
-
+	
+	public function view_detrequisiciones(){
+		$objdetreq = new reqdet();
+		$parametros = $this->set_obj();
+		$arraydetreq = $objdetreq->definir_detrequisiciones($_REQUEST['COD_CIA'], $_REQUEST['NUM_REQ'],$_REQUEST['ANIO']);
+		$html .="<table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:12px;width:75%;'>
+						<tr>
+							<th colspan='10'>Selecci&oacute;n de Articulos Requici&oacute;n No.".$arraydetreq[0]["NUM_REQ"]."</th>
+						</tr>
+						<tr>
+							<th>Num<br/>Req.</th>
+							<th>Cod<br/>Prod.</th>
+							<th>Descripci&oacute;n</th>
+							<th>U/M</th>
+							<th>Cantidad</th>
+							<th>Especificaciones</th>
+							<th>*</th>
+						</tr>";
+			foreach ($arraydetreq as $mks){
+					$html .= "<tr class='tfl'>
+									<td>".$mks["NUM_REQ"]."</td>
+									<td>".$mks["COD_PROD"]."</td>
+									<td>".$mks["NOMBRE"]."</td>
+									<td>".$mks["DESCRIPCION"]."</td>
+									<td>".$mks["CANTIDAD"]."</td>
+									<td>".$mks["ESPECIFICACIONES"]."</td>
+									<td><input type='radio' name='COD_PROD' id='ckreq-".$mks["NUM_REQ"]."' value='".$mks["COD_PROD"]."' req='".$mks["NUM_REQ"]."'></td>
+							  </tr>";
+			}
+		$html .= "</table>";
+		$ncorrel = $this->siguente_correl();
+		$data= array("tbldetreq"=>$html,"correl"=> $ncorrel);
+		echo json_encode($data);
+	}
+	
+	public function siguente_correl(){
+		if(isset($_REQUEST['NUM_REQ'])){
+			$parametros = $this->set_obj();
+			$NUMCORREL = $parametros->get_correl_key('COTIZACION',array("ANIO=".$_REQUEST['ANIO'],"NUM_REQ=".$_REQUEST['NUM_REQ'],"COD_CIA=".$_REQUEST['COD_CIA']),'CORRELATIVO');
+		}
+		if($_REQUEST['act']=='siguente_correl'){
+			echo $NUMCORREL[0][0];
+		}else{
+			return $NUMCORREL[0][0];
+		}		
+	}
+	
+	
 }
 
 

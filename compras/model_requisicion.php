@@ -2,7 +2,7 @@
 
 
 session_start();
-error_reporting(E_ALL);
+//error_reporting(E_ALL);
 # Importar modelo de abstracción de base de datos
 require_once('../core/db_abstract_model.php');
 
@@ -257,6 +257,42 @@ class requisicion extends DBAbstractModel {
 		$html .= "</table>";	
 		return $html;
 	}
+	
+	#Disponibilidad de Presupuesto por Categoria
+	 public function disponibleporcategoria(){
+		$this->rows=array();
+		$this->query = "  SELECT   CATEGORIAS.COD_CAT,
+								   CATEGORIAS.NOM_CAT,
+								   NVL (PRESUPUESTOS.VALOR, 0) VAL_PRESUPUESTADO,
+								   NVL (PRESUPUESTOS.SALDO, 0) SALDO
+						  FROM   PRESUPUESTOS, CATEGORIAS
+						  WHERE       PRESUPUESTOS.ANIO = ".date('Y')."
+								AND PRESUPUESTOS.MES = ".date('m')."
+								AND PRESUPUESTOS.CCOSTO = '".$_SESSION['PROYECTO']."'
+								AND PRESUPUESTOS.TIPO = 'P'
+								AND CATEGORIAS.COD_CIA = ".$_SESSION['cod_cia']."
+								AND CATEGORIAS.PRESUP = 'S'
+								AND (    CATEGORIAS.CTA_1 = PRESUPUESTOS.CTA1
+										AND CATEGORIAS.CTA_2 = PRESUPUESTOS.CTA2
+										AND CATEGORIAS.CTA_3 = PRESUPUESTOS.CTA3
+										AND CATEGORIAS.CTA_4 = PRESUPUESTOS.CTA4
+										AND CATEGORIAS.CTA_5 = PRESUPUESTOS.CTA5
+								OR (    CATEGORIAS.VTA_1 = PRESUPUESTOS.CTA1
+										AND CATEGORIAS.VTA_2 = PRESUPUESTOS.CTA2
+										AND CATEGORIAS.VTA_3 = PRESUPUESTOS.CTA3
+										AND CATEGORIAS.VTA_4 = PRESUPUESTOS.CTA4
+										AND CATEGORIAS.VTA_5 = PRESUPUESTOS.CTA5)
+								OR (    CATEGORIAS.INV_1 = PRESUPUESTOS.CTA1
+										AND CATEGORIAS.INV_2 = PRESUPUESTOS.CTA2
+										AND CATEGORIAS.INV_3 = PRESUPUESTOS.CTA3
+										AND CATEGORIAS.INV_4 = PRESUPUESTOS.CTA4
+										AND CATEGORIAS.INV_5 = PRESUPUESTOS.CTA5))
+								AND COD_CAT=".$_REQUEST['COD_CAT']."
+						ORDER BY   CATEGORIAS.COD_CAT";
+            $this->get_results_from_query();
+            return $this->rows;
+	}
+	
 	
 }
 ?>

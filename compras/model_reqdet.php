@@ -19,13 +19,12 @@ class reqdet extends DBAbstractModel {
     public $NOMBRE;
     public $CODIGO_UNIDAD;
     public $CANTIDAD;  
-    public $CREATED_AT;
-    public $UPDATED_AT;
+    public $ESPECIFICACIONES;
 
     ############################### ATRIBUTOS ################################
         public function atributos()
     {
-        $masx= array('COD_CIA','NUM_REQ','ANIO','COD_PROD','NOMBRE','CODIGO_UNIDAD','CANTIDAD','CREATED_AT','UPDATED_AT');
+        $masx= array('COD_CIA','NUM_REQ','ANIO','COD_PROD','NOMBRE','CODIGO_UNIDAD','CANTIDAD','ESPECIFICACIONES');
         $masx=implode($masx, ",");
         return $masx;
     }
@@ -64,19 +63,35 @@ class reqdet extends DBAbstractModel {
 	}
 
     ################################# MÉTODOS ##################################
-    # Traer datos de un Requisicion
-    public function get($ID=0) {
-        if($cod_cia != 0) {
-            $this->query = "SELECT   R.ID,
-									 R.NAME,
-									 R.VALUE_ITEM,
-									 R.CREATED_AT,
-									 R.UPDATED_AT,
-									 R.CALCULATED									 
-							FROM   PRODUC.PVC_OTHER_COSTS R
-							WHERE R.ID=".$ID;
+   
+   #
+	public function definir_detrequisiciones($COD_CIA, $NUM_REQ, $ANIO){
+		 $this->rows = array();
+		 $this->query = "   SELECT   RQ.NUM_REQ,
+									 PR.COD_PROD,
+									 PR.NOMBRE,
+									 UNI.DESCRIPCION,
+									 RQD.CANTIDAD,
+									 RQD.ESPECIFICACIONES
+							FROM            REQUISICION RQ
+								INNER JOIN
+										REQDET RQD
+											ON     RQ.COD_CIA = RQD.COD_CIA
+												   AND RQ.NUM_REQ = RQD.NUM_REQ
+												   AND RQ.ANIO = RQD.ANIO
+								INNER JOIN
+										PRODUCTOS PR
+											ON RQD.COD_PROD = PR.COD_PROD 
+											AND RQD.COD_CIA = PR.COD_CIA
+								INNER JOIN
+										UNIDADES UNI
+											ON RQD.CODIGO_UNIDAD = UNI.CODIGO_UNIDAD
+							WHERE   RQ.COD_CIA = ".$COD_CIA." 
+									AND RQ.NUM_REQ='".$NUM_REQ."' 
+									AND RQ.ANIO = ".$ANIO."
+							ORDER BY   PR.COD_PROD";
             $this->get_results_from_query();
-        }
+            return $this->rows ;
     }
        
 

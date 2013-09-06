@@ -21,7 +21,7 @@
 			</a>
 		</div>
         <div class="form_button">
-				<input type="submit" name="enviar" id="btn-save-enc" value="Generar Reporte">
+				<input type="submit" name="enviar" id="btn-save-enc" value="Generar Reporte" class='btn'>
 		</div>
     </form>
 </div> 
@@ -37,30 +37,7 @@
 				<a href="#" id='btnsavecomp' class="btn btn-success"  data-dismiss="modal" aria-hidden="true">Guardar</a>
 			</div>
 		</div>
-<script>
-	/*$("#btn-save-enc").click(function(){
-		$('#btn-savedet').removeAttr("disabled"); 
-		$.ajax({
-				url : 'index.php?ctl=controller_cotizacion&' + $("#frmcotizacion").serialize() ,     
-				data : { act : 'view_rpt', NUM_REQ : $("#NUM_REQ").val(), ANIO :  $("#ANIO").val()},
-				type : 'POST',     
-				success : 
-						function(resp) {
-							alert(resp);
-							
-						},
-				error : 
-						function(xhr, status) {
-							alert('Disculpe, existió un problema');
-						},     
-				complete : function(xhr, status) {	
-							
-						}
-	      	  	});
-		return false;
-	});*/
-	
-	
+<script>	
 	$(document).ready(function(){
 		$('#btn-savedet').attr("disabled", true);
 	});

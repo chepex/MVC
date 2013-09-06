@@ -169,9 +169,7 @@ class controller_cotizadet extends reqdet{
 	public function insert(){
 		$parametros = $this->set_obj();
 		$_REQUEST['ACEPTADA']='N';
-		$_REQUEST['VALORREQ']= $_REQUEST['CANTIDAD'] * $_REQUEST['PRECIOUNI'];
-		$parametros->save(get_class($parametros));
-		$this->msg = $parametros->mensaje;
+		$parametros->generar_detcotizacion();
 	
 	}
 	
@@ -179,13 +177,10 @@ class controller_cotizadet extends reqdet{
 		$_REQUEST["filtro"]='NO';
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.COD_PROD', 'PRODUCTOS.NOMBRE',$parametros->tableName().'.CANTIDAD',$parametros->tableName().'.ANIO',$parametros->tableName().'.CORRELATIVO');
+		$mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.CORRELATIVO',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.COD_PROD', 'PRODUCTOS.NOMBRE',$parametros->tableName().'.CANTIDAD', $parametros->tableName().'.PRECIOUNI', $parametros->tableName().'.VALORREQ');
         $masx=implode($mcampos, ",");
-        /*echo"<pre>";
-			print_r($_REQUEST);
-        echo"</pre>";*/
 		$data = $parametros->lis2(get_class($parametros), 1, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros));
+		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("update"=>"style='display:none;","delete"=>"style='display:none;","view"=>"style='display:none;","set"=>"style='display:none;'"));
 		$obvista->html = $obvista->get_template('listar',get_class($parametros)); 
 		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
 		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
@@ -197,14 +192,5 @@ class controller_cotizadet extends reqdet{
 	}
 
 }
-
-/*$objecon =  new controller_reqdet();
-	$objecon->handler();*/
-
-
-
-
-
-
 
 ?>

@@ -18,6 +18,10 @@
         <div class="form_requerid">
 			<input type="text" name="CANTIDAD" id="CANTIDAD" class="input-mini">
 		</div>
+		<div class="item_requerid_textarea">Especificaciones</div>
+        <div class="form_requerid">
+			<textarea name="ESPECIFICACIONES" id="ESPECIFICACIONES" rows='2' cols='10' maxlength='500'></textarea>
+		</div>
         <div class="form_button">
 				<input type="submit" name="enviar" id="btn-savedet" value="Agregar" class='btn'>
 				<input type="submit" name="btnfinalizar" id="btn-finalizar" value="Finalizar Requisicion" class='btn'>
@@ -35,6 +39,8 @@ $("#btn-savedet").click(function(){
 				type : 'POST',     
 				success : 
 						function(resp) {
+							$('#CANTIDAD').val('');
+							$('#ESPECIFICACIONES').val('');
 							$('#formulariox').fadeOut("slow").fadeIn("slow").html(resp);
 						},
 				error : 
@@ -57,6 +63,7 @@ $("#btn-finalizar").click(function(){
 				success : 
 						function(resp) {
 							$('#formulariox').fadeOut("slow").fadeIn("slow");
+							$('#btn-savedet').attr("disabled", true);
 						},
 				error : 
 						function(xhr, status) {

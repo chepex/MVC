@@ -57,7 +57,7 @@ class cotizadet extends DBAbstractModel {
 
     public function llave()
     {
-        return array('COD_CIA','NUM_REQ','ANIO','CORRELATIVO','COD_PROV','COD_PROD');
+        return array('COD_CIA','NUM_REQ','ANIO','CORRELATIVO','COD_PROV');
 
     }
     public function foreignkey(){
@@ -66,7 +66,34 @@ class cotizadet extends DBAbstractModel {
 
     ################################# MÉTODOS ##################################
    
-       
+    #Procedimiento que se encarga de generar detalle de Cotizacion
+   public function generar_detcotizacion(){
+		#Se Genera el Detalle a partir de los detalles de la Requisicion seleccionados
+			$this->query="INSERT INTO COTIZADET
+									(COD_CIA,NUM_REQ,
+									 ANIO,CORRELATIVO,
+									 COD_PROV,COD_PROD,
+									 CODIGO_UNIDAD,CANTIDAD,
+									 PRECIOUNI,VALORREQ,ACEPTADA)
+								SELECT   RQD.COD_CIA,
+										 RQD.NUM_REQ,
+										 RQD.ANIO,
+										 ".$_REQUEST['CORRELATIVO'].",
+										 ".$_REQUEST['COD_PROV'].",
+										 RQD.COD_PROD,
+										 RQD.CODIGO_UNIDAD,
+										 RQD.CANTIDAD,
+										 ".$_REQUEST['PRECIOUNI'].",
+										 RQD.CANTIDAD * ".$_REQUEST['PRECIOUNI'].",
+										 '".$_REQUEST['ACEPTADA']."'
+								FROM   REQDET RQD
+									WHERE       COD_CIA = ".$_REQUEST['COD_CIA']."
+												AND NUM_REQ = '".$_REQUEST['NUM_REQ']."'
+												AND ANIO = ".$_REQUEST['ANIO']."
+												AND COD_PROD = ".$_REQUEST['COD_PROD'];
+			$this->execute_single_query();
+	}
+   
 
 
 }

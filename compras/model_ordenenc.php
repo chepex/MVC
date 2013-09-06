@@ -18,7 +18,6 @@ class ordenenc extends DBAbstractModel {
     public $CODIGO_GRUPO;
     public $COD_EMP;
     public $SOLICITANTE;
-    public $NUM_PEDIDO;
     public $COD_PROV;
     public $FORMA_PAGO;
     public $VIA;
@@ -47,7 +46,7 @@ class ordenenc extends DBAbstractModel {
         public function atributos()
     {
         $masx= array('NUM_ORDEN','FECHA_ORDEN','COD_CIA','CODIGO_GRUPO','COD_EMP',
-					'SOLICITANTE','NUM_PEDIDO','COD_PROV','FORMA_PAGO','VIA','NUM_DIAS',
+					'SOLICITANTE','COD_PROV','FORMA_PAGO','VIA','NUM_DIAS',
 					'OBSERVACIONES','PROYECTO','FECHA_ING','STATUS','AUTORIZADO',
 					'FECHAUTORIZADO','ATENDIO','ANULADO','FECHAANULADO','NUM_REQ','ANIO','CODDEPTO_SOL',
 					'USUARIO','FECHA_ING','AUTORIZADA','COD_CAT',
@@ -105,7 +104,7 @@ class ordenenc extends DBAbstractModel {
 						ANIO, CODDEPTO_SOL, USUARIO, 
 						FECHA_ING, COD_CAT , TIPO_ORDEN) 
 					SELECT '".$_REQUEST['NUM_ORDEN']."', '".$_REQUEST['FECHA_ORDEN']."' , COD_CIA, CODIGO_GRUPO, COD_EMP_ELAB, EMP_SOL,
-							'".$_REQUEST['NUM_PEDIDO']."','120','".$_REQUEST['FORMA_PAGO']."',
+							'".$_REQUEST['COD_PROV']."','".$_REQUEST['FORMA_PAGO']."',
 							'".$_REQUEST['VIA']."',".$_REQUEST['NUM_DIAS'].", OBSERVACIONES, 
 							PROYECTO, '".$_REQUEST['ATENDIO']."', NUM_REQ, ANIO, 
 							CODDEPTO_SOL, USUARIO,SYSDATE, COD_CAT,TIPO_REQ
@@ -175,6 +174,33 @@ class ordenenc extends DBAbstractModel {
 		$html .= "</table>";	
 		return $html;
 	}
+	
+	#Genera una tabla con el encabezado de Orden de compra para ser generada a pdf
+   	public function rpt_ordencomprabyfecha($fechainicial, $fechafinal){
+		$this->rows=array();
+		$this->query = "  SELECT   OEC.NUM_ORDEN,
+								   OEC.NUM_PEDIDO,
+								   PR.NOMBRE,
+								   SUM (DOR.VALORREQ) VALOR,
+								   OEC.FECHA_ING
+						  FROM         ORDENENC OEC
+							INNER JOIN
+								PROVEEDORES PR
+									ON OEC.COD_CIA = PR.COD_CIA AND OEC.COD_PROV = PR.COD_PROV
+							INNER JOIN
+								DETORDEN DOR
+									ON OEC.COD_CIA = DOR.COD_CIA AND OEC.NUM_ORDEN = DOR.NUM_ORDEN
+						  WHERE   OEC.FECHA_ING BETWEEN '".$fechainicial."' AND '".$fechafinal."'
+						  GROUP BY   OEC.NUM_ORDEN,
+									OEC.NUM_PEDIDO,
+									PR.NOMBRE,
+									OEC.FECHA_ING
+						  ORDER BY OEC.FECHA_ING, OEC.NUM_ORDEN";
+        $this->get_results_from_query();
+        return $this->rows;
+	}
+	
+	
 	
 }
 ?>
