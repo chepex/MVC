@@ -298,7 +298,7 @@ class controller_ordenenc extends ordenenc{
 												"ORE.COD_CAT","CAT.NOM_CAT",
 												"DECODE (TIPO_ORDEN,'E','EXTERNA',
 																	'G','GLOBAL')TIPO_ORDEN",
-												"DEPT.COD_DEPTO","DEPT.NOM_DEPTO","VWEE.NOMBRE_ISSS ELABORADO","ORE.AUTORIZADO"
+												"DEPT.COD_DEPTO","DEPT.NOM_DEPTO","VWEE.NOMBRE_ISSS ELABORADO","ORE.AUTORIZADO","PR.CONTEXTO"
 												)
 											);
 		//$table= $parametros->create_msghtml_header($objorden);
@@ -347,7 +347,7 @@ class controller_ordenenc extends ordenenc{
 							  </tr>";
 					$html .= "<tr>
 									<td colspan='2'>
-										Contacto: <strong>".$mks["ATENDIO"]."</strong>
+										Contacto: <strong>".$mks["CONTEXTO"]."</strong>
 									</td>
 									<td>
 										Requisici&oacute;n: ".$mks["NUM_REQ"]."
@@ -432,7 +432,7 @@ class controller_ordenenc extends ordenenc{
 	
 	public function view_cotizacion(){
 		$objcotizacion = new cotizacion();
-		$arrayCotizacion = $objcotizacion->definir_cotizaciones($_REQUEST['NUM_REQ'], date('Y'));
+		$arrayCotizacion = $objcotizacion->definir_cotizaciones($_REQUEST['NUM_REQ'], date('Y'), $_REQUEST['COD_PROV']);
 		$html .="<table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:12px;'>
 						<tr>
 							<th colspan='10'>Selecci&oacute;n de Articulos Requici&oacute;n No.".$arrayCotizacion[0]["NUM_REQ"]."</th>
@@ -469,10 +469,9 @@ class controller_ordenenc extends ordenenc{
 	
 	public function get_ajax(){
 		$parametros = $this->set_obj();
-		if($_REQUEST['opt']=="CODDEPTO_SOL"){
-			$objdepto = $parametros->crea_objeto(array("DEPARTAMENTOS"), "", array("COD_CIA=".$_SESSION['cod_cia'], "COD_DEPTO=".$_REQUEST['data'].""));
-			$lstproyectos =  $parametros->get_lsoption("PROYECTO", array("PROYECTO"=>"","NOMBRE"=>""), array("COD_CIA"=>$_SESSION['cod_cia'],"PROYECTO"=> "'".$objdepto[0]['PROYECTO']."'"));
-			echo $lstproyectos;
+		if(isset($_REQUEST['COD_CIA']) && isset($_REQUEST['COD_PROV']) ){
+			$objprov = $parametros->crea_objeto(array("PROVEEDORES"), "", array("COD_CIA=".$_REQUEST['COD_CIA'], "COD_PROV='".$_REQUEST['COD_PROV']."'"));
+			echo $objprov[0]['CONTEXTO'];
 		}
 	}
 	

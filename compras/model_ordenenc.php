@@ -98,7 +98,7 @@ class ordenenc extends DBAbstractModel {
 	#Se Genera el Encabezado a partir de la Tabla de Requisiciones
 	  $this->query="INSERT INTO ORDENENC
 						(NUM_ORDEN, FECHA_ORDEN, COD_CIA, CODIGO_GRUPO, COD_EMP, 
-						SOLICITANTE, NUM_PEDIDO, COD_PROV, 
+						SOLICITANTE, COD_PROV, 
 						FORMA_PAGO, VIA, NUM_DIAS, OBSERVACIONES,
 						PROYECTO, ATENDIO, NUM_REQ, 
 						ANIO, CODDEPTO_SOL, USUARIO, 

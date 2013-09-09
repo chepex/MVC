@@ -199,11 +199,17 @@ class controller_reqdet extends reqdet{
 	public function get_all($mensaje=''){
 		$_REQUEST["filtro"]='NO';
 		$parametros = $this->set_obj();
+		$objordencompra = $parametros->crea_objeto(array("ORDENENC"), "", array("NUM_REQ='".$_REQUEST['NUM_REQ']."'","ANIO=".$_REQUEST['ANIO'],"COD_CIA=".$_REQUEST['COD_CIA']));
+		if(count($objordencompra) > 0){
+			$propiedadbtn="style='display:none;'";
+		}else{
+			$propiedadbtn="style='display:inline;'";
+		}
 		$obvista = new view_Parametros();
 		$mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.COD_PROD', 'PRODUCTOS.NOMBRE',$parametros->tableName().'.CANTIDAD', 'UNIDADES.DESCRIPCION',$parametros->tableName().'.ESPECIFICACIONES',$parametros->tableName().'.ANIO');
         $masx=implode($mcampos, ",");
 		$data = $parametros->lis2(get_class($parametros), 3, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("delete"=>"style='display:none;'", "view"=>"style='display:none;'", "set"=>"style='display:none;'"));
+		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("update"=>$propiedadbtn,"delete"=>"style='display:none;'", "view"=>"style='display:none;'", "set"=>"style='display:none;'"));
 		$obvista->html = $obvista->get_template('listar',get_class($parametros)); 
 		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
 		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);

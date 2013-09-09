@@ -109,7 +109,7 @@ class cotizacion extends DBAbstractModel {
             return $this->rows ;
     }
     
-    public function definir_cotizaciones($NUM_REQ,$ANIO){
+    public function definir_cotizaciones($NUM_REQ,$ANIO, $COD_PROV){
 		 $this->rows = array();
 		 $this->query = "  SELECT   CT.COD_CIA,
 									CT.NUM_REQ,
@@ -137,7 +137,7 @@ class cotizacion extends DBAbstractModel {
 									PROVEEDORES PROV
 										ON CTD.COD_CIA = PROV.COD_CIA 
 												AND CTD.COD_PROV = PROV.COD_PROV
-							WHERE   CT.NUM_REQ = '".$NUM_REQ."' AND CT.ANIO = ".$ANIO."
+							WHERE   CT.NUM_REQ = '".$NUM_REQ."' AND CT.ANIO = ".$ANIO." AND PROV.COD_PROV='".$COD_PROV."'
 								ORDER BY   CTD.COD_PROD";
             $this->get_results_from_query();
             return $this->rows ;

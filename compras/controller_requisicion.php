@@ -323,7 +323,7 @@ class controller_requisicion extends requisicion{
 		$objdetreq = $parametros->crea_objeto(array("REQDET RQD","PRODUCTOS PRO","UNIDADES UNI"),
 											  array("RQD.COD_CIA = PRO.COD_CIA","RQD.COD_PROD = PRO.COD_PROD","RQD.CODIGO_UNIDAD = UNI.CODIGO_UNIDAD"),
 											  array("AND RQD.NUM_REQ='".$_REQUEST['NUM_REQ']."'","RQD.ANIO=".$_REQUEST['ANIO'], "RQD.COD_CIA=".$_REQUEST['COD_CIA']),
-											  array("RQD.NUM_REQ","RQD.COD_PROD","PRO.NOMBRE","UNI.DESCRIPCION","RQD.CANTIDAD")
+											  array("RQD.NUM_REQ","RQD.COD_PROD","PRO.NOMBRE","UNI.DESCRIPCION","RQD.CANTIDAD","RQD.ESPECIFICACIONES")
 											 );
 		$html ="<!DOCTYPE html>
 			<head>

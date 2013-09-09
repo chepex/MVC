@@ -245,6 +245,7 @@ class requisicion extends DBAbstractModel {
 							<th>NOMBRE</th>
 							<th>DESCRIPCION</th>
 							<th>CANTIDAD</th>
+							<th>ESPECIFICACIONES</th>
 						</tr>";
 			foreach ($objdetrequisicion as $mks){
 					$html .= "<tr class='tfl'>
@@ -252,6 +253,7 @@ class requisicion extends DBAbstractModel {
 									<td>".$mks["NOMBRE"]."</td>
 									<td>".$mks["DESCRIPCION"]."</td>
 									<td>".$mks["CANTIDAD"]."</td>
+									<td>".$mks["ESPECIFICACIONES"]."</td>
 							  </tr>";
 			}
 		$html .= "</table>";	
