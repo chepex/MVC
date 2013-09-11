@@ -9,8 +9,10 @@ require_once('model_requisicion.php');
 require_once('model_reqdet.php');
 require_once('controller_reqdet.php');
 require_once('../core/render_view_generic.php');
+#Controlador de Requisicion
 class controller_requisicion extends requisicion{
 	
+	#Definicion de Titulos de Objetos Html
 	protected $diccionario = array(
 		'subtitle'=>array('agregar'=>'Crear Nueva requisicion',
                       'buscar'=>'Buscar requisicion',
@@ -33,6 +35,7 @@ class controller_requisicion extends requisicion{
 	
 	protected $msg;
 	
+	#Manejador de Peticiones en base a accion solicitada
 	public function handler($op='') {
 		if(empty($op)){
 			$event = 'buscar';
@@ -42,6 +45,7 @@ class controller_requisicion extends requisicion{
 			else{
 				$uri = "get_all";
 			}
+			#Peticiones definidas para el controlador Requisicion
 			$peticiones = array('set', 'get', 'delete', 'edit',
                         'agregar', 'buscar', 'borrar', 
                         'update','get_all','listar','insert','get_ajax','view','view_rpt','finalizar_req');
@@ -54,7 +58,7 @@ class controller_requisicion extends requisicion{
 			$event=$op;
 		}
 		
-		
+		#Selector de Acciones, Llamada de las mismas.
 		switch ($event) {
 			case 'set':
 				$this->set();
@@ -95,16 +99,19 @@ class controller_requisicion extends requisicion{
 		}
 	}
 	
+	#Definicion de una instancia del Modelo del Controlador requisicion encabezado de la requisicion
 	public function set_obj() {
 		$obj = new requisicion();
 		return $obj;
 	}
 	
+	#Definicion de una Instancia del Modelo de reqdet detalle  de requisicion
 	public function set_obj_details() {
 		$obj = new reqdet();
 		return $obj;
 	}
 	
+	#Método que dibuja el formulario para la insercion del encabezado de la Requisicion
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -145,7 +152,7 @@ class controller_requisicion extends requisicion{
 		$datagrafi= $parametros->get_datagrafico();
 		$obvista->html = str_replace('{titulo_grafico}', "Presupuesto Disponible por Categoria", $obvista->html);
 		$obvista->html = str_replace('{AxisY}', "Valores Expresados en USD($)", $obvista->html);
-		$obvista->html = str_replace('{AxisX}', "Codigo de Categorias de Productos", $obvista->html);
+		$obvista->html = str_replace('{AxisX}', "Categorias de Productos", $obvista->html);
 		$obvista->html = str_replace('{popup-labelx}', "Categoria ", $obvista->html);
 		$obvista->html = str_replace('{popup-labely}', "Presupuesto Disponible USD($) ", $obvista->html);
 		$obvista->html = str_replace('{series_x}', $datagrafi['categorias'], $obvista->html);
@@ -155,11 +162,13 @@ class controller_requisicion extends requisicion{
 		$obvista->retornar_vista();
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function get(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
 	}
 	
+	#Método que elimina el detalle de la requisicion, sino tiene detalle
 	public function delete(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -346,13 +355,17 @@ class controller_requisicion extends requisicion{
 	
 	public function get_ajax(){
 		$parametros = $this->set_obj();
-		if($_REQUEST['opt']=="COD_CAT"){
-				$lstproducto = $parametros->get_lsoption("PRODUCTOS", array("COD_PROD"=>"","NOMBRE"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "COD_CAT"=>"'".$_REQUEST['data']."'"));
-		}
-		if($_REQUEST['opt']=="COD_PROD"){
-				$lstproducto = $parametros->get_lsoption("PRODUCTOS", array("COD_PROD"=>"","NOMBRE"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "COD_CAT"=>"'".$_REQUEST['data']."'"));
-		}
-		echo $lstproducto;
+		if(isset($_REQUEST['COD_CAT']) && isset($_REQUEST['PROYECTO'])){
+			$lstproducto = $parametros->get_lsoption("PRODUCTOS", array("COD_PROD"=>"","NOMBRE"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "COD_CAT"=>"'".$_REQUEST['COD_CAT']."'"));
+			$presupuestoxcategoria= $parametros->disponibleporcategoria();
+			if($presupuestoxcategoria[0]['SALDO'] > 0){
+				$msjpresupuesto="";
+			}else{
+				$msjpresupuesto="Para la categoria Seleccionada, no dispone de Presupuesto! Categoria No.".$_REQUEST['COD_CAT'] ." saldo: " . $presupuestoxcategoria[0]['SALDO'];
+			}
+			$json_array=array("lstproducto"=>$lstproducto ,"msjpresupuesto"=>$msjpresupuesto,"valorsaldo"=>$presupuestoxcategoria[0]['SALDO']);
+			echo json_encode($json_array);	
+		}		
 	}
 
 }

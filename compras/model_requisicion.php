@@ -119,7 +119,7 @@ class requisicion extends DBAbstractModel {
             $this->get_results_from_query();
             $i=0;
             foreach($this->rows as $campo => $valor){
-				$categorias[]="'".$this->rows[$i]['COD_CAT']."'";
+				$categorias[]="'".$this->rows[$i]['NOM_CAT']."'";
 				$saldisponible[]=$this->rows[$i]['SALDO'];
 				$i++;
 			}
@@ -127,7 +127,7 @@ class requisicion extends DBAbstractModel {
             return $datagrafico;
 	}
 	
-	#Correos de Compras
+	#Correos de Compras Devuelve el correo del encargado del documento enviado como parametro
 	public function correo_encargadodocumento($TIPO_DOCTO){
 		$this->rows=array();
 		$this->query = "SELECT   DISTINCT 
@@ -150,6 +150,23 @@ class requisicion extends DBAbstractModel {
 	
 	#Devuelve el Correo del Usuario Solicitante de la Requisicion
 	public function correo_solicitante(){
+		$this->rows=array();
+		$this->query = "SELECT   R.NUM_REQ, CXU.CORREO_USUARIO
+							FROM      REQUISICION R
+										INNER JOIN
+											CIAS_X_USUARIO CXU
+												ON R.COD_CIA = CXU.COD_CIA 
+												AND R.EMP_SOL = CXU.COD_EMP
+							WHERE   
+								R.NUM_REQ = ".$_REQUEST['NUM_REQ']." 
+								AND R.ANIO = ".$_REQUEST['ANIO']." 
+								AND R.COD_CIA = ". $_SESSION['cod_cia'];
+		$this->get_results_from_query();
+        return $this->rows;
+	}
+	
+	#Devuelve el Correo del Usuario Encargado del Departamento Solicitante de la Requisicion
+	public function correo_encargadodepto(){
 		$this->rows=array();
 		$this->query = "SELECT   R.NUM_REQ, CXU.CORREO_USUARIO
 							FROM      REQUISICION R
@@ -260,7 +277,8 @@ class requisicion extends DBAbstractModel {
 		return $html;
 	}
 	
-	#Disponibilidad de Presupuesto por Categoria
+	#Disponibilidad de Presupuesto por Categoria, Consulta base para verificar disponibilidad de Presupuesto por
+	#categoria del producto
 	 public function disponibleporcategoria(){
 		$this->rows=array();
 		$this->query = "  SELECT   CATEGORIAS.COD_CAT,
@@ -270,7 +288,7 @@ class requisicion extends DBAbstractModel {
 						  FROM   PRESUPUESTOS, CATEGORIAS
 						  WHERE       PRESUPUESTOS.ANIO = ".date('Y')."
 								AND PRESUPUESTOS.MES = ".date('m')."
-								AND PRESUPUESTOS.CCOSTO = '".$_SESSION['PROYECTO']."'
+								AND PRESUPUESTOS.CCOSTO = '".$_REQUEST['PROYECTO']."'
 								AND PRESUPUESTOS.TIPO = 'P'
 								AND CATEGORIAS.COD_CIA = ".$_SESSION['cod_cia']."
 								AND CATEGORIAS.PRESUP = 'S'

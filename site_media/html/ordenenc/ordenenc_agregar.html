@@ -42,7 +42,7 @@
 				<option value='C'>CONTADO</option>
 			</select>
 		</div>
-		 <div class="item_requerid">D&iacute;as Cr&eacute;dito</div>
+		 <div id='lbldiascreditos' class="item_requerid">D&iacute;as Cr&eacute;dito</div>
         <div class="form_requerid">
 			<input type="text" name="NUM_DIAS" id="NUM_DIAS" class="input-small" >
 		</div>
@@ -61,8 +61,8 @@
 <br/><br/>
 <script>
 	$("#btn-save-enc").click(function(){
-		//$('#btn-savedet').removeAttr("disabled");
-		$.ajax({
+		if($("#FECHA_ORDEN").val().length > 0){
+			$.ajax({
 				url : 'index.php?ctl=controller_ordenenc&' + $("#frmordenenc").serialize() ,     
 				data : { act : 'insert' },
 				type : 'POST',     
@@ -71,6 +71,7 @@
 							$('#mensaje1').html("Se ha ingresado Correctamente la Orden de Compra No." + $("#NUM_ORDEN").val());
 							$('#mensaje1').toggle();
 							$('#btn-save-enc').attr("disabled", true);
+							$("#mensaje2").css('display','none');
 						},
 				error : 
 						function(xhr, status) {
@@ -79,7 +80,13 @@
 				complete : function(xhr, status) {	
 							
 						}
-	      	  	});
+	      	  });
+		}else{
+				$('#mensaje2').html("Los Campos son Requeridos, completelos!");
+				$('#mensaje2').toggle();
+		}
+
+		
 		return false;
 	});
 	
@@ -130,4 +137,18 @@
 						}
 		});
 	});
+	
+	$("#FORMA_PAGO").change(function(){
+		if($("#FORMA_PAGO").val() == 'C'){
+			$("#NUM_DIAS").val('0');
+			$("#NUM_DIAS").css('display','none');
+			$("#lbldiascreditos").css('display','none');
+		}else{
+			$("#NUM_DIAS").val('');
+			$("#NUM_DIAS").css('display','inline');
+			$("#lbldiascreditos").css('display','inline');
+		}
+	});
+	
+	
 </script>

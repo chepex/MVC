@@ -28,6 +28,12 @@
 					{lstdepto}
 				</select>
 		</div>
+		<div class="item_requerid">C.C</div>
+        <div class="form_requerid">
+			<select name="PROYECTO" id="PROYECTO" class="chzn-select input-xlarge">
+				{lstproyecto}
+			</select>
+		</div>
         <div class="item_requerid">Emple. Sol.</div>
         <div class="form_requerid">
 			<select name="EMP_SOL" id="EMP_SOL" class="chzn-select input-xlarge">
@@ -44,12 +50,6 @@
         <div class="form_requerid">
 			<select name="COD_CAT" id="COD_CAT" class="chzn-select input-xlarge">
 				{lstcategorias}
-			</select>
-		</div>
-		<div class="item_requerid">C.C</div>
-        <div class="form_requerid">
-			<select name="PROYECTO" id="PROYECTO" class="chzn-select input-xlarge">
-				{lstproyecto}
 			</select>
 		</div>
 		<div class="item_requerid">Prioridad</div>
@@ -81,6 +81,7 @@
 	$("#btn-save-enc").click(function(){
 		$('#btn-savedet').removeAttr("disabled"); 
 		$('#btn-savedet').removeClass( "btn" ).addClass( "btn btn-primary" );
+		$("#frmrequisicion").attr('disabled','disabled');
 		$.ajax({
 				url : 'index.php?ctl=controller_requisicion&' + $("#frmrequisicion").serialize() ,     
 				data : { act : 'insert' },
@@ -89,6 +90,7 @@
 						function(resp) {
 							$('#btn-save-enc').attr("disabled", true);
 							$('#COD_CAT').attr("disabled", true);
+							$(".frmdetailreq").toggle();
 						},
 				error : 
 						function(xhr, status) {
@@ -103,20 +105,20 @@
 	
 	
 	$("#COD_CAT").change(function(){
-		var catid= $("#COD_CAT").val();
-		llenarproducto(catid,'COD_CAT');
-	});
-	
-	function llenarproducto(id, optdata){
 		$.ajax({
 				url : 'index.php?ctl=controller_requisicion',     
-				data : { act : 'get_ajax' , data : id, opt: optdata},
+				data : { act : 'get_ajax' , COD_CAT : $("#COD_CAT").val() , PROYECTO: $("#PROYECTO").val()},
 				type : 'POST',     
 				success : 
-						function(resp) {
+						function(resp){
+							var mivar = eval('(' + resp + ')');
 							$("#COD_PROD").empty();
-							$("#COD_PROD").append(resp);	
+							$("#COD_PROD").append(mivar.lstproducto);	
 							$('#COD_PROD').trigger("liszt:updated");
+							if(mivar.valorsaldo <= 0){
+								$("#mensaje2").toggle();
+								$("#mensaje2").fadeIn("slow").html(mivar.msjpresupuesto);
+							}				
 						},
 				error : 
 						function(xhr, status) {
@@ -125,8 +127,9 @@
 				complete : function(xhr, status) {	
 							
 						}
-	      	  	});
-	}
+	   });
+	});
+	
 	$(document).ready(function(){
 		$('#btn-savedet').attr("disabled", true);
 		$('#btn-finalizar').attr("disabled", true);

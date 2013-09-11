@@ -64,7 +64,7 @@ class reqdet extends DBAbstractModel {
 
     ################################# MÉTODOS ##################################
    
-   #
+   #Consulta Base para Generar el detalle de las Cotizaciones, a partir de los productos requisados
 	public function definir_detrequisiciones($COD_CIA, $NUM_REQ, $ANIO){
 		 $this->rows = array();
 		 $this->query = "   SELECT   RQ.NUM_REQ,
@@ -93,7 +93,7 @@ class reqdet extends DBAbstractModel {
             $this->get_results_from_query();
             return $this->rows ;
     }
-       
+    
 
 
 }

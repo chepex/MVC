@@ -6,8 +6,10 @@ ini_set("display_errors", 0);
 require_once('model_cotizadet.php');
 require_once('controller_cotizacion.php');
 require_once('../core/render_view_generic.php');
+#Controlador de Detalle de Cotizaciones
 class controller_cotizadet extends reqdet{
 	
+	#Definicion de Los titulos y Objetos html
 	protected $diccionario = array(
 		'subtitle'=>array('agregar'=>'Crear Nueva Cotizacion',
                       'buscar'=>'Buscar Cotizacion',
@@ -30,6 +32,7 @@ class controller_cotizadet extends reqdet{
 	
 	protected $msg;
 	
+	#Manejador de Peticiones en base a accion solicitada
 	public function handler($op='') {
 		if(empty($op)){
 			$event = 'buscar';
@@ -39,6 +42,7 @@ class controller_cotizadet extends reqdet{
 			else{
 				$uri = "get_all";
 			}
+			#Peticiones definidas para el controlador Cotizacion
 			$peticiones = array('set', 'get', 'delete', 'edit',
                         'agregar', 'buscar', 'borrar', 
                         'update','get_all','listar','insert');
@@ -51,7 +55,7 @@ class controller_cotizadet extends reqdet{
 			$event=$op;
 		}
 		
-		
+		#Selector de Acciones, Llamada de las mismas.
 		switch ($event) {
 			case 'set':
 				$this->set();
@@ -71,7 +75,6 @@ class controller_cotizadet extends reqdet{
 				break;
 			case 'insert':
 				$this->insert();
-				//$this->set();
 				$this->get_all($this->msg);
 				break;	
 			case 'get_all':
@@ -82,17 +85,20 @@ class controller_cotizadet extends reqdet{
 				break;
 		}
 	}
-
+	
+	#Definicion de una instancia del Modelo del Controlador Cotizaciondet
 	public function set_obj() {
 		$obj = new cotizadet();
 		return $obj;
 	}
 	
+	#Definicion de una Instancia del Modelo de Cotizacion, Encabezado de la Cotizacion
 	public function set_obj_master() {
 		$obj = new cotizacion();
 		return $obj;
 	}
 	
+	#Método que Dibuja el Formulario para el ingreso del detalle de la cotizacion 
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -109,8 +115,7 @@ class controller_cotizadet extends reqdet{
 		$lstunidades = $parametros->get_htmloptions($obunidadesmedidas);
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['agregar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('agregar',get_class($parametros)), $obvista->html);
-		//$obvista->html = str_replace('{formulario_details}', $obvista->get_template('details',get_class($parametros)), $obvista->html); 
+		$obvista->html = str_replace('{formulario}', $obvista->get_template('agregar',get_class($parametros)), $obvista->html); 
 		$obvista->html = str_replace('{lstemp}', $lstempelado , $obvista->html); 
 		$obvista->html = str_replace('{lstdepto}', $lstdptos , $obvista->html);
 		$obvista->html = str_replace('{lstcategorias}', $lstcategorias , $obvista->html);
@@ -125,6 +130,7 @@ class controller_cotizadet extends reqdet{
 		$obvista->retornar_vista();
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function get(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -134,6 +140,7 @@ class controller_cotizadet extends reqdet{
 		$obvista->retornar_vista('buscar', $data);
 	}
 	
+	#Método que elimina el registro de un detalle de Requisicion
 	public function delete(){
 		$parametros = $this->set_obj();
 		$xrequisicion = $this->set_obj_master();
@@ -144,6 +151,7 @@ class controller_cotizadet extends reqdet{
 		
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function update(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -159,6 +167,7 @@ class controller_cotizadet extends reqdet{
 		$obvista->retornar_vista();
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function edit(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -166,6 +175,7 @@ class controller_cotizadet extends reqdet{
 		$this->msg=$parametros->mensaje; 
 	}
 	
+	#Método que se encarga de almacenar el detalle de la Cotizacion
 	public function insert(){
 		$parametros = $this->set_obj();
 		$_REQUEST['ACEPTADA']='N';
@@ -173,6 +183,7 @@ class controller_cotizadet extends reqdet{
 	
 	}
 	
+	#Método que se encarga de Generar la Tabla Crud del Detalle de la Cotizacion
 	public function get_all($mensaje=''){
 		$_REQUEST["filtro"]='NO';
 		$parametros = $this->set_obj();
@@ -187,6 +198,7 @@ class controller_cotizadet extends reqdet{
 		$obvista->retornar_vista();
 	}
 	
+	#Método que se invoca via Ajax
 	public function get_ajax(){
 		echo $lstproducto;
 	}

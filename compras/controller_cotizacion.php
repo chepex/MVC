@@ -8,10 +8,11 @@ require_once('model_reqdet.php');
 require_once('controller_requisicion.php');
 require_once('../core/render_view_generic.php');
 require_once('../core/html2pdf/html2pdf.class.php');
+#Controlador de Cotizaciones
 class controller_cotizacion extends cotizacion{
 	
 	
-	
+	#Definicion de Titulos de Objetos Html
 	protected $diccionario = array(
 		'subtitle'=>array('agregar'=>'Crear Nueva Cotizacion',
                       'buscar'=>'Buscar Cotizacion',
@@ -35,6 +36,7 @@ class controller_cotizacion extends cotizacion{
 	
 	protected $msg;
 	
+	#Manejador de Peticiones en base a accion solicitada
 	public function handler($op='') {
 		if(empty($op)){
 			$event = 'buscar';
@@ -44,6 +46,7 @@ class controller_cotizacion extends cotizacion{
 			else{
 				$uri = "get_all";
 			}
+			#Peticiones definidas para el controlador Cotizacion
 			$peticiones = array('set', 'get', 'delete', 'edit',
                         'agregar', 'buscar', 'borrar', 
                         'update','get_all','listar','insert','get_ajax','view','view_rpt','view_detrequisiciones','siguente_correl');
@@ -56,7 +59,7 @@ class controller_cotizacion extends cotizacion{
 			$event=$op;
 		}
 		
-		
+		#Selector de Acciones, Llamada de las mismas.
 		switch ($event) {
 			case 'set':
 				$this->set();
@@ -77,8 +80,6 @@ class controller_cotizacion extends cotizacion{
 				break;
 			case 'insert':
 				$this->insert();
-				//$this->set();
-				//$this->get_all($this->msg);
 				break;	
 			case 'get_all':
 				$this->get_all();
@@ -100,17 +101,20 @@ class controller_cotizacion extends cotizacion{
 				break;
 		}
 	}
-	
+
+	#Definicion de una instancia del Modelo del Controlador Cotizacion
 	public function set_obj() {
 		$obj = new cotizacion();
 		return $obj;
 	}
 	
+	#Definicion de una Instancia del Modelo de Requisicion
 	public function set_objreq() {
 		$obj = new requisicion();
 		return $obj;
 	}
 	
+	#Definicion del Método que Dibuja formulario para insercion de Cotizaciones
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -144,15 +148,16 @@ class controller_cotizacion extends cotizacion{
 		$obvista->retornar_vista();
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function get(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		
 		$parametros->get($parametros_data);
 		$data = array('ID'=>$parametros->ID);            
 		$obvista->retornar_vista('buscar', $data);
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function delete(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -160,19 +165,20 @@ class controller_cotizacion extends cotizacion{
 		$this->msg=$parametros->mensaje;
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function update(){
 		$parametros = $this->set_obj();
-		$obvista = new view_Parametros();
-		
-		
+		$obvista = new view_Parametros();		
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function edit(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
 		
 	}
 	
+	#Método utilizado para inserta el encabezado de una Cotizacion
 	public function insert(){
 		$parametros = $this->set_obj();
 		$_REQUEST['ACEPTADA']='N';
@@ -182,6 +188,7 @@ class controller_cotizacion extends cotizacion{
 		
 	}
 	
+	#Método que dibuja la tabla Crud del Encabezado de la Cotizacion
 	public function get_all($mensaje=''){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -202,7 +209,8 @@ class controller_cotizacion extends cotizacion{
 		$obvista->retornar_vista();
 		
 	}
-	
+
+	#Método que dibuja el formulario para parametrizacion de Matriz de Cotizaciones
 	public function view(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -220,6 +228,7 @@ class controller_cotizacion extends cotizacion{
 		
 	}
 	
+	#Método que Genera Matriz de Cotizaciones en Html, se puede generar pdf desde el navegador
 	public function view_rpt(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -280,6 +289,7 @@ class controller_cotizacion extends cotizacion{
 		
 	}
 	
+	#Metodo que responde a peticion ajax para obtener los productos de una categoria, y el correlativo de la Cotizacion
 	public function get_ajax(){
 		$parametros = $this->set_obj();
 		if($_REQUEST['opt']=="NUM_REQ" ){
@@ -291,6 +301,8 @@ class controller_cotizacion extends cotizacion{
 		}
 	}
 	
+	#Método que Dibuja tabla con el detalle de la requisicion, para generar el detalle de la cotizacion
+	#El Método es Invocado via Ajax
 	public function view_detrequisiciones(){
 		$objdetreq = new reqdet();
 		$parametros = $this->set_obj();
@@ -325,6 +337,7 @@ class controller_cotizacion extends cotizacion{
 		echo json_encode($data);
 	}
 	
+	#Método que Genera el Siguente Numero correlativo de la Cotizacion
 	public function siguente_correl(){
 		if(isset($_REQUEST['NUM_REQ'])){
 			$parametros = $this->set_obj();

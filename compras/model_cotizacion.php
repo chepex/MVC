@@ -75,6 +75,7 @@ class cotizacion extends DBAbstractModel {
 
     ################################# MÉTODOS ##################################
     
+    #Consulta Base para la Generacion de Matriz de Cotizacion
     public function comparativo_precios($NUM_REQ,$ANIO){
 		 $this->rows = array();
 		 $this->query = "  SELECT   CT.COD_CIA,
@@ -109,6 +110,7 @@ class cotizacion extends DBAbstractModel {
             return $this->rows ;
     }
     
+    #Consulta Base para Generacion de Orden de Compra, Se muestras las Cotizaciones, por cada Requisicion y Proveedor
     public function definir_cotizaciones($NUM_REQ,$ANIO, $COD_PROV){
 		 $this->rows = array();
 		 $this->query = "  SELECT   CT.COD_CIA,

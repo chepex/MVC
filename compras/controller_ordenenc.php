@@ -9,8 +9,11 @@ require_once('model_cotizacion.php');
 require_once('model_detorden.php');
 require_once('controller_detorden.php');
 require_once('../core/render_view_generic.php');
+require_once('../core/html2pdf/html2pdf.class.php');
+#Controlador de Encabezado de Orden de Compra
 class controller_ordenenc extends ordenenc{
 	
+	#Definicion de Titulos de Objetos Html
 	protected $diccionario = array(
 		'subtitle'=>array('agregar'=>'Crear Nueva Orden de Compra',
                       'buscar'=>'Buscar Orden de Compra',
@@ -35,6 +38,7 @@ class controller_ordenenc extends ordenenc{
 	
 	protected $msg;
 	
+	#Manejador de Peticiones en base a accion solicitada
 	public function handler($op='') {
 		if(empty($op)){
 			$event = 'buscar';
@@ -44,6 +48,7 @@ class controller_ordenenc extends ordenenc{
 			else{
 				$uri = "get_all";
 			}
+			#Peticiones definidas para el controlador Cotizacion
 			$peticiones = array('set', 'get', 'delete', 'edit',
                         'agregar', 'buscar', 'borrar', 
                         'update','get_all','listar','insert','get_ajax','view','view_rpt','view_cotizacion','render_pdf', 'set_ocompra','rpt_ordencompra');
@@ -56,7 +61,7 @@ class controller_ordenenc extends ordenenc{
 			$event=$op;
 		}
 		
-		
+		#Selector de Acciones, Llamada de las mismas.
 		switch ($event) {
 			case 'set':
 				$this->set();
@@ -77,8 +82,6 @@ class controller_ordenenc extends ordenenc{
 				break;
 			case 'insert':
 				$this->insert();
-				//$this->set();
-				//$this->get_all($this->msg);
 				break;	
 			case 'get_all':
 				$this->get_all();
@@ -107,12 +110,13 @@ class controller_ordenenc extends ordenenc{
 		}
 	}
 	
+	#Definicion de una instancia del Modelo del Controlador ordenenc encabezado de orden de compra
 	public function set_obj() {
 		$obj = new ordenenc();
 		return $obj;
 	}
 	
-	
+	#Método que dibuja el formulario para insercion del encabezado de la Orden de Compra
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -140,65 +144,31 @@ class controller_ordenenc extends ordenenc{
 		$obvista->retornar_vista();
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function get(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function delete(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$tiene_detalle =  $parametros->tiene_detalle($_REQUEST['COD_CIA'],$_REQUEST['NUM_REQ'],$_REQUEST['ANIO']);
-		if(!$tiene_detalle){
-			$parametros->delete(get_class($parametros));
-			$this->msg=$parametros->mensaje;
-		}else{
-			$this->msg="No es Posible eliminar Requisicion, Tiene Detalles Asociados!!";
-		}*/
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function update(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		
-		/*$data = $parametros->lis(get_class($parametros),1);
-		$tagreplace = $parametros->render_etiquetas($data);
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['modificar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('modificar',get_class($parametros)), $obvista->html);
-		$obvista->html = str_replace('{mensaje}', ' ', $obvista->html);
-		$obvista->html = str_replace('{NUM_REQ}', $_REQUEST['NUM_REQ'], $obvista->html);
-		$obvista->html = str_replace('{COD_CIA}', $_REQUEST['COD_CIA'], $obvista->html);
-		$obvista->html = str_replace('{ANIO}', $_REQUEST['ANIO'], $obvista->html);
-		$obvista->render_html($tagreplace);  
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->retornar_vista();*/
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function edit(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*if(isset($_REQUEST['CKAUTORIZADO'])){
-			if($_REQUEST['CKAUTORIZADO']=="1"){
-				$estado='AUTORIZADA';
-				$objciau = $parametros->crea_objeto(array("CIAS_X_USUARIO"), "", array("USUARIO='".$_SESSION['usuario']."'"));
-				$_REQUEST['FECHA_AUTORIZADO']="SYSDATE";
-				$_REQUEST['AUTORIZADO_POR']=$objciau[0]["COD_EMP"];
-			}else{
-				$estado='DECLINADA';
-			}
-			$listaemail = $parametros->correo_solicitante();
-			$destinatario = $listaemail[0]['CORREO_USUARIO'];
-			$asunto = 'La Requisicion No.'. $_REQUEST['NUM_REQ'];
-			$tipo_requisicion= $_REQUEST['TIPO_REQ']=='G' ? 'GLOBAL' : 'EXTERNA';
-			$bodymsg="La Requisicion No: ". $_REQUEST['NUM_REQ'] . " de Tipo " . $tipo_requisicion . " ha sido Procesada, y su estado es: ". $estado;
-			$parametros->sendemail('ingresorequisiciones@caricia.com', $destinatario, $asunto, $bodymsg);
-		}
-		$parametros->update(get_class($parametros));
-		$this->msg=$parametros->mensaje; */
 	}
 	
+	#Método que inserta en el encabezado de la orden de compra, es algunos campos son tomados de su correspondiente Requisicion
 	public function insert(){
 		$parametros = $this->set_obj();
 		$objciau = $parametros->crea_objeto(array("CIAS_X_USUARIO"), '',array("USUARIO='".$_SESSION['usuario']."'"));
@@ -208,6 +178,7 @@ class controller_ordenenc extends ordenenc{
 		}
 	}
 	
+	#Método que dibuja la tabla Crud para el encanbezado de la Orden de Compra
 	public function get_all($mensaje=''){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -226,6 +197,7 @@ class controller_ordenenc extends ordenenc{
 		$obvista->retornar_vista();
 	}
 	
+	#Método que Genera Vista de orden de Compra con su encabezado y detalle
 	public function view(){
 		$parametros = $this->set_obj();
 		$detorden = new controller_detorden();
@@ -257,6 +229,7 @@ class controller_ordenenc extends ordenenc{
 		
 	}
 	
+	#Método que dibuja el formulario para parametrizacion de Reporte de Orden de Compra
 	public function view_rpt(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -272,6 +245,7 @@ class controller_ordenenc extends ordenenc{
 		$obvista->retornar_vista();
 	}
 	
+	#Método que se encarga de Generar tabla con los datos de la orden de compra para su impresion
 	public function render_pdf(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -427,9 +401,20 @@ class controller_ordenenc extends ordenenc{
 					</tfoot>";
 		$html.="</table></div>";
 		$html .= "</body></html>";
-		echo $html;
+		//echo $html;
+					try{
+$html2pdf = new HTML2PDF('P','letter','es',false,'ISO-8859-15',3);
+$html2pdf->pdf->SetDisplayMode('fullpage');
+$html2pdf->writeHTML($html, isset($_GET['vuehtml']));
+$html2pdf->Output('reporte.pdf');
+}
+catch(HTML2PDF_exception $e) {
+echo $e;
+exit;
+}
 	}
 	
+	#Método que se encarga de dibujar el detalle de la Orden de Compra, para generarla a partir de los articulos seleccionados
 	public function view_cotizacion(){
 		$objcotizacion = new cotizacion();
 		$arrayCotizacion = $objcotizacion->definir_cotizaciones($_REQUEST['NUM_REQ'], date('Y'), $_REQUEST['COD_PROV']);
@@ -467,6 +452,7 @@ class controller_ordenenc extends ordenenc{
 		echo $html;
 	}
 	
+	#Método invocado via ajax para recupera el contacto registrado en el proveedor
 	public function get_ajax(){
 		$parametros = $this->set_obj();
 		if(isset($_REQUEST['COD_CIA']) && isset($_REQUEST['COD_PROV']) ){
@@ -475,6 +461,7 @@ class controller_ordenenc extends ordenenc{
 		}
 	}
 	
+	#Método que se encarga de Dibujar el formulario para la parametrizacion del reporte orden de compra por fecha
 	public function set_rpt_ordencompra(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -489,6 +476,7 @@ class controller_ordenenc extends ordenenc{
 		
 	}
 	
+	#Método que se encarga de Dibujar el Reporte Orden de Compras por fechas
 	public function rpt_ordencompra(){
 		$parametros = $this->set_obj();
 		$objcomp = $parametros->rpt_ordencomprabyfecha($_REQUEST['fechainicial'],$_REQUEST['fechafinal']);

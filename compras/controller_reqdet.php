@@ -6,8 +6,10 @@ ini_set("display_errors", 0);
 require_once('model_reqdet.php');
 require_once('controller_requisicion.php');
 require_once('../core/render_view_generic.php');
+#Controlador de Detalle de Orden de Compra
 class controller_reqdet extends reqdet{
 	
+	#Definicion de Titulos de Objetos Html
 	protected $diccionario = array(
 		'subtitle'=>array('agregar'=>'Crear Nueva Requisicion',
                       'buscar'=>'Buscar Requisicion',
@@ -30,6 +32,7 @@ class controller_reqdet extends reqdet{
 	
 	protected $msg;
 	
+	#Manejador de Peticiones en base a accion solicitada
 	public function handler($op='') {
 		if(empty($op)){
 			$event = 'buscar';
@@ -39,6 +42,7 @@ class controller_reqdet extends reqdet{
 			else{
 				$uri = "get_all";
 			}
+			#Peticiones definidas para el controlador Cotizacion
 			$peticiones = array('set', 'get', 'delete', 'edit',
                         'agregar', 'buscar', 'borrar', 
                         'update','get_all','listar','insert');
@@ -51,7 +55,7 @@ class controller_reqdet extends reqdet{
 			$event=$op;
 		}
 		
-		
+		#Selector de Acciones, Llamada de las mismas.
 		switch ($event) {
 			case 'set':
 				$this->set();
@@ -67,11 +71,9 @@ class controller_reqdet extends reqdet{
 				break;
 			case 'edit':
 				$this->edit();
-				//$this->get_all($this->msg);
 				break;
 			case 'insert':
 				$this->insert();
-				//$this->set();
 				$this->get_all($this->msg);
 				break;	
 			case 'get_all':
@@ -83,16 +85,19 @@ class controller_reqdet extends reqdet{
 		}
 	}
 
+	#Definicion de una instancia del Modelo del Controlador reqdet detalle de la requisicion
 	public function set_obj() {
 		$obj = new reqdet();
 		return $obj;
 	}
 	
+	#Definicion de una Instancia del Modelo de requisicion encabezado de la orden de rquisicion
 	public function set_obj_master() {
 		$obj = new requisicion();
 		return $obj;
 	}
 	
+	#Método que dibuja el formulario para insercion del detalle de la Requisicion
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -110,7 +115,6 @@ class controller_reqdet extends reqdet{
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['agregar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('agregar',get_class($parametros)), $obvista->html);
-		//$obvista->html = str_replace('{formulario_details}', $obvista->get_template('details',get_class($parametros)), $obvista->html); 
 		$obvista->html = str_replace('{lstemp}', $lstempelado , $obvista->html); 
 		$obvista->html = str_replace('{lstdepto}', $lstdptos , $obvista->html);
 		$obvista->html = str_replace('{lstcategorias}', $lstcategorias , $obvista->html);
@@ -125,6 +129,7 @@ class controller_reqdet extends reqdet{
 		$obvista->retornar_vista();
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function get(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -134,6 +139,7 @@ class controller_reqdet extends reqdet{
 		$obvista->retornar_vista('buscar', $data);
 	}
 	
+	#Método generico definido en el controlador, no se utiliza
 	public function delete(){
 		$parametros = $this->set_obj();
 		$xrequisicion = $this->set_obj_master();
@@ -144,6 +150,7 @@ class controller_reqdet extends reqdet{
 		
 	}
 	
+	#Método que dibuja el formulario para la modificacion de detalle de Requisicion
 	public function update(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -173,6 +180,7 @@ class controller_reqdet extends reqdet{
 		$obvista->retornar_vista();
 	}
 	
+	#Método que modifica el detalle de la Requisicion, notifica a compras de que la Requisicion sufrio cambios
 	public function edit(){
 		$parametros = $this->set_obj();
 		$requisicion = new requisicion();
@@ -189,6 +197,7 @@ class controller_reqdet extends reqdet{
 		$xrequisicion->view();
 	}
 	
+	#Método que se encarga del la insercion del detalle de la requisicion
 	public function insert(){
 		$parametros = $this->set_obj();
 		$parametros->save(get_class($parametros));
@@ -196,6 +205,7 @@ class controller_reqdet extends reqdet{
 	
 	}
 	
+	#Método que dibuja la tabla crud del detalle de la Requisicion
 	public function get_all($mensaje=''){
 		$_REQUEST["filtro"]='NO';
 		$parametros = $this->set_obj();
@@ -216,6 +226,7 @@ class controller_reqdet extends reqdet{
 		$obvista->retornar_vista();
 	}
 	
+	#Método para invocaciones via Ajax
 	public function get_ajax(){
 		echo $lstproducto;
 	}

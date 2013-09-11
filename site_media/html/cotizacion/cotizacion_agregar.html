@@ -85,9 +85,6 @@
 							var mivar = eval('(' + resp + ')');
 							$("#det_req").empty();
 							$("#det_req").fadeIn("slow").html(mivar.tbldetreq);
-							/*$("#COD_PROD").empty();
-							$("#COD_PROD").append(mivar.lstpro);	
-							$('#COD_PROD').trigger("liszt:updated");*/
 							$("#CORRELATIVO").val(mivar.correl);
 						},
 				error : 
