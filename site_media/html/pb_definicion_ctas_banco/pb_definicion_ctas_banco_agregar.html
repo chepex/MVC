@@ -1,0 +1,122 @@
+<br/>
+<br/>
+<table border='0'>
+	<tr>
+		<td style="width:40%;">
+			<div>
+	<fieldset>Guardar Definicion CTAS</fieldset>
+	<form id="frmpbestados" action="{SET}" method="POST">
+        <div class="item_requerid">Compa&ntilde;ia</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+		</div>
+        <div class="item_requerid">C&oacute;digo Definici&oacute;n</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_DEFINICION" id="COD_DEFINICION" readonly="readonly" value="{COD_DEFINICION}">
+		</div>
+		<div class="item_requerid_textarea">Descripci&oacute;n Def.</div>
+		<div class="form_requerid">
+			<textarea name="DESCRIPCION_DEFINICION" id="DESCRIPCION_DEFINICION" rows='2' cols='10' maxlength='250'></textarea>
+		</div>
+		<div class="item_requerid">Tipo Aplicaci&oacute;n</div>
+        <div class="form_requerid">
+			<select name="TIPO_APLICACION" id="TIPO_APLICACION" class="chzn-select input-xlarge">
+				<option value='C'>CARGO</option>
+				<option value='A'>ABONO</option>
+			</select>
+		</div>
+		<div class="item_requerid">Cuenta Contable</div>
+		<div class="form_requerid">
+			<input type="text" class="input-mini" name="CTA_1" id="CTA_1" placeholder="CTA_1">
+			<input type="text" class="input-mini" name="CTA_2" id="CTA_2" placeholder="CTA_2">
+			<input type="text" class="input-mini" name="CTA_3" id="CTA_3" placeholder="CTA_3">
+			<input type="text" class="input-mini" name="CTA_4" id="CTA_4" placeholder="CTA_4">
+			<input type="text" class="input-mini" name="CTA_5" id="CTA_5" placeholder="CTA_5">
+		</div>
+		<div class="item_requerid">BANCO</div>
+        <div class="form_requerid">
+			<select name="COD_BANCO" id="COD_BANCO" class="chzn-select input-xlarge">
+				{COD_BANCO}
+			</select>
+		</div>
+		<div class="item_requerid">ESTADO</div>
+		<div class="form_requerid">
+			<select name="COD_ESTADO" id="COD_ESTADO" class="chzn-select input-xlarge">
+				{COD_ESTADO}
+			</select>
+		</div>
+		<div class="item_requerid">Destino Aplicacion</div>
+		<div class="form_requerid">
+			<select name="COD_DESTINOAPLICACION" id="COD_DESTINOAPLICACION" class="chzn-select input-xlarge">
+				{COD_DESTINOAPLICACION}
+			</select>
+		</div>
+        <div class="form_button">
+				<input type="submit" name="enviar" id="btn-save-enc" value="Agregar" class='btn'>
+		</div>
+    </form>
+</div> 
+		</td>
+		<td style="width:60%;">
+		</td>
+	</tr>
+</table>
+<script>
+	/*$("#btn-save-enc").click(function(){
+		$('#btn-savedet').removeAttr("disabled"); 
+		$('#btn-savedet').removeClass( "btn" ).addClass( "btn btn-primary" );
+		$("#frmrequisicion").attr('disabled','disabled');
+		$.ajax({
+				url : 'index.php?ctl=controller_requisicion&' + $("#frmrequisicion").serialize() ,     
+				data : { act : 'insert' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$('#btn-save-enc').attr("disabled", true);
+							$('#COD_CAT').attr("disabled", true);
+							$(".frmdetailreq").toggle();
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	      	  	});
+		return false;
+	});
+	
+	
+	$("#COD_CAT").change(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_requisicion',     
+				data : { act : 'get_ajax' , COD_CAT : $("#COD_CAT").val() , PROYECTO: $("#PROYECTO").val()},
+				type : 'POST',     
+				success : 
+						function(resp){
+							var mivar = eval('(' + resp + ')');
+							$("#COD_PROD").empty();
+							$("#COD_PROD").append(mivar.lstproducto);	
+							$('#COD_PROD').trigger("liszt:updated");
+							if(mivar.valorsaldo <= 0){
+								$("#mensaje2").toggle();
+								$("#mensaje2").fadeIn("slow").html(mivar.msjpresupuesto);
+							}				
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	   });
+	});
+	
+	$(document).ready(function(){
+		$('#btn-savedet').attr("disabled", true);
+		$('#btn-finalizar').attr("disabled", true);
+	});*/
+</script>

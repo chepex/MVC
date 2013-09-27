@@ -1,0 +1,65 @@
+    <form id="frmeditbancos" action="{EDIT}" method="POST">
+		<h5>Modificaci&oacute;n de Bancos</h5>
+		<div class="item_requerid">Compa&ntilde;ia</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+		</div>
+        <div class="item_requerid">C&oacute;digo Banco</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_BANCO" id="COD_BANCO" readonly="readonly" value="{COD_BANCO}">
+		</div>
+		<div class="item_requerid">Nom. Corto</div>
+        <div class="form_requerid">
+			<input type="text" class="input-large" name="NOMBRE_CORTO" id="NOMBRE_CORTO" maxlength='150' value="{NOMBRE_CORTO}" >
+		</div>
+		<div class="item_requerid">Nom. Largo</div>
+        <div class="form_requerid">
+			<input type="text" class="input-xlarge" name="NOMBRE_LARGO" id="NOMBRE_LARGO" maxlength='250' value="{NOMBRE_LARGO}">
+		</div>
+		<div class="item_requerid_textarea">Direcci&oacute;n</div>
+		<div class="form_requerid">
+			<textarea name="DIRECCION" id="DIRECCION" rows='2' cols='10' maxlength='500'>{DIRECCION}</textarea>
+		</div>
+		<div class="item_requerid">Telefono</div>
+        <div class="form_requerid">
+			<input type="text" class="input-medium" name="TELEFONO" id="TELEFONO" maxlength='13' value="{TELEFONO}">
+		</div>
+		<div class="item_requerid_textarea">Observaciones</div>
+		<div class="form_requerid">
+			<textarea name="OBSERVACIONES" id="OBSERVACIONES" rows='2' cols='10' maxlength='500'>{OBSERVACIONES}</textarea>
+		</div>
+		<div class="item_requerid">Estado</div>
+        <div class="form_requerid">
+			<select name="COD_ESTADO" id="COD_ESTADO" class="chzn-select input-xlarge">
+				{lstestados}
+			</select><a id='lstestados' href="#" class='btn btn-info' title="Listar Todos Los Estados"><i class="icon-align-justify"></i></a>
+		</div>
+        <div class="form_button">
+			<input type="submit" name="enviar" id="btn-aut" value="Modificar" class='btn'>
+		</div>
+    </form>
+    
+   <script>
+	$("#lstestados").click(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_pb_estados',     
+				data : { act : 'get'},
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$("#COD_ESTADO").empty();
+							$("#COD_ESTADO").append(resp);	
+							$('#COD_ESTADO').trigger("liszt:updated");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+		});
+		return false;
+	});
+	</script>

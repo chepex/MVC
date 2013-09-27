@@ -1,0 +1,135 @@
+<br/>
+<br/>
+<table border='0'>
+	<tr>
+		<td style="width:40%;">
+			<div>
+	<fieldset>Guardar Lineas de Cr&eacute;dito</fieldset><br/>
+	<form id="frmpbestados" action="{SET}" method="POST">
+        <div class="item_requerid">Compa&ntilde;ia</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+		</div>
+        <div class="item_requerid">C&oacute;digo Linea</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_LINEA" id="COD_LINEA" readonly="readonly" value="{COD_LINEA}">
+		</div>
+		<div class="item_requerid">Num. Ref. Linea</div>
+		<div class="form_requerid">
+			<input type="text" class="input-large" name="NUM_REFLINEA" id="NUM_REFLINEA" maxlength="35">
+		</div>
+		<div class="item_requerid">BANCO</div>
+        <div class="form_requerid">
+			<select name="COD_BANCO" id="COD_BANCO" class="chzn-select input-xlarge">
+				{COD_BANCO}
+			</select>
+		</div>
+		<div class="item_requerid">TIPO CR&Eacute;DITO</div>
+        <div class="form_requerid">
+			<select name="COD_TIPOCREDITO" id="COD_TIPOCREDITO" class="chzn-select input-xlarge">
+				{COD_TIPOCREDITO}
+			</select>
+		</div>
+		<div class="item_requerid">ESTADO LINEA</div>
+		<div class="form_requerid">
+			<select name="COD_ESTADO" id="COD_ESTADO" class="chzn-select input-xlarge">
+				{COD_ESTADO}
+			</select>
+		</div>
+		<div class="item_requerid">TECHO LINEA</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="TECHO_LINEA" id="TECHO_LINEA">
+		</div>
+		<div class="item_requerid">FEC.APER.</div>
+		<div class="form_requerid">
+			<input type="text" class="input-large" name="FECHA_APERTURA" id="FECHA_APERTURA">
+		</div>
+		<div class="item_requerid">FEC. VEN.</div>
+		<div class="form_requerid">
+			<input type="text" class="input-large" name="FECHA_VENCIMIENTO" id="FECHA_VENCIMIENTO">
+		</div>
+		<div class="item_requerid_textarea">DESTINO</div>
+		<div class="form_requerid">
+			<textarea name="DESTINO" id="DESTINO" rows='2' cols='10' maxlength='500'></textarea>
+		</div>
+		<div class="item_requerid_textarea">DES. FORMA PAGO</div>
+		<div class="form_requerid">
+			<textarea name="DESCRIPCION_FORMA_PAGO" id="DESCRIPCION_FORMA_PAGO" rows='2' cols='10' maxlength='500'></textarea>
+		</div>
+		<div class="item_requerid_textarea">DES. GARANTIAS</div>
+		<div class="form_requerid">
+			<textarea name="DESCRIPCION_GARANTIAS" id="DESCRIPCION_GARANTIAS" rows='2' cols='10' maxlength='500'></textarea>
+		</div>
+		<div class="item_requerid_textarea">MOTIVOS CADUCIDAD</div>
+		<div class="form_requerid">
+			<textarea name="MOTIVOS_CADUCIDAD" id="MOTIVOS_CADUCIDAD" rows='2' cols='10' maxlength='500'></textarea>
+		</div>
+        <div class="form_button">
+				<input type="submit" name="enviar" id="btn-save-enc" value="Agregar" class='btn'>
+		</div>
+    </form>
+</div> 
+		</td>
+		<td style="width:60%;">
+		</td>
+	</tr>
+</table>
+<script>
+	/*$("#btn-save-enc").click(function(){
+		$('#btn-savedet').removeAttr("disabled"); 
+		$('#btn-savedet').removeClass( "btn" ).addClass( "btn btn-primary" );
+		$("#frmrequisicion").attr('disabled','disabled');
+		$.ajax({
+				url : 'index.php?ctl=controller_requisicion&' + $("#frmrequisicion").serialize() ,     
+				data : { act : 'insert' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$('#btn-save-enc').attr("disabled", true);
+							$('#COD_CAT').attr("disabled", true);
+							$(".frmdetailreq").toggle();
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	      	  	});
+		return false;
+	});
+	
+	
+	$("#COD_CAT").change(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_requisicion',     
+				data : { act : 'get_ajax' , COD_CAT : $("#COD_CAT").val() , PROYECTO: $("#PROYECTO").val()},
+				type : 'POST',     
+				success : 
+						function(resp){
+							var mivar = eval('(' + resp + ')');
+							$("#COD_PROD").empty();
+							$("#COD_PROD").append(mivar.lstproducto);	
+							$('#COD_PROD').trigger("liszt:updated");
+							if(mivar.valorsaldo <= 0){
+								$("#mensaje2").toggle();
+								$("#mensaje2").fadeIn("slow").html(mivar.msjpresupuesto);
+							}				
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	   });
+	});
+	
+	$(document).ready(function(){
+		$('#btn-savedet').attr("disabled", true);
+		$('#btn-finalizar').attr("disabled", true);
+	});*/
+</script>

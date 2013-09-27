@@ -1,0 +1,19 @@
+    <form id="frmeditestados" action="{EDIT}" method="POST">
+		<h5>Modificaci&oacute;n de Tipos de Cr&eacute;ditos</h5>
+       <div class="item_requerid">Compa&ntilde;ia</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+		</div>
+        <div class="item_requerid">Cod Tipo Cr&eacute;dito</div>
+        <div class="form_requerid">
+			<input type="text" class="input-small" name="COD_TIPOCREDITO" id="COD_TIPOCREDITO" readonly="readonly" value="{COD_TIPOCREDITO}" maxlength="6">
+		</div>
+        <div class="item_requerid">Descripci&oacute;n</div>
+        <div class="form_requerid">
+			<input type="text" name="DESCRIPCION_TIPOCREDITO" id="DESCRIPCION_TIPOCREDITO" value="{DESCRIPCION_TIPOCREDITO}" class="input-Xlarge" maxlength="250">
+		</div>
+        <div class="form_button">
+			<input type="submit" name="enviar" id="btn-aut" value="Modificar" class='btn'>
+		</div>
+    </form>

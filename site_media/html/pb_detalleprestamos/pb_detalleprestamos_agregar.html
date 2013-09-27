@@ -1,0 +1,135 @@
+<br/>
+<br/>
+<table border='0'>
+	<tr>
+		<td style="width:40%;">
+			<div>
+	<fieldset>Generar Prestamo</fieldset><br/>
+	<form id="frmpbestados" action="{SET}" method="POST">
+        <div class="item_requerid">Compa&ntilde;ia</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+		</div>
+        <div class="item_requerid">C&oacute;digo Prestamo</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_PRESTAMO" id="COD_PRESTAMO" readonly="readonly" value="{COD_PRESTAMO}">
+		</div>
+		<div class="item_requerid">Num. Ref.</div>
+		<div class="form_requerid">
+			<input type="text" class="input-large" name="REF_PRESTAMO" id="REF_PRESTAMO" maxlength="35">
+		</div>
+		<div class="item_requerid">BANCO</div>
+        <div class="form_requerid">
+			<select name="COD_BANCO" id="COD_BANCO" class="chzn-select input-xlarge">
+				{COD_BANCO}
+			</select>
+		</div>
+		<div class="item_requerid">FEC.APER.</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="FECHA_APERTURA" id="FECHA_APERTURA">
+		</div>
+		<div class="item_requerid">FEC. VEN.</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="FECHA_VENCIMIENTO" id="FECHA_VENCIMIENTO">
+		</div>
+		<div class="item_requerid">A&Ntilde;OS PLAZO</div>
+		<div class="form_requerid">
+			<input type="text" class="input-mini" name="ANIOS_PLAZO" id="ANIOS_PLAZO">
+		</div>
+		<div class="item_requerid">% INT. ANUAL</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="TASA_INTERES" id="TASA_INTERES">
+		</div>
+		<div class="item_requerid">MONTO APRO.</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="MONTO_APROBADO" id="MONTO_APROBADO">
+		</div>
+		<div class="item_requerid">VALOR CUOTA</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="VALOR_CUOTA" id="VALOR_CUOTA">
+		</div>
+		<div class="item_requerid">VALOR SEGURO</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="VALOR_SEGURO" id="VALOR_SEGURO">
+		</div>
+		<div class="item_requerid">ESTADO PRESTA.</div>
+		<div class="form_requerid">
+			<select name="COD_ESTADO" id="COD_ESTADO" class="chzn-select input-xlarge">
+				{COD_ESTADO}
+			</select>
+		</div>
+		<div class="item_requerid">LINEA</div>
+		<div class="form_requerid">
+			<select name="COD_LINEA" id="COD_LINEA" class="chzn-select input-xlarge">
+				{COD_LINEA}
+			</select>
+		</div>
+        <div class="form_button">
+				<input type="submit" name="enviar" id="btn-save-enc" value="Generar Prestamo" class='btn'>
+		</div>
+    </form>
+</div> 
+		</td>
+		<td style="width:60%;">
+		</td>
+	</tr>
+</table>
+<script>
+	/*$("#btn-save-enc").click(function(){
+		$('#btn-savedet').removeAttr("disabled"); 
+		$('#btn-savedet').removeClass( "btn" ).addClass( "btn btn-primary" );
+		$("#frmrequisicion").attr('disabled','disabled');
+		$.ajax({
+				url : 'index.php?ctl=controller_requisicion&' + $("#frmrequisicion").serialize() ,     
+				data : { act : 'insert' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$('#btn-save-enc').attr("disabled", true);
+							$('#COD_CAT').attr("disabled", true);
+							$(".frmdetailreq").toggle();
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	      	  	});
+		return false;
+	});
+	
+	
+	$("#COD_CAT").change(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_requisicion',     
+				data : { act : 'get_ajax' , COD_CAT : $("#COD_CAT").val() , PROYECTO: $("#PROYECTO").val()},
+				type : 'POST',     
+				success : 
+						function(resp){
+							var mivar = eval('(' + resp + ')');
+							$("#COD_PROD").empty();
+							$("#COD_PROD").append(mivar.lstproducto);	
+							$('#COD_PROD').trigger("liszt:updated");
+							if(mivar.valorsaldo <= 0){
+								$("#mensaje2").toggle();
+								$("#mensaje2").fadeIn("slow").html(mivar.msjpresupuesto);
+							}				
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	   });
+	});
+	
+	$(document).ready(function(){
+		$('#btn-savedet').attr("disabled", true);
+		$('#btn-finalizar').attr("disabled", true);
+	});*/
+</script>

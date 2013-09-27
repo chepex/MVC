@@ -1,0 +1,77 @@
+<h4>Listado Lineas de Cr&eacute;dito</h4><br/>
+			<div  align='center'>
+				<!--<a href='index.php?ctl=controller_pb_estados&filtro=1' class='btn pull-right'>3 Meses</a>
+				<a href='index.php?ctl=controller_pb_estados&filtro=2' class='btn pull-right'>8 Meses</a>-->
+				<table id="tblreq" style='font-size:13px;' class='table'>
+					<thead>
+						<tr>
+							<th>
+								CODIGO CIA
+							</th>
+							<th>
+								CODIGO LINEA
+							</th>
+							<th>
+								NUM REF.
+							</th>
+							<th>
+								BANCO
+							</th>
+							<th>
+								TIPO CR&Eacute;DITO
+							</th>
+							<th>
+								TECHO LINEA
+							</th>
+							<th>
+								ESTADO LINEA
+							</th>
+							<th>
+								FECHA APERTURA
+							</th>
+							<th>
+								FECHA VENCIMIENTO
+							</th>
+							<th>
+								DESTINO
+							</th>
+							<th>
+								DESCRIPCION FORMA PAGO
+							</th>
+							<th>
+								DESCRIPCION GARANTIAS
+							</th>
+							<th>
+								MOTIVOS CADUCIDAD
+							</th>
+							<th>
+								*
+							</th>
+					</tr>
+				</thead>
+				<tbody>
+					{Detalle}
+			</div>
+			<br/><br/><br/>
+</div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+/**TABLA FORMATO**/
+oTable =    $('#tblreq').dataTable( {      
+        "sDom": '<"H"Tfr>t<"F"ip>',
+        "bJQueryUI": true,
+        "bSort": false,
+        "sPaginationType": "full_numbers"  ,
+        "oTableTools": {"aButtons": ["copy","print",
+                                {  "sExtends":    "collection",
+                                    "sButtonText": "Export...",
+                                    "aButtons":    [ "xls", "pdf" ] }
+                            ]},
+        "oLanguage": {
+			"sSearch": "Buscar Linea de Credito:"
+		}
+    } );	
+});
+</script>
+

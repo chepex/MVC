@@ -1,0 +1,211 @@
+<br/>
+<br/>
+<div>
+	<h4>Generar Prestamo</h4><br/>
+	<form id="frmprestamos" action="{SET}" method="POST">
+		<table>
+			<tr>
+				<td>
+					 <div class="item_requerid">Compa&ntilde;ia</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+		</div>
+        <div class="item_requerid">C&oacute;digo Prestamo</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_PRESTAMO" id="COD_PRESTAMO" readonly="readonly" value="{COD_PRESTAMO}">
+		</div>
+		<div class="item_requerid">Num. Ref.</div>
+		<div class="form_requerid">
+			<input type="text" class="input-large" name="REF_PRESTAMO" id="REF_PRESTAMO" maxlength="35">
+		</div>
+		<div class="item_requerid">BANCO</div>
+        <div class="form_requerid">
+			<select name="COD_BANCO" id="COD_BANCO" class="chzn-select input-xlarge">
+				<option selected>Seleccione Una Opcion</option>
+				{COD_BANCO}
+			</select>
+		</div>
+		<div class="item_requerid">LINEA</div>
+		<div class="form_requerid">
+			<select name="COD_LINEA" id="COD_LINEA" class="chzn-select input-xlarge">
+				{COD_LINEA}
+			</select>
+		</div>
+		<div class="item_requerid">FEC.APER.</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="FECHA_APERTURA" id="FECHA_APERTURA">
+		</div>
+		<div class="item_requerid">PLAZO</div>
+		<div class="form_requerid">
+			<input type="text" class="input-mini" name="PLAZO" id="PLAZO">
+		</div>
+		<div class="item_requerid">% INT.</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="TASA_INTERES" id="TASA_INTERES">
+		</div>
+		<div class="item_requerid">MONTO APRO.</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="MONTO_APROBADO" id="MONTO_APROBADO">
+		</div>
+		<div class="item_requerid">ESTADO PRESTA.</div>
+		<div class="form_requerid">
+			<select name="COD_ESTADO" id="COD_ESTADO" class="chzn-select input-xlarge">
+				{COD_ESTADO}
+			</select>
+		</div>
+		<div class="item_requerid">FEC. VEN.</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="FECHA_VENCIMIENTO" id="FECHA_VENCIMIENTO">
+		</div>
+		<div class="item_requerid">VALOR CUOTA</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="VALOR_CUOTA" id="VALOR_CUOTA">
+		</div>
+		<div class="item_requerid">VALOR SEGURO</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="VALOR_SEGURO" id="VALOR_SEGURO">
+		</div>
+		<div class="item_requerid_textarea">TIPO DE TABLA</div>
+		<div class="form_requerid">
+			<br/>
+			<input type="radio" id="TIPO_TABLA" name="TIPO_TABLA">CUOTAS MENSUALES Y SUCESIVAS DE CAPITAL Y DE INTERESES<br/><br/>
+			<input type="radio" id="TIPO_TABLA" name="TIPO_TABLA">PAGO DE INTERESES MENSUALES Y CAPITAL AL VENCIMIENTO
+		</div>
+		<div class="form_button">
+			<br/>
+				<button class="btn" id="btnamortizacion" >Generar Tabla de Amortizaci&oacute;n</button>
+				<input type="submit" name="enviar" id="btn-save-enc" value="Generar Prestamo" class='btn' disabled="disabled">
+		</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<br/><br/>
+					<div id='tblamortizacion'></div>
+				</td>
+			</tr>
+		</table>
+    </form>
+</div> 
+<div id="myModal" class="modal hide fade" data-backdrop="static">
+	<div class="modal-header"></div>
+		<div class="modal-body">
+			Espere por favor....
+			<div id='pbar' class="progress progress-striped active">
+				<div class="bar" style="width: 100%;">Generando....</div>
+			</div>
+		</div>
+	<div class="modal-footer"></div>
+</div>
+<script>
+	$(document).ready(function(){
+		$('#btn-save-enc').attr("disabled", true);
+		$("#btnamortizacion").attr("disabled", true)
+	});
+	$("#btnamortizacion").click(function(){
+		if($("#REF_PRESTAMO").val().length > 0 && $("#PLAZO").val().length > 0 && $("#TASA_INTERES").val().length > 0 && $("#MONTO_APROBADO").val().length > 0){
+			$.ajax({
+				url : 'index.php?ctl=controller_pb_prestamos&' + $("#frmprestamos").serialize() ,     
+				data : { act : 'get_ajax' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							var mivar = $.parseJSON(resp); 
+							$("#tblamortizacion").fadeOut('slow').html('&nbsp;');
+							$("#tblamortizacion").fadeIn('slow').html(mivar.tblamortizacion);
+							$("#FECHA_VENCIMIENTO").val(mivar.fecha_vencimiento);
+							$("#VALOR_CUOTA").val(mivar.valor_cuota);
+							$("#VALOR_SEGURO").val('0');
+							$('#btn-save-enc').removeAttr("disabled"); 
+							$('#btn-save-enc').removeClass( "btn" ).addClass( "btn btn-primary" );
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+	      	 });
+		}else{
+			$("#mensaje2").toggle();
+			$("#mensaje2").fadeIn('slow').html("Complete Los Campos Requeridos!!");
+		}
+		return false;
+	});
+	
+	$("#btn-save-enc").click(function(){
+		$('#myModal').modal({
+			keyboard: false
+		});
+		$.ajax({
+				url : 'index.php?ctl=controller_pb_prestamos&' + $("#frmprestamos").serialize() ,     
+				data : { act : 'insert' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$('#btn-save-enc').attr('disabled','disabled');
+							$('#btnamortizacion').attr('disabled','disabled');
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							$("#myModal").fadeOut('slow').modal('hide');
+							$('body').removeClass('modal-open');
+							$('.modal-backdrop').fadeOut('slow').remove();
+						}
+	      	  	});
+		return false;
+	});	
+	$("#COD_BANCO").change(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_pb_lineascredito&COD_BANCO='+ $("#COD_BANCO").val(),     
+				data : { act : 'get' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$("#COD_LINEA").empty();
+							$("#COD_LINEA").append(resp);	
+							$('#COD_LINEA').trigger("liszt:updated");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+					
+						}
+	      	  	});
+	});
+	
+	$("#MONTO_APROBADO").focusout(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_pb_lineascredito&COD_BANCO='+ $("#COD_BANCO").val() + '&COD_LINEA=' + $("#COD_LINEA").val() + '&MONTO_APROBADO=' + $("#MONTO_APROBADO").val(),     
+				data : { act : 'view' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							var mivar = $.parseJSON(resp); 
+							if(mivar.mensaje != null){
+								$("#mensaje2").toggle();
+								$("#mensaje2").fadeIn('slow').html(mivar.mensaje);
+								$("#btnamortizacion").attr("disabled", true)
+							}else{
+								$("#mensaje2").css("display","none");
+								$('#btnamortizacion').removeAttr("disabled");
+							}
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+					
+						}
+	      	  	});
+	});
+	
+</script>

@@ -84,7 +84,7 @@ abstract class DBAbstractModel {
 		
 	}
 
-	/*Lista especiales donde se depenete de varias tablas*/
+	/*Lista especiales donde se DEPENDE de varias tablas*/
 	public function lis2($class,$id=0,$at="0"){
 
 		$this->rows = array();
@@ -191,6 +191,7 @@ abstract class DBAbstractModel {
 		
 		if($_REQUEST["filtro"]=="")$_REQUEST["filtro"]=1;
 		if($_REQUEST["filtro"]>0){
+			$conjuncion = " AND ";
 			if ($_REQUEST["filtro"]==1){
 				$where = "WHERE CREATED_AT > add_months(SYSDATE, -3)";
 			}
@@ -200,19 +201,22 @@ abstract class DBAbstractModel {
 			if ($_REQUEST["filtro"]==3){
 				$where = "WHERE  CREATED_AT > add_months(SYSDATE, -12)";
 			}			
-		}	
+		}
+		else{
+			$conjuncion = " WHERE ";
+		}
 			
 		if($id==1){
-			$where .= " AND ". $this->get_key($llave);
+			$where .= $conjuncion. $this->get_key($llave);
 		} 
 		if($id==2){
 			$campos2 = explode(',',$campos);		
-			$where .= " AND ". $this->get_fields($campos2);
+			$where .= $conjuncion. $this->get_fields($campos2);
 		
 		} 
 		if($id==3){
 			$foreignkey = $cl->foreignkey();
-			$where .= " AND ". $this->get_key($foreignkey);
+			$where .= $conjuncion. $this->get_key($foreignkey);
 		}		
 			
 		$i=0;
@@ -262,7 +266,7 @@ abstract class DBAbstractModel {
 			$this->query="INSERT INTO ".$tabla."(".$campos.")VALUES(".$xx.")";					
 			$this->execute_single_query();			
 			if($this->error==""){
-				$this->mensaje= "registro insertado correctamente";			
+				$this->mensaje= "Registro Insertado Correctamente";			
 			}
 			
 	}
@@ -291,7 +295,7 @@ abstract class DBAbstractModel {
 			$this->query="UPDATE  ".$tabla." SET ".$xx." ". $where;
 			$this->execute_single_query();				
 			if($this->error==""){
-				$this->mensaje= "registro insertado correctamente";			
+				$this->mensaje= "Registro Actualizado Correctamente";			
 			}				
 			
 			
@@ -311,7 +315,7 @@ abstract class DBAbstractModel {
 			if($this->error==""){
 				$this->mensaje= "registro insertado correctamente";			
 			}		
-		$this->mensaje = "registro eliminado correctamente";
+		$this->mensaje = "Registro Eliminado Correctamente";
 		
 	}
 	

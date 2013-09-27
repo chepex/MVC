@@ -1,0 +1,120 @@
+    <form id="frmeditbancos" action="{EDIT}" method="POST">
+		<h5>Modificaci&oacute;n de Definicion CTAS</h5>
+		        <div class="item_requerid">Compa&ntilde;ia</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+		</div>
+        <div class="item_requerid">C&oacute;digo Definici&oacute;n</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_DEFINICION" id="COD_DEFINICION" readonly="readonly" value="{COD_DEFINICION}">
+		</div>
+		<div class="item_requerid_textarea">Descripci&oacute;n Def.</div>
+		<div class="form_requerid">
+			<textarea name="DESCRIPCION_DEFINICION" id="DESCRIPCION_DEFINICION" rows='2' cols='10' maxlength='250'>{DESCRIPCION_DEFINICION}</textarea>
+		</div>
+		<div class="item_requerid">Tipo Aplicaci&oacute;n</div>
+        <div class="form_requerid">
+			<select name="TIPO_APLICACION" id="TIPO_APLICACION" class="chzn-select input-xlarge">
+				<option value='C'>CARGO</option>
+				<option value='A'>ABONO</option>
+			</select>
+		</div>
+		<div class="item_requerid_textarea">Cuenta Contable</div>
+		<div class="form_requerid">
+			<input type="text" class="input-mini" name="CTA_1" id="CTA_1" value="{CTA_1}">
+			<input type="text" class="input-mini" name="CTA_2" id="CTA_2" value="{CTA_2}">
+			<input type="text" class="input-mini" name="CTA_3" id="CTA_3" value="{CTA_3}">
+			<input type="text" class="input-mini" name="CTA_4" id="CTA_4" value="{CTA_4}">
+			<input type="text" class="input-mini" name="CTA_5" id="CTA_5" value="{CTA_5}">
+		</div>
+		<div class="item_requerid">BANCO</div>
+        <div class="form_requerid">
+			<select name="COD_BANCO" id="COD_BANCO" class="chzn-select input-xlarge">
+				{COD_BANCO}
+			</select><a id='lstbancos' href="#" class='btn btn-info' title="Listar Todos Los Bancos"><i class="icon-align-justify"></i></a>
+		</div>
+		<div class="item_requerid_textarea">ESTADO DEFINICI&Oacute;N</div>
+		<div class="form_requerid">
+			<select name="COD_ESTADO" id="COD_ESTADO" class="chzn-select input-xlarge">
+				{COD_ESTADO}
+			</select><a id='lstestados' href="#" class='btn btn-info' title="Listar Todos Los Estados"><i class="icon-align-justify"></i></a>
+		</div>
+		<div class="item_requerid">Destino Aplicacion</div>
+		<div class="form_requerid">
+			<select name="COD_DESTINOAPLICACION" id="COD_DESTINOAPLICACION" class="chzn-select input-xlarge">
+				{COD_DESTINOAPLICACION}
+			</select><a id='lstdestinoapli' href="#" class='btn btn-info' title="Listar Todos Los Destinos de Aplicacion"><i class="icon-align-justify"></i></a>
+		</div>
+        <div class="form_button">
+			<input type="submit" name="enviar" id="btn-aut" value="Modificar" class='btn'>
+		</div>
+    </form>
+    
+     <script>
+	$("#lstestados").click(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_pb_estados',     
+				data : { act : 'get'},
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$("#COD_ESTADO").empty();
+							$("#COD_ESTADO").append(resp);	
+							$('#COD_ESTADO').trigger("liszt:updated");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+		});
+		return false;
+	});
+	
+	$("#lstbancos").click(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_pb_bancos',     
+				data : { act : 'get'},
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$("#COD_BANCO").empty();
+							$("#COD_BANCO").append(resp);	
+							$('#COD_BANCO').trigger("liszt:updated");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+		});
+		return false;
+	});
+	
+	$("#lstdestinoapli").click(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_pb_definicion_ctas_banco',     
+				data : { act : 'get'},
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$("#COD_DESTINOAPLICACION").empty();
+							$("#COD_DESTINOAPLICACION").append(resp);	
+							$('#COD_DESTINOAPLICACION').trigger("liszt:updated");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+		});
+		return false;
+	});
+	</script>

@@ -1,0 +1,66 @@
+<h4>Listado de Bancos</h4><br/>
+			<div style="width:75%;" align='center'>
+				<!--<a href='index.php?ctl=controller_pb_estados&filtro=1' class='btn pull-right'>3 Meses</a>
+				<a href='index.php?ctl=controller_pb_estados&filtro=2' class='btn pull-right'>8 Meses</a>-->
+				<table id="tblreq" style='font-size:13px;' class='table'>
+					<thead>
+						<tr>
+							<th>
+								CODIGO CIA
+							</th>
+							<th>
+								CODIGO BANCO
+							</th>
+							<th>
+								NOM. BANCO
+							</th>
+							<th>
+								DIRECCION
+							</th>
+							<th>
+								TELEFONO1
+							</th>
+							<th>
+								TELEFONO2
+							</th>
+							<th>
+								OBSERVACIONES
+							</th>
+							<th>
+								NOM_CORTO
+							</th>
+							<th>
+								*
+							</th>
+					</tr>
+				</thead>
+				<tbody>
+					{Detalle}
+			<br/>
+			<a href='index.php?ctl=controller_pb_definicion_ctas_banco&act=get_all' class='btn btn-info pull-left'>
+				<i class="icon-list"></i>&nbsp;Parametrizaci&oacute;n de CTA por Banco
+			</a>
+			</div>
+			<br/><br/><br/>
+</div>
+</div>
+<script type="text/javascript">
+$(document).ready(function(){
+/**TABLA FORMATO**/
+oTable =    $('#tblreq').dataTable( {      
+        "sDom": '<"H"Tfr>t<"F"ip>',
+        "bJQueryUI": true,
+        "bSort": false,
+        "sPaginationType": "full_numbers"  ,
+        "oTableTools": {"aButtons": ["copy","print",
+                                {  "sExtends":    "collection",
+                                    "sButtonText": "Export...",
+                                    "aButtons":    [ "xls", "pdf" ] }
+                            ]},
+        "oLanguage": {
+			"sSearch": "Buscar Banco:"
+		}
+    } );	
+});
+</script>
+
