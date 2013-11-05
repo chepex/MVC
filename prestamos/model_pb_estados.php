@@ -52,6 +52,7 @@ class pb_estados extends DBAbstractModel {
 
     ################################# MÉTODOS ##################################
    
+   #Devuelve el Valor de la Secuencia para el siguente correlativo de la tabla pb_estados
     public function nextval_seq(){
 		$this->rows=array();
 		$this->query="SELECT SEQ_PBESTADOS.NEXTVAL FROM DUAL";
@@ -59,6 +60,7 @@ class pb_estados extends DBAbstractModel {
         return $this->rows[0]['NEXTVAL'];
 	}
 	
+	#Devuelve una lista de option html con todos los estados
 	public function get_options(){
 		$lstestados = $this->get_lsoption($this->tableName(), array("COD_ESTADO"=>"","DESCRIPCION_ESTADO"=>""));
 		return $lstestados;

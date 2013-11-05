@@ -1,4 +1,4 @@
-<h4>Listado de Prestamos</h4><br/>
+<h4>Listado de Pagos</h4><br/>
 			<div  align='center'>
 				<!--<a href='index.php?ctl=controller_pb_estados&filtro=1' class='btn pull-right'>3 Meses</a>
 				<a href='index.php?ctl=controller_pb_estados&filtro=2' class='btn pull-right'>8 Meses</a>
@@ -10,7 +10,7 @@
 								CODIGO CIA
 							</th>
 							<th>
-								CODIGO PRESTAMOS
+								CODIGO PAGO
 							</th>
 							<th>
 								REF. PRESTAMO
@@ -19,25 +19,7 @@
 								BANCO
 							</th>
 							<th>
-								FECHA APERTURA
-							</th>
-							<th>
-								FECHA VENCIMIENTO
-							</th>
-							<th>
-								MESES PLAZO
-							</th>
-							<th>
-								% INT. ANUAL
-							</th>
-							<th>
-								MONTO APROBADO
-							</th>
-							<th>
-								VALOR CUOTA
-							</th>
-							<th>
-								ESTADO
+								FECHA PAGO
 							</th>
 							<th>
 								LINEA
@@ -66,7 +48,7 @@ oTable =    $('#tblreq').dataTable( {
                                     "aButtons":    [ "xls", "pdf" ] }
                             ]},
         "oLanguage": {
-			"sSearch": "Buscar Prestamo:"
+			"sSearch": "Buscar Pago:"
 		}
     } );	
 });

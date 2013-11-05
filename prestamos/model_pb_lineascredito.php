@@ -72,6 +72,7 @@ class pb_lineascredito extends DBAbstractModel {
 
     ################################# MÉTODOS ##################################
    
+   #Devuelve el Correlativo de la Secuencia para la tabla pb_lineascredito
     public function nextval_seq(){
 		$this->rows=array();
 		$this->query="SELECT SEQ_PBLINEACRED.NEXTVAL FROM DUAL";
@@ -79,11 +80,13 @@ class pb_lineascredito extends DBAbstractModel {
         return $this->rows[0]['NEXTVAL'];
 	}
 	
+	#Devuelve una lista de option html con las lineas de credito del un banco especifico, y que esten activas
 	public function get_options(){
 		$lstlineas = $this->get_lsoption($this->tableName(), array("COD_LINEA"=>"","NUM_REFLINEA"=>""), array("COD_CIA"=>$_SESSION['cod_cia'],"COD_BANCO"=>"'".$_REQUEST['COD_BANCO']."'","COD_ESTADO"=>"1"));
 		return $lstlineas;
 	}
 	
+	#Valida que el Monto del Credito solicitado para una Linea de Credito, no exceda el valor del techo de la misma
 	public function validar_disponibilidad($COD_CIA,$COD_BANCO,$COD_LINEA=0,$VALOR_SOLICITUD=0){
 		$this->rows=array();
 		$this->TECHO_LINEA = 0;

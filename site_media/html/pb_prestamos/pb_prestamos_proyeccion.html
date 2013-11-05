@@ -1,0 +1,23 @@
+<br/>
+<br/>
+<div>
+	<h4>Parametros Proyeccion de Pago</h4><br/>
+	<form id="frmprestamos" action="{PROYEC}" method="POST">
+		<div class="item_requerid">Per&iacute;odo</div>
+        <div class="form_requerid">
+			<input type="text" class="input-small" name="FECHA_INI" id="FECHA_INI">
+			<input type="text" class="input-small" name="FECHA_FIN" id="FECHA_FIN">
+		</div>
+		<div class="item_requerid">BANCO</div>
+        <div class="form_requerid">
+			<select name="COD_BANCO" id="COD_BANCO" class="chzn-select input-xlarge">
+				<option selected>Seleccione Una Opcion</option>
+				{COD_BANCO}
+			</select>
+		</div>
+		<div class="form_button">
+			<br/>
+				<input type="submit" name="enviar" id="btn-save-enc" value="Ver Proyeccion de Pago" class='btn'>
+		</div>
+    </form>
+</div> 

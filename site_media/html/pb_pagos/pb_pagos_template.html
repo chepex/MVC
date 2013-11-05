@@ -13,6 +13,7 @@
 </style>
 
 <script src="../site_media/js/jquery.js"></script>
+<script src="../site_media/js/jquery.PrintArea.js"></script>
 <script src="../site_media/js/chosen/chosen.jquery.js"></script>
 <script src="../site_media/js/jquery.dataTables.js"></script>	
 <script type="text/javascript" src="../site_media/js/jquery-ui.min.js"></script>
@@ -39,19 +40,15 @@
 </html>
 <script>
 	
-	$('#FECHA_APERTURA').datepicker({
+	$('#FECHA_PAGO').datepicker({
 		dateFormat: 'dd/mm/yy'
 	});
 	
-	$('#FECHA_VENCIMIENTO').datepicker({
+	$('#FECHA_PAGO_FILTROI').datepicker({
 		dateFormat: 'dd/mm/yy'
 	});
 	
-	$('#FECHA_INI').datepicker({
-		dateFormat: 'dd/mm/yy'
-	});
-	
-	$('#FECHA_FIN').datepicker({
+	$('#FECHA_PAGO_FILTROF').datepicker({
 		dateFormat: 'dd/mm/yy'
 	});
 	
@@ -69,6 +66,9 @@
 	else{
 		$("#mensaje2").hide();   
 	}
+	$("#imprime").click(function (){
+		$("div.PrintArea").printArea();
+	});
 	
 </script> 
 

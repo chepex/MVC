@@ -64,6 +64,20 @@ abstract class DBAbstractModel {
 		
 	}
 	
+	private function iniciar_transaccion(){
+		$this->open_connection();
+		$this->conn->StartTrans();
+	}
+	
+	protected function execute_transaccion_query($query){
+		 $this->conn->Execute($this->query);
+	}
+	
+	private function finalizar_transaccion(){
+		$this->conn->CompleteTrans();
+		$this->close_connection();
+	}
+	
 	# Traer resultados de una consulta en un Array
 	 protected function get_results_from_query() {
 		$this->open_connection();
@@ -317,6 +331,28 @@ abstract class DBAbstractModel {
 			}		
 		$this->mensaje = "Registro Eliminado Correctamente";
 		
+	}
+	
+	#Inserta Un nuevo Registro
+	protected function save_insert_trans($class){
+		$this->connexion;
+		$cl = new $class;
+		$campos =$cl->atributos();
+		$tabla  =$cl->tableName(); 
+		$llave	=$cl->llave(); 	
+		$campos =$cl->atributos();
+		$lista = explode(',', $campos);
+		for($i=0;$i<count($lista);$i++){			
+			$array[$i]= $_REQUEST[$lista[$i]] == 'SYSDATE' || $_REQUEST[$lista[$i]] == 'NULL' || $_REQUEST[$lista[$i]] == 'USER' ? $_REQUEST[$lista[$i]] : "'".$_REQUEST[$lista[$i]]."'" ;
+		}
+		
+			$xx=implode(",", $array);
+			$this->query="INSERT INTO ".$tabla."(".$campos.")VALUES(".$xx.")";					
+			/*$this->execute_single_query();			
+			if($this->error==""){
+				$this->mensaje= "Registro Insertado Correctamente";			
+			}*/
+		return 	$this->query;
 	}
 	
 	# Renderiza una Tabla Con todos sus Registros y el CRUD
@@ -640,6 +676,89 @@ abstract class DBAbstractModel {
 		$clscorreo->asunto = $asunto;
 		$clscorreo->msgboby = $mensajebody;
 		$clscorreo->EnviarByMailSMTP();
+	}
+	
+	#Numero de Dias Entre dos Fechas
+	/*
+	 * @Parametros
+	 * @fecha1 Fecha inicial desde donde se cuenta la diferencia de dias, este parametro
+	 * debe ser completado con una fecha con formato dd/mm/YYY.
+	 * @fecha2 Fecha Final desde donde se cuenta la diferencia de dias, este parametro
+	 * debe ser completado con una fecha con formato dd/mm/YYY.
+	 * 
+	 * */
+	public function diferencia_dias($fecha1, $fecha2){
+		//defino fecha 1
+		$explode_fecha1= explode("/",$fecha1);
+		$ano1 = $explode_fecha1[2];
+		$mes1 = $explode_fecha1[1];
+		$dia1 = $explode_fecha1[0];
+
+		//defino fecha 2
+		$explode_fecha2= explode("/",$fecha2);
+		$ano2 = $explode_fecha2[2];
+		$mes2 = $explode_fecha2[1];
+		$dia2 = $explode_fecha2[0];
+
+		//calculo timestam de las dos fechas
+		$timestamp1 = mktime(0,0,0,$mes1,$dia1,$ano1);
+		$timestamp2 = mktime(0,0,0,$mes2,$dia2,$ano2);
+
+		//resto a una fecha la otra
+		$segundos_diferencia = $timestamp1 - $timestamp2;
+		//echo $segundos_diferencia;
+
+		//convierto segundos en días
+		$dias_diferencia = $segundos_diferencia / (60 * 60 * 24);
+
+		//obtengo el valor absoulto de los días (quito el posible signo negativo)
+		$dias_diferencia = abs($dias_diferencia);
+
+		//quito los decimales a los días de diferencia
+		$dias_diferencia = floor($dias_diferencia);
+
+		return $dias_diferencia; 
+	}
+	
+	#Numero de Dias Correspondiente a un Año
+	/*
+	 * @Parametros
+	 * @anio: Año del que se desea saber los dias, se calcula en base a si es bisiesto o no,
+	 * si es bisiesto tiene 366 dias, sucede cada cuatro años, y si no es bisiesto tiene 365 dias.
+	 * 
+	 * */
+	public function es_bisiesto($anio){
+		if (($anio % 4 == 0) && (($anio % 100 != 0) || ($anio % 400 == 0))){
+			$dias_anio = 366;
+		}else{
+			$dias_anio = 365;
+		}
+		return $dias_anio;
+	}
+	
+	#Es Fin de Semana
+	/*
+	 * @Parametros
+	 * @fecha: Recibe una Fecha en formato Y-m-d, para saber si el dia de la Fecha es fin de semana
+	 * 
+	 * */
+	public function es_findesemana($fecha){
+		//Divide la Fecha es dia Mes Año
+		$fecha = explode('-',$fecha);
+		// Convierte la Fecha en segundos para operarlos
+		$fecha = mktime('1', '1', '1', $fecha[1],$fecha[2],$fecha[0]);
+		//Devuelve un Arreglo con la Informacion de la Fecha, Nombre del dia, mes entre otros...
+		$DataDate = getdate($fecha);
+		//Verifica si es Domingo
+		if($DataDate['wday']==0){
+			$findesemana=0;
+		//Verifica si es Sabado
+		}elseif($DataDate['wday']==6){
+			$findesemana=1;
+		}else{
+			$findesemana=2;
+		}
+		return $findesemana;
 	}
 
 }

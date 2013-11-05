@@ -17,7 +17,7 @@
 		</div>
 		<div class="item_requerid">Num. Ref.</div>
 		<div class="form_requerid">
-			<input type="text" class="input-large" name="REF_PRESTAMO" id="REF_PRESTAMO" maxlength="35">
+			<input type="text" class="input-large" name="REF_PRESTAMO" id="REF_PRESTAMO" maxlength="35" required="">
 		</div>
 		<div class="item_requerid">BANCO</div>
         <div class="form_requerid">
@@ -34,19 +34,19 @@
 		</div>
 		<div class="item_requerid">FEC.APER.</div>
 		<div class="form_requerid">
-			<input type="text" class="input-small" name="FECHA_APERTURA" id="FECHA_APERTURA">
+			<input type="text" class="input-small" name="FECHA_APERTURA" id="FECHA_APERTURA" required="">
 		</div>
 		<div class="item_requerid">PLAZO</div>
 		<div class="form_requerid">
-			<input type="text" class="input-mini" name="PLAZO" id="PLAZO">
+			<input type="text" class="input-mini" name="PLAZO" id="PLAZO" required="">
 		</div>
 		<div class="item_requerid">% INT.</div>
 		<div class="form_requerid">
-			<input type="text" class="input-small" name="TASA_INTERES" id="TASA_INTERES">
+			<input type="text" class="input-small" name="TASA_INTERES" id="TASA_INTERES" required="">
 		</div>
 		<div class="item_requerid">MONTO APRO.</div>
 		<div class="form_requerid">
-			<input type="text" class="input-small" name="MONTO_APROBADO" id="MONTO_APROBADO">
+			<input type="text" class="input-small" name="MONTO_APROBADO" id="MONTO_APROBADO" required="">
 		</div>
 		<div class="item_requerid">ESTADO PRESTA.</div>
 		<div class="form_requerid">
@@ -56,21 +56,21 @@
 		</div>
 		<div class="item_requerid">FEC. VEN.</div>
 		<div class="form_requerid">
-			<input type="text" class="input-small" name="FECHA_VENCIMIENTO" id="FECHA_VENCIMIENTO">
+			<input type="text" class="input-small" name="FECHA_VENCIMIENTO" id="FECHA_VENCIMIENTO" required="">
 		</div>
 		<div class="item_requerid">VALOR CUOTA</div>
 		<div class="form_requerid">
-			<input type="text" class="input-small" name="VALOR_CUOTA" id="VALOR_CUOTA">
+			<input type="text" class="input-small" name="VALOR_CUOTA" id="VALOR_CUOTA" required="">
 		</div>
-		<div class="item_requerid">VALOR SEGURO</div>
-		<div class="form_requerid">
-			<input type="text" class="input-small" name="VALOR_SEGURO" id="VALOR_SEGURO">
+		<div class="item_requerid" style="display:none;">VALOR SEGURO</div>
+		<div class="form_requerid" style="display:none;">
+			<input type="text" class="input-small" name="VALOR_SEGURO" id="VALOR_SEGURO" required="">
 		</div>
 		<div class="item_requerid_textarea">TIPO DE TABLA</div>
 		<div class="form_requerid">
 			<br/>
-			<input type="radio" id="TIPO_TABLA" name="TIPO_TABLA">CUOTAS MENSUALES Y SUCESIVAS DE CAPITAL Y DE INTERESES<br/><br/>
-			<input type="radio" id="TIPO_TABLA" name="TIPO_TABLA">PAGO DE INTERESES MENSUALES Y CAPITAL AL VENCIMIENTO
+			<input type="radio" id="TIPO_TABLA" name="TIPO_TABLA" value="0">CUOTAS MENSUALES Y SUCESIVAS DE CAPITAL Y DE INTERESES<br/><br/>
+			<input type="radio" id="TIPO_TABLA" name="TIPO_TABLA" value="1">PAGO DE INTERESES MENSUALES Y CAPITAL AL VENCIMIENTO
 		</div>
 		<div class="form_button">
 			<br/>
@@ -147,6 +147,8 @@
 						function(resp) {
 							$('#btn-save-enc').attr('disabled','disabled');
 							$('#btnamortizacion').attr('disabled','disabled');
+							$("#mensaje1").toggle();
+							$("#mensaje1").fadeIn('slow').html(resp);
 						},
 				error : 
 						function(xhr, status) {

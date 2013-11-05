@@ -1,8 +1,7 @@
-<h4>Listado de Prestamos</h4><br/>
+<h4>Listado de Recibos de Pago</h4><br/>
 			<div  align='center'>
 				<!--<a href='index.php?ctl=controller_pb_estados&filtro=1' class='btn pull-right'>3 Meses</a>
-				<a href='index.php?ctl=controller_pb_estados&filtro=2' class='btn pull-right'>8 Meses</a>
-				<a href='index.php?ctl=controller_pb_estados&filtro=3' class='btn pull-right'>12 Meses</a>-->
+				<a href='index.php?ctl=controller_pb_estados&filtro=2' class='btn pull-right'>8 Meses</a>-->
 				<table id="tblreq" style='font-size:13px;' class='table'>
 					<thead>
 						<tr>
@@ -10,37 +9,28 @@
 								CODIGO CIA
 							</th>
 							<th>
-								CODIGO PRESTAMOS
+								CODIGO RECIBO
 							</th>
 							<th>
-								REF. PRESTAMO
+								COD. DESGLOSE
 							</th>
 							<th>
 								BANCO
 							</th>
 							<th>
-								FECHA APERTURA
+								TIPO DOC.
 							</th>
 							<th>
-								FECHA VENCIMIENTO
+								CUENTA
 							</th>
 							<th>
-								MESES PLAZO
+								CHEQUERA
 							</th>
 							<th>
-								% INT. ANUAL
+								FECHA RECIBO
 							</th>
 							<th>
-								MONTO APROBADO
-							</th>
-							<th>
-								VALOR CUOTA
-							</th>
-							<th>
-								ESTADO
-							</th>
-							<th>
-								LINEA
+								VALOR
 							</th>
 							<th>
 								*
@@ -50,6 +40,7 @@
 				<tbody>
 					{Detalle}
 			</div>
+			<br/><br/><br/>
 </div>
 </div>
 <script type="text/javascript">
@@ -66,7 +57,7 @@ oTable =    $('#tblreq').dataTable( {
                                     "aButtons":    [ "xls", "pdf" ] }
                             ]},
         "oLanguage": {
-			"sSearch": "Buscar Prestamo:"
+			"sSearch": "Buscar Recibo:"
 		}
     } );	
 });

@@ -69,6 +69,7 @@ class pb_bancos extends DBAbstractModel {
 
     ################################# MÉTODOS ##################################
    
+  
     public function nextval_seq(){
 		$this->rows=array();
 		$this->query="SELECT SEQ_PBBANCOS.NEXTVAL FROM DUAL";
@@ -77,8 +78,20 @@ class pb_bancos extends DBAbstractModel {
 	}
 	
 	public function get_options(){
-		$lstbancos = $this->get_lsoption($this->tableName(), array("COD_BANCO"=>"","NOMBRE_CORTO"=>""));
+		$lstbancos = $this->get_lsoption($this->tableName(), array("COD_BANCO"=>"","NOM_BANCO"=>""), array("COD_CIA"=>$_SESSION['cod_cia']));
 		return $lstbancos;
+	}
+	
+	public function get_optionscuentas($COD_CIA, $COD_BANCO){
+		$objcuenta = $this->crea_objeto(array("Bco_Cuentas a","Bancos b"),array("b.Cod_Cia = a.Cod_Cia","b.Cod_Banco = a.Cod_Banco"),array("and a.Cod_Cia =".$COD_CIA ,"b.Cod_banco = '".$COD_BANCO."'","a.Estado = 'A'"),array("a.Cod_Cuenta","'CUENTA BCO.'"));
+		$lstcuentas = $this->get_htmloptions($objcuenta);
+		return $lstcuentas;
+	}
+	
+	public function get_optionschequeras($COD_CIA, $COD_BANCO, $COD_CUENTA){
+		$objchequeras = $this->crea_objeto(array("chequeras a","bco_cuentas b"),array("b.cod_cia = a.cod_cia","b.cod_cuenta = a.cod_cuenta","b.cod_banco = a.cod_banco"),array("and a.Cod_Cia =".$COD_CIA ,"a.Cod_banco = '".$COD_BANCO."'","a.cod_cuenta='".$COD_CUENTA."'","a.habilitada = 'A'", "b.estado = 'A'"),array("a.secuencia","'CHEQUERA'"));
+		$lstchequeras= $this->get_htmloptions($objchequeras);
+		return $lstchequeras;
 	}
 	
 	

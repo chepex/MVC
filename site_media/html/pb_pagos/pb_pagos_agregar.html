@@ -1,0 +1,358 @@
+<br/>
+<br/>
+<div>
+	<form id="frmpago" action="{SET}" method="POST">
+		<table style='width:90%' align='center'>
+			<tr>
+				<td>
+					<table border='0' style='width:100%'>
+						<tr>
+							<td>
+								<h5>Generaci&oacute;n de Pagos</h5><br/>
+								<div class="item_requerid">Compa&ntilde;ia</div>
+								<div class="form_requerid">
+									<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+									<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+								</div>
+								<div class="item_requerid">C&oacute;digo Desglose</div>
+								<div class="form_requerid">
+									<input type="text" class="input-mini" name="COD_DESGLOSE" id="COD_DESGLOSE" readonly="readonly" value="{COD_DESGLOSE}">
+								</div>
+								<!--<div class="item_requerid">Prestamos de Banco</div>
+								<div class="form_requerid">
+									<select name="COD_BANCO" id="COD_BANCO" class="chzn-select input-xlarge">
+										<option>Seleccione un Banco!</option>
+										{COD_BANCO}
+									</select>
+								</div>-->
+		
+								<!--<div class="item_requerid">Cuenta</div>
+									<div class="form_requerid">
+									<select name="COD_CUENTA" id="COD_CUENTA" class="chzn-select input-xlarge">
+									<option>Seleccione un Cuenta!</option>
+									</select>
+									</div>-->
+								<div class="item_requerid">Fecha Pago</div>
+								<div class="form_requerid">
+									<input type="text" class="input-small" name="FECHA_PAGO" id="FECHA_PAGO" required="" value='{FPAGO}'>
+								</div>
+						
+								<div class="item_requerid">Prestamos a Vencer</div>
+								<div class="form_requerid">
+									<input type="text" class="input-small" name="FECHA_PAGO_FILTROI" id="FECHA_PAGO_FILTROI" required="" value="{FPAGOVEN}"> al
+									<input type="text" class="input-small" name="FECHA_PAGO_FILTROF" id="FECHA_PAGO_FILTROF" required="" value="{FPAGOVEN}">
+								</div>
+								
+					
+								<div class="form_button">
+									<br/>
+									<button class='btn btn-primary' id='btnliscuotas'><i class='icon-th-list icon-white'></i>&nbsp;Listar Cuotas</button>
+									<button name="enviar" id="btn-save-enc" class='btn btn-primary' style='display:none;'><i class='icon-refresh icon-white'></i>&nbsp;Generar Pago</button>
+								</div>
+								<!--<div class="item_requerid">Tipo Nota</div>
+									<div class="form_requerid">
+									<select name="TIPO_NOTA" id="TIPO_NOTA" class="chzn-select input-xlarge">
+									<option>Seleccione Tipo Nota!</option>
+									{TIPO_NOTA}
+									</select>
+								</div>-->
+
+								<!--<div class="item_requerid">Disponible $USD para Pagos</div>
+									<div class="form_requerid">
+									<input type='text' class='input-small' required='' name='MONTO_DISP_PAGO' id='MONTO_DISP_PAGO' />
+									</div>
+								</div>-->
+							</td>
+							<td>
+								<a class='btn btn-primary' href="#" id="imprime" style='display:none;float:right;'><i class='icon-print icon-white'></i>&nbsp;Imprimir Resumen</a>
+								<br/>
+								<div id='resumenpago' class='PrintArea'></div>
+							</td>
+						</tr>
+					</table>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<br/>
+					<br/>
+					<div id='tblcuotas' style='margin:0 auto;'></div>
+				</td>
+			</tr>
+		</table>
+	</form>		
+</div> 
+<div id="myModal" class="modal hide fade" data-backdrop="static">
+	<div class="modal-header"></div>
+		<div class="modal-body">
+			Espere por favor....
+			<div id='pbar' class="progress progress-striped active">
+				<div class="bar" style="width: 100%;">Generando Pago....</div>
+			</div>
+		</div>
+	<div class="modal-footer"></div>
+</div>
+<script>
+
+	$("#COD_BANCO").change(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_pb_prestamos&COD_BANCO='+ $("#COD_BANCO").val(),     
+				data : { act : 'get' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							var mivar = $.parseJSON(resp);
+							$("#COD_PRESTAMO").empty();
+							$("#COD_PRESTAMO").append(mivar.lstprestamos);	
+							$('#COD_PRESTAMO').trigger("liszt:updated");
+							$("#COD_CUENTA").empty();
+							$("#COD_CUENTA").append(mivar.lstcuentas);	
+							$('#COD_CUENTA').trigger("liszt:updated");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+					
+						}
+	      	  	});
+	});
+	
+	$("#btnliscuotas").click(function(){
+		if($("#FECHA_PAGO").val().length > 0 && $("#FECHA_PAGO_FILTROI").val().length > 0 && $("#FECHA_PAGO_FILTROF").val().length > 0){
+			$.ajax({
+				url : 'index.php?ctl=controller_pb_pagos&'+ $("#frmpago").serialize(),     
+				data : { act : 'get' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							var mivar = $.parseJSON(resp);
+							$("#tblcuotas").empty();
+							$("#tblcuotas").fadeOut('slow').fadeIn('slow').html(mivar.tblcuotas);
+							$("#resumenpago").empty();
+							$("#resumenpago").fadeOut('slow').fadeIn('slow').html(mivar.tblresumen);
+							$("#imprime").fadeOut('slow').fadeIn('slow').css("display","inline");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+			});
+		}else{
+			$("#mensaje2").toggle().fadeIn('Slow');
+			$("#mensaje2").html('La Fecha en Que se Realiza el Pago es Requerida!!');
+		}
+		return false;
+	});
+	
+	$("#btn-save-enc").click(function(){
+		if($("#FECHA_PAGO").val().length > 0){
+			$('#myModal').modal({
+				keyboard: false
+			});
+			$.ajax({
+				url : 'index.php?ctl=controller_pb_pagos&'+ $("#frmpago").serialize(),     
+				data : { act : 'insert' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							var mivar = $.parseJSON(resp);
+							$("#tblcuotas").empty();
+							$("#tblcuotas").fadeOut('slow').fadeIn('slow').html(mivar.tblcuotas);
+							$('#btn-save-enc').attr("disabled", true);
+							$('#imprime').removeClass( "btn-primary" ).addClass( "btn" );
+							$('#btnliscuotas').removeClass( "btn-primary" ).addClass( "btn" );
+							$('#btn-save-enc').removeClass( "btn-primary" ).addClass( "btn" );
+							/*$('#btn-save-det').removeAttr("disabled");
+							
+							$('#btn-save-det').removeClass( "btn" ).addClass( "btn btn-primary" ); 
+							$('#formulario-details').toggle();*/
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							$("#myModal").fadeOut('slow').modal('hide');
+							$('body').removeClass('modal-open');
+							$('.modal-backdrop').fadeOut('slow').remove();
+						}
+			});
+		}else{
+			$("#mensaje2").toggle().fadeIn('Slow');
+			$("#mensaje2").html('La Fecha en Que se Realiza el Pago es Requerida!!');
+		}
+
+		return false;
+	});
+	
+	$(".ckcuota").live("click",function(){
+		var num_fila= $(this).attr("NUMID");
+		$('#btn_addx_'+num_fila).removeAttr("disabled");
+		$("#btn-save-enc").css("display","inline");
+		/*if($("#MONTO_DISP_PAGO").val().length > 0 && $("#MONTO_DISP_PAGO").val() > 0){
+			var disponible = parseFloat($("#MONTO_DISP_PAGO").val());
+			var cuota = $(this).attr("VALOR_CUOTA");
+			var num_chk = $(this).attr("NUM_CHK");
+			if(disponible >= cuota){
+				disponible = disponible - cuota;
+				$("#MONTO_DISP_PAGO").val(disponible.toFixed(2));
+			}else{
+				$("#ABONO_CUOTA_"+ num_chk).val(disponible.toFixed(2));
+				disponible =disponible - disponible;
+				$("#MONTO_DISP_PAGO").val(disponible.toFixed(2));
+			}
+			
+		}
+		//alert($(this).attr("VALOR_CUOTA"));*/
+	});
+	
+	$(".addx").live("click",function(){
+		var NUMCORRE = $(this).attr("NUMID");
+		if($("#BANCO_"+NUMCORRE).val() > 0 && $("#DISPONBAN_"+NUMCORRE).val() > 0 && $("#PAGOX_"+NUMCORRE).val().length > 0){
+			var cuota = parseFloat($("#XCUBRIR_"+NUMCORRE).val());
+			var pagobanco = parseFloat($("#DISPONBAN_"+NUMCORRE).val());
+			var cod_cuota = $(this).attr("COD_CUOTA");
+			var cod_banco = $("#BANCO_"+NUMCORRE).val();
+			var cod_cuenta = $("#CUENTAX"+NUMCORRE).val();
+			var tipo_documento = $("#PAGOX_"+NUMCORRE).val();
+			var fecha_pago = $("#FECHA_PAGO").val();
+			var cod_desglose = $("#COD_DESGLOSE").val();
+			var chequera='';
+			if(tipo_documento=='CH'){
+				chequera=$("#CHEQUERAX_"+NUMCORRE).val();
+			}
+			if(cuota==0 || pagobanco > cuota){
+				$("#mensaje2").html("<h6>Cuota ya fue cubierta con el desglose de los pagos!<br/> &Oacute; Valor de Disponible del Banco es Mayor que Valor de la Cuota</h6>");
+				$("#mensaje2").focus();
+				$("#mensaje2").show('slow').delay(3000).fadeOut('slow');
+				$(this).attr("disabled", true);
+				$("#DISPONBAN_"+NUMCORRE).val(0);
+				return false;
+			}
+			$.ajax({
+				url : 'index.php?ctl=controller_pb_desglosepago&COD_CUOTA='+ cod_cuota + '&COD_BANCO='+ cod_banco + '&COD_CUENTA=' + cod_cuenta + '&TIPO_DOCUMENTO='+ tipo_documento + '&SECUENCIA='+ chequera + '&VALOR_ABONO='+pagobanco + '&FECHA_PAGO=' + fecha_pago + '&COD_DESGLOSE=' + cod_desglose + '&NUMID='+NUMCORRE ,     
+				data : { act : 'insert' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							var mivar = $.parseJSON(resp);
+							$("#DESGLOSE_"+cod_cuota).empty();
+							$("#DESGLOSE_"+cod_cuota).fadeOut('slow').fadeIn('slow').html(mivar.tbldeglosepago);	
+							$("#ABONO_CUOTA_"+NUMCORRE).val(mivar.totalabono);					
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+			});
+			
+			var valorabono = parseFloat(cuota - pagobanco);
+			$("#XCUBRIR_"+NUMCORRE).val(valorabono.toFixed(2));
+			var pagobanco = parseFloat($("#DISPONBAN_"+NUMCORRE).val(0));
+			$("#DISPONBAN_"+NUMCORRE).focus();
+		}else{
+			$("#mensaje2").html("<h6>Verfique el Banco, El Monto Disponible del Banco, y a Traves de que Documento se Realizara el Pago<br/>Los Datos Solicitados Son Requeridos</h6>");
+			$("#mensaje2").focus();
+			$("#mensaje2").show('slow').delay(3000).fadeOut('slow');
+			
+			
+		}
+		
+		return false;
+		
+	});
+	
+	$(".BANCOX").live("change",function(){
+		var numlinea = $(this).attr("NUMID");
+		if($(this).val().length > 0){
+			$.ajax({
+				url : 'index.php?ctl=controller_pb_bancos&elemento=2&COD_BANCO='+ $(this).val(),     
+				data : { act : 'view' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$("#CUENTAX"+numlinea).empty();
+							$("#CUENTAX"+numlinea).append(resp);	
+							$("#CUENTAX"+numlinea).trigger("liszt:updated");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+			});
+		}
+	});
+	
+	$(".PAGOX").live("change",function(){
+		var numlinea = $(this).attr("NUMID");
+		if($(this).val() == 'CH'){
+			$.ajax({
+				url : 'index.php?ctl=controller_pb_bancos&elemento=3&COD_BANCO='+ $("#BANCO_"+numlinea).val() + "&COD_CUENTA="+$("#CUENTAX"+numlinea).val(),     
+				data : { act : 'view' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$("#CHEQUERAX_"+numlinea).empty();
+							$("#CHEQUERAX_"+numlinea).append(resp);	
+							$("#CHEQUERAX_"+numlinea).trigger("liszt:updated");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+			});
+		}else{
+			$("#CHEQUERAX_"+numlinea).empty();
+			$("#CHEQUERAX_"+numlinea).trigger("liszt:updated");
+		}
+	});
+	
+	$(".BTNDESGLOSEX").live("click",function(){
+		var NUMCORRE = $(this).attr("NUMID");
+		var coddetdeglose = $(this).attr("COD_DETDESGLOSE");
+		var codcuota = $(this).attr("COD_CUOTA");
+		var valorabono = parseFloat($(this).attr("VALOR_ABONO"));
+		var valorxcubrir = parseFloat($("#XCUBRIR_"+NUMCORRE).val());
+		var nuevoxcubrir;
+		if(coddetdeglose > 0){
+			$.ajax({
+				url : 'index.php?ctl=controller_pb_desglosepago&COD_CUOTA='+ codcuota + '&COD_DESGLOSE='+ $('#COD_DESGLOSE').val() + '&COD_DETDESGLOSE=' + coddetdeglose + '&FECHA_PAGO='+ $("#FECHA_PAGO").val(),     
+				data : { act : 'delete' },
+				type : 'POST',     
+				success : 
+						function(resp) {
+							var mivar = $.parseJSON(resp);
+							$("#DESGLOSE_"+codcuota).empty();
+							$("#DESGLOSE_"+codcuota).fadeOut('slow').fadeIn('slow').html(mivar.tbldeglosepago);	
+							$("#ABONO_CUOTA_"+NUMCORRE).val(mivar.totalabono);
+							nuevoxcubrir = valorxcubrir + valorabono;
+							$("#XCUBRIR_"+NUMCORRE).val(nuevoxcubrir.toFixed(2));		
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+			});
+		}
+		return false;
+	});
+	
+		
+</script>

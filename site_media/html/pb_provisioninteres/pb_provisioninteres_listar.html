@@ -1,5 +1,5 @@
-<h4>Listado de Prestamos</h4><br/>
-			<div  align='center'>
+<h4>Listado de Estados</h4><br/>
+			<div style="width:75%;" align='center'>
 				<!--<a href='index.php?ctl=controller_pb_estados&filtro=1' class='btn pull-right'>3 Meses</a>
 				<a href='index.php?ctl=controller_pb_estados&filtro=2' class='btn pull-right'>8 Meses</a>
 				<a href='index.php?ctl=controller_pb_estados&filtro=3' class='btn pull-right'>12 Meses</a>-->
@@ -7,40 +7,10 @@
 					<thead>
 						<tr>
 							<th>
-								CODIGO CIA
+								CODIGO ESTADO
 							</th>
 							<th>
-								CODIGO PRESTAMOS
-							</th>
-							<th>
-								REF. PRESTAMO
-							</th>
-							<th>
-								BANCO
-							</th>
-							<th>
-								FECHA APERTURA
-							</th>
-							<th>
-								FECHA VENCIMIENTO
-							</th>
-							<th>
-								MESES PLAZO
-							</th>
-							<th>
-								% INT. ANUAL
-							</th>
-							<th>
-								MONTO APROBADO
-							</th>
-							<th>
-								VALOR CUOTA
-							</th>
-							<th>
-								ESTADO
-							</th>
-							<th>
-								LINEA
+								DESCRIPCION
 							</th>
 							<th>
 								*
@@ -66,7 +36,7 @@ oTable =    $('#tblreq').dataTable( {
                                     "aButtons":    [ "xls", "pdf" ] }
                             ]},
         "oLanguage": {
-			"sSearch": "Buscar Prestamo:"
+			"sSearch": "Buscar Estado:"
 		}
     } );	
 });

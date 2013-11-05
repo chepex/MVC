@@ -1,0 +1,40 @@
+<br/>
+<br/>
+<div>
+	<fieldset>Provisi&oacute;n de Inter&eacute;s</fieldset>
+	<form id="frmprovisioni" action="{SET}" method="POST">
+		<div class="item_requerid">Compa&ntilde;ia</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+		</div>
+        <div class="item_requerid">MES</div>
+        <div class="form_requerid">
+			<select name="MES_PROVISION" id="MES_PROVISION" class="chzn-select">
+				<option selected>Mes..</option>
+				<option value='01'>Enero</option>
+				<option value='02'>Febrero</option>
+				<option value='03'>Marzo</option>
+				<option value='04'>Abril</option>
+				<option value='05'>Mayo</option>
+				<option value='06'>Junio</option>
+				<option value='07'>Julio</option>
+				<option value='08'>Agosto</option>
+				<option value='09'>Septiembre</option>
+				<option value='10'>Octubre</option>
+				<option value='11'>Noviembre</option>
+				<option value='12'>Diciembre</option>
+			</select>
+		</div>
+        <div class="item_requerid">A&Ntilde;O</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="ANIO_PROVISION" id="ANIO_PROVISION"  value="{ANIO_PROVISION}">
+		</div>
+        <div class="form_button">
+			<input type="submit" name="enviar" id="btn-save-enc" value="Generar Provisi&oacute;n" class='btn btn-primary'>
+		</div>
+    </form>
+</div> 
+<script>
+	
+</script>

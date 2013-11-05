@@ -5,7 +5,8 @@ error_reporting(E_ALL);
 ini_set("display_errors", 0);
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', 300);
-require_once('controller_pb_detalleprestamo.php');
+require_once('controller_pb_detalleprestamos.php');
+require_once('controller_pb_bancos.php');
 require_once('model_pb_prestamos.php');
 require_once('../core/render_view_generic.php');
 #Controlador de Requisicion
@@ -28,7 +29,8 @@ class controller_pb_prestamos extends pb_prestamos{
 							'GET'=>'../prestamos/?ctl=controller_pb_prestamos',
         'DELETE'=>'../prestamos/?ctl=controller_pb_prestamos&act=delete',
         'EDIT'=>'../prestamos/?ctl=controller_pb_prestamos&act=edit',
-        'GET_ALL'=>'../prestamos/?ctl=controller_pb_prestamos&act=get_all'
+        'GET_ALL'=>'../prestamos/?ctl=controller_pb_prestamos&act=get_all',
+        'PROYEC'=>'../prestamos/?ctl=controller_pb_prestamos&act=viewproyeccion'
 		)
 	);
 	
@@ -47,7 +49,7 @@ class controller_pb_prestamos extends pb_prestamos{
 			#Peticiones definidas para el controlador Requisicion
 			$peticiones = array('set', 'get', 'delete', 'edit',
                         'agregar', 'buscar', 'borrar', 
-                        'update','get_all','listar','insert','get_ajax','view','view_rpt','finalizar_req');
+                        'update','get_all','listar','insert','get_ajax','view','view_detprestamo','proyeccionpago','viewproyeccion');
 			foreach ($peticiones as $peticion) {
 				if( $uri == $peticion)  {
 					$event = $peticion;
@@ -89,8 +91,14 @@ class controller_pb_prestamos extends pb_prestamos{
 			case 'view':
 				$this->view();
 				break;
-			case 'view_rpt':
-				$this->view_rpt();
+			case 'view_detprestamo':
+				$this->view_detprestamo();
+				break;
+			case 'proyeccionpago':
+				$this->proyeccionpago();
+				break;
+			case 'viewproyeccion':
+				$this->viewproyeccion();
 				break;
 		}
 	}
@@ -124,7 +132,10 @@ class controller_pb_prestamos extends pb_prestamos{
 	#Método generico definido en el controlador, no se utiliza
 	public function get(){
 		$parametros = $this->set_obj();
-		$obvista = new view_Parametros();
+		$lstprestamos =  $parametros->get_options($_REQUEST['COD_BANCO']);
+		$lstcuentas = $parametros->get_lsoption("chequeras", array("cod_cuenta"=>"","cod_cuenta"=>""),array("COD_CIA"=>$_SESSION['cod_cia'],"COD_BANCO"=>"'".$_REQUEST['COD_BANCO']."'" , "HABILITADA"=>"'A'"));
+		$jsonarray = array("lstprestamos"=> $lstprestamos, "lstcuentas"=> $lstcuentas);
+		echo json_encode($jsonarray);
 	}
 	
 	#Método que elimina el detalle de la requisicion, sino tiene detalle
@@ -180,6 +191,7 @@ class controller_pb_prestamos extends pb_prestamos{
 		$detprestamo = new controller_pb_detalleprestamos();
 		$parametros->save(get_class($parametros));
 		$detprestamo->Guardar_tablaamortizacion();
+		echo$this->msg="<h4>Se ha Completado la Transaccion!</h4>";
 		
 	}
 	
@@ -192,7 +204,6 @@ class controller_pb_prestamos extends pb_prestamos{
 						 $parametros->tableName().".FECHA_APERTURA",$parametros->tableName().".FECHA_VENCIMIENTO",
 						 $parametros->tableName().".PLAZO",$parametros->tableName().".TASA_INTERES",
 						 $parametros->tableName().".MONTO_APROBADO",$parametros->tableName().".VALOR_CUOTA",
-						 $parametros->tableName().".VALOR_SEGURO",
 						 "PB_ESTADOS.DESCRIPCION_ESTADO","PB_LINEASCREDITO.NUM_REFLINEA");
         $masx=implode($mcampos, ",");
 		$data = $parametros->lis2(get_class($parametros), 3, $masx);
@@ -241,25 +252,230 @@ class controller_pb_prestamos extends pb_prestamos{
 		
 	}
 	
-	public function view_rpt(){
+	public function view_detprestamo(){
+		$parametros = $this->set_obj();
+		$bancos = new controller_pb_bancos();
+		$objdetprestamo = new pb_detalleprestamos();
+		$arraydetprestamo = $objdetprestamo->listar_cuotas($_REQUEST['FECHA_PAGO_FILTROI'], $_REQUEST['FECHA_PAGO_FILTROF'] );
+		$arrayresumenpago = $objdetprestamo->resumen_porpagar($_REQUEST['FECHA_PAGO_FILTROI'], $_REQUEST['FECHA_PAGO_FILTROF']);
+		$lstbancos= $bancos->get();
+		$html .="<table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:8.5px;width:50%;'>
+						<tr>
+							<th colspan='18'>Compromisos de Pago Bancarios</th>
+						</tr>";
+			$i=0;
+			foreach ($arraydetprestamo as $mks){
+				$i++;
+				if($mks["SALDO_CUOTA"] > 0){
+					if($i%2==0){
+						$clasetr="success";
+
+					}else{
+						$clasetr="info";	
+					}
+					$html .= "
+					<tr class='warning'>
+							<th>*</th>
+							<th>Ref. Prestamo</th>
+							<th>BCO.</th>
+							<th>Ref. Linea</th>
+							<th>Tipo Cred.</th>
+							<th>No. Cuota</th>
+							<th>Fecha Pago</th>
+							<th>Saldo Capital Actual</th>
+							<th>Amortizacion Cuota</th>
+							<th>Interes Cuota</th>
+							<th>Sal.Cap. Despues de Pago</th>
+							<th>Valor Cuota</th>
+							<th>Saldo Cuota</th>
+							<th>Abono Cuota</th>
+							<th>Pago a traves de Banco:</th>
+							<th>Valor Disponible en Banco</th>
+							<th>Pen.xCubrir</th>
+					</tr>
+					<tr class='".$clasetr."'>
+									<td>
+										<input type='checkbox' class='ckcuota' name='COD_CUOTA_".$i."' value='".$mks["COD_CUOTA"]."' NUMID='".$i."'/>
+									</td>
+									<td>".$mks["REF_PRESTAMO"]."</td>
+									<td>".$mks["NOM_CORTO"]."</td>
+									<td>".$mks["NUM_REFLINEA"]."</td>
+									<td>".$mks["DESCRIPCION_TIPOCREDITO"]."</td>
+									<td>".$mks["NUMERO_CUOTA"]."</td>
+									<td>".$mks["FECHA_PAGO"]."</td>
+									<td>".number_format($mks["SALDO_CAPITALANT"],2,'.',',')."</td>
+									<td>".number_format($mks["VALOR_AMORTIZACION"],2,'.',',')."</td>
+									<td>".number_format($mks["VALOR_INTERES"],2,'.',',')."</td>
+									<td>".number_format($mks["SALDO_CAPITAL"],2,'.',',')."</td>
+									<td>".number_format($mks["VALOR_CUOTA"],2,'.',',')."</td>
+									<td>".number_format($mks["SALDO_CUOTA"],2,'.',',')."</td>
+									<td>
+										<input type='text' class='input-small' required='' id='ABONO_CUOTA_".$i."' name='ABONO_CUOTA_".$i."' value='".number_format($mks["SALDO_CUOTA"],2,'.','')."'  NUMID='".$i."' readonly='readonly'/>
+									</td>
+									<td>
+										<select class='BANCOX chzn-select input-small' id='BANCO_".$i."' name='BANCO_".$i."' NUMID='".$i."'>
+											<option>Banco..</option>
+											".$lstbancos."
+										</select>
+										<select class='CUENTAX chzn-select input-small' id='CUENTAX".$i."' name='CUENTAX_".$i."' NUMID='".$i."'>
+											<option value='0'>Cuenta..</option>
+										</select>
+										<select class='PAGOX chzn-select input-small' id='PAGOX_".$i."' name='PAGOX_".$i."' NUMID='".$i."'>
+											<option value='0'>Forma Pago</option>
+											<option value='NC'>NC-NOTA DE CARGO</option>
+											<option value='CH'>CH-CHEQUE</option>
+										</select>
+										<select class='chzn-select input-small' id='CHEQUERAX_".$i."' name='CHEQUERAX_".$i."' NUMID='".$i."'>
+											<option value='0'>Chequera..</option>
+										</select>
+									</td>
+									<td>
+										<input type='text' class='input-small' required='' id='DISPONBAN_".$i."' name='DISPONBAN_".$i."' value='0'  />
+										<button id='btn_addx_".$i."' class='addx btn btn-primary' title='Agregar Monto' NUMID='".$i."' COD_CUOTA='".$mks["COD_CUOTA"]."' disabled='disabled'><i class='icon-plus-sign icon-white'></i></button>
+									</td>
+									<td>
+										<input type='text' class='input-small' required='' id='XCUBRIR_".$i."' name='XCUBRIR_".$i."' NUMID='".$i."' value='".number_format($mks["SALDO_CUOTA"],2,'.','')."' disabled='disabled' />
+									</td>
+							  </tr>
+							  <tr class='tfl'>
+								<td colspan='15'>
+										<div id='DESGLOSE_".$mks["COD_CUOTA"]."' NUMID='".$i."' class='DESGLOSEX'></div>
+								</td>
+							  </tr>";
+				}
+			}
+		$html .= "</table><script>$('.chzn-select').chosen();</script>";
+		$html2.="<table class='table table-hover tbl' border='0.5px' bordercolor='#585858' style='font-size:10px;width:100%;'>
+						<thead>
+						<tr>
+							<th colspan='3'>
+								<h6>Resumen Acumulado a Pagar<br/>
+									Con Fecha de Pago Comprendida entre: ".$_REQUEST['FECHA_PAGO_FILTROI']."
+									y el: ".$_REQUEST['FECHA_PAGO_FILTROF']."</h6>
+							</th>
+						</tr>
+						<tr>
+							<th>Banco</th>
+							<th>Tipo Cred.</th>
+							<th>A Pagar</th>
+						</tr>
+						</thead><tbody>";
+			$i=0;
+			$acuresumen=0;
+			foreach($arrayresumenpago as $resumenpago){
+				if($i%2==0){
+					$clasetr="success";
+
+				}else{
+					$clasetr="info";	
+				}
+
+				$html2 .= "
+							<tr class='".$clasetr."'>
+								<td>".$resumenpago["NOM_BANCO"]."</td>
+								<td>".$resumenpago["DESCRIPCION_TIPOCREDITO"]."</td>
+								<td>".number_format($resumenpago["A_PAGAR"],2,'.',',')."</td>
+							</tr>";
+							$i++;
+							$acuresumen = $acuresumen + $resumenpago["A_PAGAR"];
+			}
+			$html2 .= "</tbody><tfoot><tr><th>&nbsp;</th><th>TOTAL A PAGAR:</th><th>".number_format($acuresumen,2,'.',',')."</th></tr></tfoot></table>";
+		$data= array("tblcuotas"=>$html,"tblresumen"=>$html2);
+		echo json_encode($data);
+	}
+	
+	public function proyeccionpago(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$_REQUEST[$parametros->tableName().".COD_CIA"] = $_SESSION['cod_cia']; 
-		$_REQUEST[$parametros->tableName().".ANIO"] = date('Y');//2012;
-		//$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL','NOM_DEPTO','FECHA_ING','FECHA_AUTORIZADO','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','DESCRIPCION_PRIORIDAD');
-        $mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.CODDEPTO_SOL','DEPARTAMENTOS.NOM_DEPTO',$parametros->tableName().'.FECHA_ING',$parametros->tableName().'.FECHA_AUTORIZADO',$parametros->tableName().'.OBSERVACIONES',$parametros->tableName().'.PROYECTO',$parametros->tableName().'.ANIO',$parametros->tableName().'.COD_CAT',$parametros->tableName().'.TIPO_REQ','PRIORIDADES.DESCRIPCION_PRIORIDAD');
-        $masx=implode($mcampos, ",");
-		$data = $parametros->lis2(get_class($parametros), 2, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros));
+		$lstbancos = $parametros->get_lsoption("bancos", array("COD_BANCO"=>"","NOM_BANCO"=>""), array("COD_CIA"=>$_SESSION['cod_cia']));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html); 
-		$obvista->html = str_replace('{formulario_details}', '', $obvista->html);  
+		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['agregar'], $obvista->html);
+		$obvista->html = str_replace('{formulario}', $obvista->get_template('proyeccion',get_class($parametros)), $obvista->html);
+		$obvista->html = str_replace('{COD_BANCO}', $lstbancos , $obvista->html);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
-		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
-		$obvista->retornar_vista();*/
+		$obvista->retornar_vista();
+	}
+	
+	public function viewproyeccion(){
+		$parametros = $this->set_obj();
+		$objproyeccion= $parametros->proyeccionsaldos($_REQUEST['FECHA_INI'],$_REQUEST['FECHA_FIN'],$_REQUEST['COD_BANCO']);	
+		/*echo"<pre>";
+			print_r($objproyeccion);
+		echo"</pre>";*/
+		$html ="<!DOCTYPE html>
+			<head>
+					<link rel='stylesheet' type='text/css' href='../site_media/css/bootstrap/css/bootstrap.css'/>
+					<meta charset='ISO-8859-15'>
+					<style type='text/css'>
+						.tbl {border-collapse:collapse}
+						.tfl {border:1px solid black}
+					</style>
+					<title>Saldos Bancarios Por Pagar</title>
+			</head>
+			<body>";
+		$html .="<table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:12px;'>
+						<tr>
+							<th colspan='11'><center><h4>INDUSTRIAS CARICIA, S.A. DE C.V. <br/>SALDOS BANCARIOS POR PAGAR AL: ".$_REQUEST['FECHA_FIN']."</h4></center></th>
+						</tr>
+						<tr>
+							<th>Referencia</th>
+							<th>Fecha Ape.</th>
+							<th>Fecha Vcto.</th>
+							<th>Meses Plazo</th>
+							<th>Tasa Int %</th>
+							<th>Monto Aprobado</th>
+							<th>Cuota</th>
+							<th>Prox. Pago</th>
+							<th>Ult. Pago</th>
+							<th>Int. Normal</th>
+							<th>Saldo. Act.</th>
+						</tr>
+						<tr>
+							<td colspan='11'>
+								<h6>".$objproyeccion[0]['DESCRIPCION_TIPOCREDITO']."</h6>
+							</td>
+						</tr>
+						<tr>
+							<td colspan='11'>
+								<h6>".$objproyeccion[0]['NOM_BANCO']."</h6>
+							</td>
+						</tr>";
+			$BANCO = $objproyeccion[0]['COD_BANCO'];
+			$TIPOCREDITO = $objproyeccion[0]['COD_TIPOCREDITO'];
+			foreach ($objproyeccion as $mks){
+				if($TIPOCREDITO != $mks["COD_TIPOCREDITO"]){
+						$html.="<tr>
+									<td colspan='11'>
+										<h6>".$mks['DESCRIPCION_TIPOCREDITO']."</h6>
+									</td>
+								</tr>";
+					}
+					if($BANCO != $mks["COD_BANCO"]){
+						$html.="<tr>
+									<td colspan='11'>
+										<h6>".$mks['NOM_BANCO']."</h6>
+									</td>
+								</tr>";
+					}
+					$html .= "<tr class='tfl'>
+									<td>".$mks["REF_PRESTAMO"]."</td>
+									<td>".$mks["FECHA_APERTURA"]."</td>
+									<td>".$mks["FECHA_VENCIMIENTO"]."</td>
+									<td>".$mks["PLAZO"]."</td>
+									<td>".number_format($mks["TASA_INTERES"],2,'.',',')."</td>
+									<td>".number_format($mks["MONTO_APROBADO"],2,'.',',')."</td>
+									<td>".number_format($mks["VALOR_CUOTA"],2,'.',',')."</td>
+									<td>".$mks["FECHA_PAGO"]."</td>
+									<td>".$mks["ULT_PAGO"]."</td>
+									<td>".number_format($mks["VALOR_INTERES"],2,'.',',')."</td>
+									<td>". ((number_format($mks["SALDO_CAPACT"],2,'.',',') <= 0) ? number_format($mks["MONTO_APROBADO"],2,'.',',') : number_format($mks["SALDO_CAPACT"],2,'.',','))."</td>
+							  </tr>";
+					$BANCO = $mks["COD_BANCO"];
+					$TIPOCREDITO = $mks["COD_TIPOCREDITO"];
+			}
+		$html .= "</table></body></html>";
+		echo $html;
 	}
 	
 	public function get_ajax(){

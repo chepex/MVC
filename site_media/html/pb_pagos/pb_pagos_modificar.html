@@ -1,0 +1,133 @@
+    <form id="frmeditbancos" action="{EDIT}" method="POST">
+		<h5>Modificaci&oacute;n de Lineas de Cr&eacute;dito</h5>
+		<div class="item_requerid">Compa&ntilde;ia</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_CIA" id="COD_CIA" readonly="readonly" value="{codcia}">
+			<input type="text" class="input-large" name="TXTCIA" id="TXTCIA" readonly="readonly" value="{descia}">
+		</div>
+        <div class="item_requerid">C&oacute;digo Linea</div>
+        <div class="form_requerid">
+			<input type="text" class="input-mini" name="COD_LINEA" id="COD_LINEA" readonly="readonly" value="{COD_LINEA}">
+		</div>
+		<div class="item_requerid">Num. Ref. Linea</div>
+		<div class="form_requerid">
+			<input type="text" class="input-large" name="NUM_REFLINEA" id="NUM_REFLINEA" maxlength="35" value="{NUM_REFLINEA}">
+		</div>
+		<div class="item_requerid">BANCO</div>
+        <div class="form_requerid">
+			<select name="COD_BANCO" id="COD_BANCO" class="chzn-select input-xlarge">
+				{COD_BANCO}
+			</select><a id='lstbancos' href="#" class='btn btn-info' title="Listar Todos Los Bancos"><i class="icon-align-justify"></i></a>
+		</div>
+		<div class="item_requerid">TIPO CR&Eacute;DITO</div>
+        <div class="form_requerid">
+			<select name="COD_TIPOCREDITO" id="COD_TIPOCREDITO" class="chzn-select input-xlarge">
+				{COD_TIPOCREDITO}
+			</select><a id='lsttipocre' href="#" class='btn btn-info' title="Listar Todos Los Tipos de Credito"><i class="icon-align-justify"></i></a>
+		</div>
+		<div class="item_requerid">ESTADO LINEA</div>
+		<div class="form_requerid">
+			<select name="COD_ESTADO" id="COD_ESTADO" class="chzn-select input-xlarge">
+				{COD_ESTADO}
+			</select><a id='lstestados' href="#" class='btn btn-info' title="Listar Todos Los Estados"><i class="icon-align-justify"></i></a>
+		</div>
+		<div class="item_requerid">TECHO LINEA</div>
+		<div class="form_requerid">
+			<input type="text" class="input-small" name="TECHO_LINEA" id="TECHO_LINEA" value="{TECHO_LINEA}">
+		</div>
+		<div class="item_requerid">FEC.APER.</div>
+		<div class="form_requerid">
+			<input type="text" class="input-large" name="FECHA_APERTURA" id="FECHA_APERTURA" value="{FECHA_APERTURA}">
+		</div>
+		<div class="item_requerid">FEC. VEN.</div>
+		<div class="form_requerid">
+			<input type="text" class="input-large" name="FECHA_VENCIMIENTO" id="FECHA_VENCIMIENTO" value="{FECHA_VENCIMIENTO}">
+		</div>
+		<div class="item_requerid_textarea">DESTINO</div>
+		<div class="form_requerid">
+			<textarea name="DESTINO" id="DESTINO" rows='2' cols='10' maxlength='500'>{DESTINO}</textarea>
+		</div>
+		<div class="item_requerid_textarea">DES. FORMA PAGO</div>
+		<div class="form_requerid">
+			<textarea name="DESCRIPCION_FORMA_PAGO" id="DESCRIPCION_FORMA_PAGO" rows='2' cols='10' maxlength='500'>{DESCRIPCION_FORMA_PAGO}</textarea>
+		</div>
+		<div class="item_requerid_textarea">DES. GARANTIAS</div>
+		<div class="form_requerid">
+			<textarea name="DESCRIPCION_GARANTIAS" id="DESCRIPCION_GARANTIAS" rows='2' cols='10' maxlength='500'>{DESCRIPCION_GARANTIAS}</textarea>
+		</div>
+		<div class="item_requerid_textarea">MOTIVOS CADUCIDAD</div>
+		<div class="form_requerid">
+			<textarea name="MOTIVOS_CADUCIDAD" id="MOTIVOS_CADUCIDAD" rows='2' cols='10' maxlength='500'>{MOTIVOS_CADUCIDAD}</textarea>
+		</div>
+        <div class="form_button">
+			<input type="submit" name="enviar" id="btn-aut" value="Modificar" class='btn'>
+		</div>
+    </form>
+    
+     <script>
+	$("#lstestados").click(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_pb_estados',     
+				data : { act : 'get'},
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$("#COD_ESTADO").empty();
+							$("#COD_ESTADO").append(resp);	
+							$('#COD_ESTADO').trigger("liszt:updated");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+		});
+		return false;
+	});
+	
+	$("#lstbancos").click(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_pb_bancos',     
+				data : { act : 'get'},
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$("#COD_BANCO").empty();
+							$("#COD_BANCO").append(resp);	
+							$('#COD_BANCO').trigger("liszt:updated");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+		});
+		return false;
+	});
+	
+	$("#lsttipocre").click(function(){
+		$.ajax({
+				url : 'index.php?ctl=controller_pb_tipos_creditos',     
+				data : { act : 'get'},
+				type : 'POST',     
+				success : 
+						function(resp) {
+							$("#COD_TIPOCREDITO").empty();
+							$("#COD_TIPOCREDITO").append(resp);	
+							$('#COD_TIPOCREDITO').trigger("liszt:updated");
+						},
+				error : 
+						function(xhr, status) {
+							alert('Disculpe, existió un problema');
+						},     
+				complete : function(xhr, status) {	
+							
+						}
+		});
+		return false;
+	});
+	</script>

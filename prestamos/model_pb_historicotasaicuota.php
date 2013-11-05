@@ -7,19 +7,21 @@ session_start();
 require_once('../core/db_abstract_model.php');
 
 
-class pb_tipos_creditos extends DBAbstractModel {
+class pb_historicotasaicuota extends DBAbstractModel {
 
 
 
     ############################### PROPIEDADES ################################
     public $COD_CIA;
-    public $COD_TIPOCREDITO;
-    public $DESCRIPCION_TIPOCREDITO;
+    public $COD_PRESTAMO;
+    public $TASA_INTERES_ANT;
+    public $VALOR_CUOTA;
+    public $COD_CUOTA;
 
     ############################### ATRIBUTOS ################################
         public function atributos()
     {
-        $masx= array('COD_CIA','COD_TIPOCREDITO','DESCRIPCION_TIPOCREDITO');
+        $masx= array('COD_CIA','COD_PRESTAMO','TASA_INTERES_ANT','VALOR_CUOTA','COD_CUOTA');
         $masx=implode($masx, ",");
         return $masx;
     }
@@ -36,7 +38,7 @@ class pb_tipos_creditos extends DBAbstractModel {
 
         public function tableName()
     {
-        return 'pb_tipos_creditos';
+        return 'pb_historicotasaicuota';
     }
     
     public function Modulo()
@@ -47,26 +49,12 @@ class pb_tipos_creditos extends DBAbstractModel {
 
     public function llave()
     {
-        return array('COD_CIA','COD_TIPOCREDITO');
+        return array('COD_CIA','COD_PRESTAMO','COD_CUOTA');
 
     }
 
     ################################# MÉTODOS ##################################
-   
-   #Devuelve el correlativo de la secuencia para la tabla pbtipos_creditos
-    public function nextval_seq(){
-		$this->rows=array();
-		$this->query="SELECT SEQ_PBTIPOS_CREDITOS.NEXTVAL FROM DUAL";
-		$this->get_results_from_query();
-        return $this->rows[0]['NEXTVAL'];
-	}
-	
-	#Devuelve una lista de opciones html, de los tipos de creditos
-	public function get_options(){
-		$lsttipocredito = $this->get_lsoption($this->tableName(), array("COD_TIPOCREDITO"=>"","DESCRIPCION_TIPOCREDITO"=>""));
-		return $lsttipocredito;
-	}
-	
+  
 	
 }
 ?>

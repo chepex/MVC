@@ -2,32 +2,33 @@
 
 
 error_reporting(E_ALL);
-ini_set("display_errors", 1);
+ini_set("display_errors", 0);
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', 300);
-require_once('model_pb_definicion_ctas_banco.php');
+require_once('model_pb_detallepago.php');
+require_once('controller_pb_pagos.php');
 require_once('../core/render_view_generic.php');
-#Controlador de definicion de cuentas de banco
-class controller_pb_definicion_ctas_banco extends pb_definicion_ctas_banco{
+#Controlador de Detalle de pagos
+class controller_pb_detallepago extends pb_detallepago{
 	
 	#Definicion de Titulos de Objetos Html
 	protected $diccionario = array(
-		'subtitle'=>array('agregar'=>'Crear Nuevo Definicion CTA',
-                      'buscar'=>'Buscar Definicion CTA',
-                      'borrar'=>'Eliminar Definicion CTA',
-                      'modificar'=>'Modificar Definicion CTA',
-                      'listar'=>'Lista de Definicion CTA'),
+		'subtitle'=>array('agregar'=>'Crear Nuevo Detalle Pago',
+                      'buscar'=>'Buscar Detalle Pago',
+                      'borrar'=>'Eliminar Detalle Pago',
+                      'modificar'=>'Modificar Detalle Pago',
+                      'listar'=>'Lista de Detalle Pago'),
 		'links_menu'=>array(
-						'VIEW_SET_USER'=>'prestamos/?ctl=controller_pb_definicion_ctas_banco&act=set',
-						'VIEW_GET_USER'=>'prestamos/?ctl=controller_pb_definicion_ctas_banco&act=buscar',
-						'VIEW_EDIT_USER'=>'prestamos/?ctl=controller_pb_definicion_ctas_banco&act=modificar',
-						'VIEW_DELETE_USER'=>'prestamos/?ctl=controller_pb_definicion_ctas_banco&act=borrar'),
+						'VIEW_SET_USER'=>'prestamos/?ctl=controller_pb_detallepago&act=set',
+						'VIEW_GET_USER'=>'prestamos/?ctl=controller_pb_detallepago&act=buscar',
+						'VIEW_EDIT_USER'=>'prestamos/?ctl=controller_pb_detallepago&act=modificar',
+						'VIEW_DELETE_USER'=>'prestamos/?ctl=controller_pb_detallepago&act=borrar'),
 		'form_actions'=>array(
-							'SET'=>'../prestamos/?ctl=controller_pb_definicion_ctas_banco&act=insert',
-							'GET'=>'../prestamos/?ctl=controller_pb_definicion_ctas_banco',
-        'DELETE'=>'../prestamos/?ctl=controller_pb_definicion_ctas_banco&act=delete',
-        'EDIT'=>'../prestamos/?ctl=controller_pb_definicion_ctas_banco&act=edit',
-        'GET_ALL'=>'../prestamos/?ctl=controller_pb_definicion_ctas_banco&act=get_all'
+							'SET'=>'../prestamos/?ctl=controller_pb_detallepago&act=insert',
+							'GET'=>'../prestamos/?ctl=controller_pb_detallepago',
+        'DELETE'=>'../prestamos/?ctl=controller_pb_detallepago&act=delete',
+        'EDIT'=>'../prestamos/?ctl=controller_pb_detallepago&act=edit',
+        'GET_ALL'=>'../prestamos/?ctl=controller_pb_detallepago&act=get_all'
 		)
 	);
 	
@@ -43,7 +44,7 @@ class controller_pb_definicion_ctas_banco extends pb_definicion_ctas_banco{
 			else{
 				$uri = "get_all";
 			}
-			#Peticiones definidas para el controlador Definicion de Cuentas de Banco
+			#Peticiones definidas para el controlador Requisicion
 			$peticiones = array('set', 'get', 'delete', 'edit',
                         'agregar', 'buscar', 'borrar', 
                         'update','get_all','listar','insert','get_ajax','view','view_rpt','finalizar_req');
@@ -77,7 +78,6 @@ class controller_pb_definicion_ctas_banco extends pb_definicion_ctas_banco{
 				break;
 			case 'insert':
 				$this->insert();
-				$this->get_all($this->msg);
 				break;	
 			case 'get_all':
 				$this->get_all();
@@ -94,107 +94,111 @@ class controller_pb_definicion_ctas_banco extends pb_definicion_ctas_banco{
 		}
 	}
 	
-	#Definicion de una instancia del Modelo del Controlador Definicion de Cuentas de Banco
+	#Definicion de una instancia del Modelo del Controlador de detalle de pagos
 	public function set_obj() {
-		$obj = new pb_definicion_ctas_banco();
+		$obj = new pb_detallepago();
 		return $obj;
 	}
 	
 	
-	#Método que dibuja el formulario para la insercion de Definicion de Cuentas de Banco
+	#Método que dibuja el formulario para la insercion de detalle de pagos
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$lstestados = $parametros->get_lsoption("pb_estados", array("COD_ESTADO"=>"","DESCRIPCION_ESTADO"=>""));
-		$lstbancos = $parametros->get_lsoption("bancos", array("COD_BANCO"=>"","NOM_BANCO"=>""), array("COD_CIA"=>$_SESSION['cod_cia']));
-		$lstdestinosapli = $parametros->get_lsoption("pb_destinoaplicacion", array("COD_DESTINOAPLICACION"=>"","DESCRIPCION_DESTINO"=>""));
+		/*$lstestados = $parametros->get_lsoption("pb_estados", array("COD_ESTADO"=>"","DESCRIPCION_ESTADO"=>""));
+		$lstbancos = $parametros->get_lsoption("pb_bancos", array("COD_BANCO"=>"","NOMBRE_CORTO"=>""), array("COD_CIA"=>$_SESSION['cod_cia']));
+		$lstlineas = $parametros->get_lsoption("pb_lineascredito", array("COD_LINEA"=>"","NUM_REFLINEA"=>""), array("COD_CIA"=>$_SESSION['cod_cia']));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['agregar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('agregar',get_class($parametros)), $obvista->html);
-		$obvista->html = str_replace('{COD_DEFINICION}',$this->nextval_seq(), $obvista->html);
+		$obvista->html = str_replace('{COD_PRESTAMO}',$this->nextval_seq(), $obvista->html);
 		$obvista->html = str_replace('{codcia}', $_SESSION['cod_cia'] , $obvista->html);
 		$obvista->html = str_replace('{descia}', $_SESSION['nom_cia'] , $obvista->html);
 		$obvista->html = str_replace('{COD_ESTADO}', $lstestados , $obvista->html);
 		$obvista->html = str_replace('{COD_BANCO}', $lstbancos , $obvista->html);
-		$obvista->html = str_replace('{COD_DESTINOAPLICACION}', $lstdestinosapli , $obvista->html);
+		$obvista->html = str_replace('{COD_LINEA}', $lstlineas , $obvista->html);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->retornar_vista();
+		$obvista->retornar_vista();*/
 	}
 	
-	#Método que imprime la lista de option html provistas por el modelo, para ser recuperadas via Ajax
+	#Método generico definido en el controlador, no se utiliza
 	public function get(){
 		$parametros = $this->set_obj();
-		echo $parametros->get_options();
+		/*$objcuota = $parametros->crea_objeto(array($this->tableName()),'',array("COD_CIA=".$_SESSION['cod_cia'],"COD_PRESTAMO=".$_REQUEST['COD_PRESTAMO'],"NUMERO_CUOTA=".$_REQUEST['NUMERO_CUOTA']));
+		$dataArray=array("VALOR_CUOTA"=>$objcuota[0]['VALOR_CUOTA'],
+				   "TASA_INTERES"=>$objcuota[0]['TASA_INTERES'],
+				   "VALOR_INTERES"=>$objcuota[0]['VALOR_INTERES'],
+				   "VALOR_AMORTIZACION"=>$objcuota[0]['VALOR_AMORTIZACION'],
+				   "SALDO_CAPITAL"=>$objcuota[0]['SALDO_CAPITAL'],
+				   "COD_CUOTA"=>$objcuota[0]['COD_CUOTA']
+				   );
+		echo json_encode($dataArray);*/
 	}
 	
-	#Método que elimina la definicion de la cuenta de bancos
+	#Método que elimina el detalle de la requisicion, sino tiene detalle
 	public function delete(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$parametros->delete(get_class($parametros));
-		$this->msg=$parametros->mensaje;
+		/*$parametros->delete(get_class($parametros));
+		$this->msg=$parametros->mensaje;*/
 	}
 	
-	#Método que Dibuja el Formulario de Actualizacion de Definicion de Cuentas de Banco
 	public function update(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$objdefctaban = $this->crea_objeto(array("pb_definicion_ctas_banco dfcta","bancos ban","pb_estados edos"),
-										   array("dfcta.COD_ESTADO = edos.COD_ESTADO","dfcta.COD_CIA = ban.COD_CIA","dfcta.COD_BANCO = ban.COD_BANCO AND"),
-										   array("dfcta.COD_DEFINICION=".$_REQUEST['COD_DEFINICION'])
+		/*$objlinea = $this->crea_objeto(array("pb_lineascredito linc","pb_bancos ban","pb_estados edos","pb_tipos_creditos tipcre"),
+										   array("linc.COD_ESTADO = edos.COD_ESTADO","linc.COD_CIA = ban.COD_CIA","linc.COD_BANCO = ban.COD_BANCO","linc.COD_CIA = tipcre.COD_CIA","linc.COD_TIPOCREDITO = tipcre.COD_TIPOCREDITO AND"),
+										   array("linc.COD_CIA=".$_REQUEST['COD_CIA'],"linc.COD_LINEA=".$_REQUEST['COD_LINEA'])
 										   );
-		$lstestados = $parametros->get_lsoption("pb_estados", array("COD_ESTADO"=>"","DESCRIPCION_ESTADO"=>""),array("COD_ESTADO"=>$objdefctaban[0]['COD_ESTADO']));
-		$lstbancos = $parametros->get_lsoption("bancos", array("COD_BANCO"=>"","NOM_BANCO"=>""), array("COD_CIA"=>$_SESSION['cod_cia'],"COD_BANCO"=>$objdefctaban[0]['COD_BANCO']));
-		$lstdestinosapli = $parametros->get_lsoption("pb_destinoaplicacion", array("COD_DESTINOAPLICACION"=>"","DESCRIPCION_DESTINO"=>""), array("COD_DESTINOAPLICACION"=>$objdefctaban[0]['COD_DESTINOAPLICACION']));
+		$lstestados = $parametros->get_lsoption("pb_estados", array("COD_ESTADO"=>"","DESCRIPCION_ESTADO"=>""),array("COD_ESTADO"=>$objlinea[0]['COD_ESTADO']));
+		$lstbancos = $parametros->get_lsoption("pb_bancos", array("COD_BANCO"=>"","NOMBRE_CORTO"=>""), array("COD_CIA"=>$_SESSION['cod_cia'],"COD_BANCO"=>$objlinea[0]['COD_BANCO']));
+		$lsttipocre = $parametros->get_lsoption("pb_tipos_creditos", array("COD_TIPOCREDITO"=>"","DESCRIPCION_TIPOCREDITO"=>""), array("COD_CIA"=>$_SESSION['cod_cia'],"COD_TIPOCREDITO"=>$objlinea[0]['COD_TIPOCREDITO']));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['modificar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('modificar',get_class($parametros)), $obvista->html);
 		$obvista->html = str_replace('{mensaje}', ' ', $obvista->html);
 		$obvista->html = str_replace('{codcia}', $_SESSION['cod_cia'] , $obvista->html);
 		$obvista->html = str_replace('{descia}', $_SESSION['nom_cia'] , $obvista->html);
-		$obvista->html = str_replace('{COD_DEFINICION}', $objdefctaban[0]['COD_DEFINICION'] , $obvista->html);
-		$obvista->html = str_replace('{DESCRIPCION_DEFINICION}', $objdefctaban[0]['DESCRIPCION_DEFINICION'], $obvista->html);
-		$obvista->html = str_replace('{CTA_1}', $objdefctaban[0]['CTA_1'], $obvista->html);
-		$obvista->html = str_replace('{CTA_2}', $objdefctaban[0]['CTA_2'], $obvista->html);
-		$obvista->html = str_replace('{CTA_3}', $objdefctaban[0]['CTA_3'], $obvista->html);
-		$obvista->html = str_replace('{CTA_4}', $objdefctaban[0]['CTA_4'], $obvista->html);
-		$obvista->html = str_replace('{CTA_5}', $objdefctaban[0]['CTA_5'], $obvista->html);
+		$obvista->html = str_replace('{COD_LINEA}', $objlinea[0]['COD_LINEA'] , $obvista->html);
+		$obvista->html = str_replace('{NUM_REFLINEA}', $objlinea[0]['NUM_REFLINEA'] , $obvista->html);
+		$obvista->html = str_replace('{COD_TIPOCREDITO}', $lsttipocre , $obvista->html);
+		$obvista->html = str_replace('{TECHO_LINEA}', $objlinea[0]['TECHO_LINEA'], $obvista->html);
+		$obvista->html = str_replace('{FECHA_APERTURA}', $objlinea[0]['FECHA_APERTURA'], $obvista->html);
+		$obvista->html = str_replace('{FECHA_VENCIMIENTO}', $objlinea[0]['FECHA_VENCIMIENTO'], $obvista->html);
+		$obvista->html = str_replace('{DESTINO}', $objlinea[0]['DESTINO'], $obvista->html);
+		$obvista->html = str_replace('{DESCRIPCION_FORMA_PAGO}', $objlinea[0]['DESCRIPCION_FORMA_PAGO'], $obvista->html);
+		$obvista->html = str_replace('{DESCRIPCION_GARANTIAS}', $objlinea[0]['DESCRIPCION_GARANTIAS'], $obvista->html);
+		$obvista->html = str_replace('{MOTIVOS_CADUCIDAD}', $objlinea[0]['MOTIVOS_CADUCIDAD'], $obvista->html);
 		$obvista->html = str_replace('{COD_ESTADO}', $lstestados , $obvista->html);
 		$obvista->html = str_replace('{COD_BANCO}', $lstbancos , $obvista->html);
-		$obvista->html = str_replace('{COD_DESTINOAPLICACION}', $lstdestinosapli , $obvista->html);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->retornar_vista();
+		$obvista->retornar_vista();*/
 	}
 	
-	#Método que Actualiza los Cambios realizados para la definicion de cuentas de banco
 	public function edit(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$parametros->update(get_class($parametros));
-		$this->msg=$parametros->mensaje; 
+		/*$parametros->update(get_class($parametros));
+		$this->msg=$parametros->mensaje; */
 	}
 	
-	#Método que Guarda la definicion de las cuentas de banco
 	public function insert(){
 		$parametros = $this->set_obj();
+		//$prestamos = new controller_pb_prestamos();
+		$_REQUEST['COD_DETPAGO'] = $this->nextval_seq();
+		//$_REQUEST['NUMERO_CUOTA'] = $_REQUEST['NUMERO_CUOTA'] - 1;
 		$parametros->save(get_class($parametros));
+		//$prestamos->view_detprestamo();
 	}
 	
-	#Metodo que devuelve las lista CRUD de la definicion de cuentas de Banco
 	public function get_all($mensaje=''){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$_REQUEST["filtro"]="NO";
-		$mcampos = array($parametros->tableName().".COD_DEFINICION",$parametros->tableName().".DESCRIPCION_DEFINICION",
-						 "DECODE(".$parametros->tableName().".TIPO_APLICACION,'C','CARGO','A','ABONO') ",$parametros->tableName().".CTA_1",
-						 $parametros->tableName().".CTA_2",$parametros->tableName().".CTA_3",
-						 $parametros->tableName().".CTA_4",$parametros->tableName().".CTA_5",
-						 "BANCOS.NOM_BANCO","PB_ESTADOS.DESCRIPCION_ESTADO","PB_DESTINOAPLICACION.DESCRIPCION_DESTINO");
-        $masx=implode($mcampos, ",");
-		$data = $parametros->lis2(get_class($parametros), 3, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros),"", array("view"=>"style='display:none;'"));
+		/*$_REQUEST["filtro"]="NO";
+		$data = $parametros->lis(get_class($parametros), 1, "0");
+		$rendertable = $parametros->render_table_crud(get_class($parametros));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html); 
@@ -202,10 +206,9 @@ class controller_pb_definicion_ctas_banco extends pb_definicion_ctas_banco{
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
 		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
 		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
-		$obvista->retornar_vista();
+		$obvista->retornar_vista();*/
 	}
 	
-	#Método generico no se esta utilizando
 	public function view(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -240,7 +243,6 @@ class controller_pb_definicion_ctas_banco extends pb_definicion_ctas_banco{
 		
 	}
 	
-	#Método Generico para generar reportes, no se esta utilizando
 	public function view_rpt(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -261,7 +263,7 @@ class controller_pb_definicion_ctas_banco extends pb_definicion_ctas_banco{
 		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
 		$obvista->retornar_vista();*/
 	}
-	#Método generico que devuelve peticiones via ajax 
+	
 	public function get_ajax(){
 		$parametros = $this->set_obj();
 		/*if(isset($_REQUEST['COD_CAT']) && isset($_REQUEST['PROYECTO'])){

@@ -7,7 +7,7 @@ ini_set('memory_limit', '-1');
 ini_set('max_execution_time', 300);
 require_once('model_pb_bancos.php');
 require_once('../core/render_view_generic.php');
-#Controlador de Requisicion
+#Controlador de Bancos 
 class controller_pb_bancos extends pb_bancos{
 	
 	#Definicion de Titulos de Objetos Html
@@ -94,14 +94,14 @@ class controller_pb_bancos extends pb_bancos{
 		}
 	}
 	
-	#Definicion de una instancia del Modelo del Controlador requisicion encabezado de la requisicion
+	#Definicion de una instancia del Modelo del Controlador Bancos
 	public function set_obj() {
 		$obj = new pb_bancos();
 		return $obj;
 	}
 	
 	
-	#Método que dibuja el formulario para la insercion del encabezado de la Requisicion
+	#Método que dibuja el formulario para la insercion del encabezado de Bancos
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -118,10 +118,10 @@ class controller_pb_bancos extends pb_bancos{
 		$obvista->retornar_vista();
 	}
 	
-	#Método generico definido en el controlador, no se utiliza
+	#Método que devuelve la lista de option html con los Bancos, y las cuentas bancarias relacionadas a este
 	public function get(){
 		$parametros = $this->set_obj();
-		echo $parametros->get_options();
+		return $parametros->get_options();
 	}
 	
 	#Método que elimina el detalle de la requisicion, sino tiene detalle
@@ -191,35 +191,16 @@ class controller_pb_bancos extends pb_bancos{
 	
 	public function view(){
 		$parametros = $this->set_obj();
-		$obvista = new view_Parametros();
-		/*$detreq = new controller_reqdet();
-		//$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL', 'NOM_DEPTO','FECHA_ING','FECHA_AUTORIZADO','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','DESCRIPCION_PRIORIDAD');
-        $mcampos = array($parametros->tableName().'.COD_CIA',
-						 $parametros->tableName().'.NUM_REQ',
-						 $parametros->tableName().'.CODDEPTO_SOL',
-						 'DEPARTAMENTOS.NOM_DEPTO',
-						 $parametros->tableName().'.FECHA_ING',
-						 $parametros->tableName().'.FECHA_AUTORIZADO',
-						 $parametros->tableName().'.OBSERVACIONES',
-						 $parametros->tableName().'.PROYECTO',
-						 $parametros->tableName().'.ANIO',
-						 $parametros->tableName().'.COD_CAT',
-						 $parametros->tableName().'.TIPO_REQ',
-						 'PRIORIDADES.DESCRIPCION_PRIORIDAD'
-						);
-        $masx=implode($mcampos, ",");
-		$data = $parametros->lis2(get_class($parametros), 1, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("delete"=>"style='display:none;'","update"=>"style='display:none;'","view"=>"style='display:none;'","set"=>"style='display:none;'"));
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html);  
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
-		$obvista->html = str_replace('{formulario_details}', '', $obvista->html);
-		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
-		$obvista->retornar_vista();
-		$detreq->get_all();*/
+		if($_REQUEST['elemento']==2){
+			//retornar la lista de option de cuentas
+			echo $parametros->get_optionscuentas($_SESSION['cod_cia'], $_REQUEST['COD_BANCO']);
+		}
+		if($_REQUEST['elemento']==3){
+			//retornar la lista de option de chequeras
+			echo $parametros->get_optionschequeras($_SESSION['cod_cia'], $_REQUEST['COD_BANCO'], $_REQUEST['COD_CUENTA']);
+		}
+		
+		
 		
 	}
 	

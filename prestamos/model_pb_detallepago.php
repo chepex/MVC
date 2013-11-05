@@ -7,36 +7,43 @@ session_start();
 require_once('../core/db_abstract_model.php');
 
 
-class pb_tipos_creditos extends DBAbstractModel {
+class pb_detallepago extends DBAbstractModel {
 
 
 
     ############################### PROPIEDADES ################################
     public $COD_CIA;
-    public $COD_TIPOCREDITO;
-    public $DESCRIPCION_TIPOCREDITO;
+    public $COD_DETPAGO; 
+    public $COD_DESGLOSE; 
+    public $COD_CUOTA; 
+    public $ABONO_INTERES; 
+	public $ABONO_AMORTIZACION;
+
 
     ############################### ATRIBUTOS ################################
         public function atributos()
     {
-        $masx= array('COD_CIA','COD_TIPOCREDITO','DESCRIPCION_TIPOCREDITO');
+        $masx= array('COD_CIA','COD_DETPAGO','COD_DESGLOSE','COD_CUOTA','ABONO_INTERES','ABONO_AMORTIZACION');
         $masx=implode($masx, ",");
         return $masx;
     }
     
      
     public function relaciones(){
-         return $masx;                
+		$masx =  $this->tableName().".COD_CIA = PB_DETALLEPRESTAMOS.COD_CIA
+				 AND ". $this->tableName().".COD_CUOTA = PB_DETALLEPRESTAMOS.COD_CUOTA"; 
+        return $masx;                
     }
 
     public function relacione_tablas(){
+		 $masx= 'PB_DETALLEPRESTAMOS';
          return $masx;                
     }
 
 
         public function tableName()
     {
-        return 'pb_tipos_creditos';
+        return 'pb_detallepago';
     }
     
     public function Modulo()
@@ -47,24 +54,22 @@ class pb_tipos_creditos extends DBAbstractModel {
 
     public function llave()
     {
-        return array('COD_CIA','COD_TIPOCREDITO');
+        return array('COD_CIA','COD_DETPAGO');
 
     }
+    
+    public function foreignkey(){
+		return "";
+	}
 
     ################################# MÉTODOS ##################################
    
-   #Devuelve el correlativo de la secuencia para la tabla pbtipos_creditos
+   #Devuelve el correlativo de la secuecia para la tabla de Detalle de Pagos
     public function nextval_seq(){
 		$this->rows=array();
-		$this->query="SELECT SEQ_PBTIPOS_CREDITOS.NEXTVAL FROM DUAL";
+		$this->query="SELECT SEQ_PBDETPAGO.NEXTVAL FROM DUAL";
 		$this->get_results_from_query();
         return $this->rows[0]['NEXTVAL'];
-	}
-	
-	#Devuelve una lista de opciones html, de los tipos de creditos
-	public function get_options(){
-		$lsttipocredito = $this->get_lsoption($this->tableName(), array("COD_TIPOCREDITO"=>"","DESCRIPCION_TIPOCREDITO"=>""));
-		return $lsttipocredito;
 	}
 	
 	

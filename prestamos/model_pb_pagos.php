@@ -7,36 +7,44 @@ session_start();
 require_once('../core/db_abstract_model.php');
 
 
-class pb_tipos_creditos extends DBAbstractModel {
+class pb_pagos extends DBAbstractModel {
 
 
 
     ############################### PROPIEDADES ################################
     public $COD_CIA;
-    public $COD_TIPOCREDITO;
-    public $DESCRIPCION_TIPOCREDITO;
+    public $COD_PAGO; 
+    public $COD_PRESTAMO;
+    public $FECHA_PAGO; 
 
     ############################### ATRIBUTOS ################################
         public function atributos()
     {
-        $masx= array('COD_CIA','COD_TIPOCREDITO','DESCRIPCION_TIPOCREDITO');
+        $masx= array('COD_CIA','COD_PAGO','COD_PRESTAMO','FECHA_PAGO');
         $masx=implode($masx, ",");
         return $masx;
     }
     
      
     public function relaciones(){
-         return $masx;                
+		$masx =  $this->tableName().".COD_CIA = PB_PRESTAMOS.COD_CIA 
+				 AND ". $this->tableName().".COD_PRESTAMO = PB_PRESTAMOS.COD_PRESTAMO
+				 AND PB_PRESTAMOS.COD_CIA = BANCOS.COD_CIA
+				 AND PB_PRESTAMOS.COD_BANCO = BANCOS.COD_BANCO
+				 AND PB_PRESTAMOS.COD_CIA = PB_LINEASCREDITO.COD_CIA
+				 AND PB_PRESTAMOS.COD_LINEA = PB_LINEASCREDITO.COD_LINEA";
+        return $masx;                
     }
 
     public function relacione_tablas(){
+		 $masx= 'PB_PRESTAMOS,PB_LINEASCREDITO,BANCOS';
          return $masx;                
     }
 
 
         public function tableName()
     {
-        return 'pb_tipos_creditos';
+        return 'pb_pagos';
     }
     
     public function Modulo()
@@ -47,24 +55,22 @@ class pb_tipos_creditos extends DBAbstractModel {
 
     public function llave()
     {
-        return array('COD_CIA','COD_TIPOCREDITO');
+        return array('COD_CIA','COD_PAGO');
 
     }
+    
+    public function foreignkey(){
+		return "";
+	}
 
     ################################# MÉTODOS ##################################
    
-   #Devuelve el correlativo de la secuencia para la tabla pbtipos_creditos
+   #Devuelve el correlativo de la secuencia para la tabla pb_pagos
     public function nextval_seq(){
 		$this->rows=array();
-		$this->query="SELECT SEQ_PBTIPOS_CREDITOS.NEXTVAL FROM DUAL";
+		$this->query="SELECT SEQ_PBPAGOS.NEXTVAL FROM DUAL";
 		$this->get_results_from_query();
         return $this->rows[0]['NEXTVAL'];
-	}
-	
-	#Devuelve una lista de opciones html, de los tipos de creditos
-	public function get_options(){
-		$lsttipocredito = $this->get_lsoption($this->tableName(), array("COD_TIPOCREDITO"=>"","DESCRIPCION_TIPOCREDITO"=>""));
-		return $lsttipocredito;
 	}
 	
 	
