@@ -197,12 +197,10 @@ class controller_pb_desglosepago extends pb_desglosepago{
 			//Si el valor a abonar es menor que el valor de los intereses, no se abona nada a capital
 			}else{
 				$_REQUEST['VALOR_CAPITAL'] = 0;
-				//se obtiene el valor del gasto para el interes de la cuota
-				$valor_gasto = $objcuota[0]['VALOR_INTERES']  - $objprovision[0]['VALOR_PROVISION'];
 				//si el abono es mayor que el valor del gasto se paga toda la provision, y el resto al gasto
-				if($_REQUEST['VALOR_ABONO'] > $valor_gasto){
-					$_REQUEST['VALOR_GASTO'] = $valor_gasto;
+				if($_REQUEST['VALOR_ABONO'] > $objprovision[0]['VALOR_PROVISION']){
 					$_REQUEST['VALOR_PROVISION'] = $objprovision[0]['VALOR_PROVISION'];
+					$_REQUEST['VALOR_GASTO'] = $_REQUEST['VALOR_ABONO'] - $objprovision[0]['VALOR_PROVISION'];
 				//si el valor del abono no cubre el gasto se abona todo a la provision
 				}else{
 					$_REQUEST['VALOR_GASTO'] = 0;

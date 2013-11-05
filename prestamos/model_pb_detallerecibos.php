@@ -92,7 +92,8 @@ class pb_detallerecibos extends DBAbstractModel {
 							   PB_RECIBOS.COD_CUENTA,
 							   PB_RECIBOS.SECUENCIA,
 							   PB_RECIBOS.TIPO_DOCUMENTO,
-							   PB_RECIBOS.VALOR_RECIBO
+							   PB_RECIBOS.VALOR_RECIBO,
+							   PB_RECIBOS.FECHA_RECIBO
 						FROM	PB_DETALLERECIBOS DETRECI
 							INNER JOIN
 								PB_RECIBOS

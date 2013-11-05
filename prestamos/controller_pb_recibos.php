@@ -291,37 +291,52 @@ class controller_pb_recibos extends pb_recibos{
 		$parametros = $this->set_obj();
 		$detrecibo = new pb_detallerecibos();
 		$datadetrecibos = $detrecibo->listar_detrecibos($_REQUEST['COD_CIA'],$_REQUEST['COD_RECIBO']);
-		$html .="<link rel='stylesheet' type='text/css' href='../site_media/css/bootstrap/css/bootstrap.css'/><table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:10px;width:60%;'>
-						<tr>
-							<th colspan='2'>RECIBO DE PAGO</th>
-						</tr>
-						<tr>
-							<th>Recibo No.:".$datadetrecibos[0]['COD_RECIBO']."</th>
-							<th>Banco: ".$datadetrecibos[0]['NOM_BANCO']."</th>
-						</tr>
-						<tr>
-							<th>Tipo Doc.:".$datadetrecibos[0]['TIPO_DOCUMENTO']."</th>
-							<th>Fecha:".$datadetrecibos[0]['FECHA_RECIBO']."</th>
-						</tr>
-						<tr>
-							<th>Cuenta:".$datadetrecibos[0]['COD_CUENTA']."</th>
-							<th>Chequera:".$datadetrecibos[0]['SECUENCIA']." </th>
-						</tr>
-						<tr>
-							<th colspan='2'>Valor:".$datadetrecibos[0]['VALOR_RECIBO']."</th>
-						</tr>
-				</table>";
-				$html .="<table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:10px;width:60%;'>
+		$html .="
+				<html>
+					<head>
+							<title>Recibo de Prestamos Bancarion No. ".$datadetrecibos[0]['COD_RECIBO']."</title>
+							<link rel='stylesheet' type='text/css' href='../site_media/css/bootstrap/css/bootstrap.css'/>
+							<script src='../site_media/js/jquery.js'></script>
+							<script src='../site_media/js/jquery.PrintArea.js'></script>
+					</head>
+					<body>
+						<center>
+							<a class='btn btn-primary' href='#' id='imprime' style='margin-top:1%;'><i class='icon-print icon-white'></i>&nbsp;Imprimir Recibo</a>
+							<a class='btn btn-primary' href='?ctl=".$_REQUEST['ctl']."&act=get_all' style='margin-top:1%;'><i class='icon-th-list icon-white'></i>&nbsp;Regresar Lista Recibos</a>
+						</center>
+						<div id='pb_recibo' class='PrintArea'>
+						<table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:10px; width:40%; margin-top:3%;' align='center'>
 							<tr>
-								<th>CTA 1</th>
-								<th>CTA 2</th>
-								<th>CTA 3</th>
-								<th>CTA 4</th>
-								<th>CTA 5</th>
-								<th>CONCEPTO</th>
-								<th>CARGO</th>
-								<th>ABONO</th>
-							</tr>";
+								<th colspan='4'><center>RECIBO DE PAGO</center></th>
+							</tr>
+							<tr>
+								<th>Recibo No.: ".$datadetrecibos[0]['COD_RECIBO']."</th>
+								<th>Banco: ".$datadetrecibos[0]['NOM_BANCO']."</th>
+								<th>Tipo Doc.: ".$datadetrecibos[0]['TIPO_DOCUMENTO']."</th>
+								<th>Fecha: ".$datadetrecibos[0]['FECHA_RECIBO']."</th>
+							</tr>
+							<tr>
+								<th>Cuenta: ".$datadetrecibos[0]['COD_CUENTA']."</th>
+								<th>Chequera: ".$datadetrecibos[0]['SECUENCIA']." </th>
+								<th colspan='2'>Valor: ".number_format($datadetrecibos[0]['VALOR_RECIBO'],2,'.',',')."</th>
+							</tr>
+						</table>";
+			$html .="<table class='table table table-bordered' border='0.5px' bordercolor='#585858' style='font-size:10px;' align='center'>
+						<thead>
+						<tr>
+							<th>CTA 1</th>
+							<th>CTA 2</th>
+							<th>CTA 3</th>
+							<th>CTA 4</th>
+							<th>CTA 5</th>
+							<th>CONCEPTO</th>
+							<th>CARGO</th>
+							<th>ABONO</th>
+						</tr>
+						</thead>
+						<tbody>";
+			$acutotalc = 0;
+			$acutotala = 0;
 			foreach ($datadetrecibos as $mks){
 					$html .= "<tr class='tfl'>
 									<td>
@@ -343,14 +358,29 @@ class controller_pb_recibos extends pb_recibos{
 										".$mks["CONCEPTO"]."
 									</td>	
 									<td>
-										".$mks["CARGO"]."
+										<p style='float:right;'>".number_format($mks["CARGO"],2,'.',',')."</p>
 									</td>	
 									<td>
-										".$mks["ABONO"]."
+										<p style='float:right;'>".number_format($mks["ABONO"],2,'.',',')."</p>
 									</td>									
 							  </tr>";
+							  $acutotalc = $acutotalc + $mks["CARGO"];
+							  $acutotala = $acutotala + $mks["ABONO"];
 			}
-		$html .= "</table>";
+		$html .= "</tbody>
+				<tfoot>
+					<th colspan='6'><p style='float:right;'>TOTAL</p></th>
+					<th><p style='float:right;'>".number_format($acutotalc,2,'.',',')."</p></th>
+					<th><p style='float:right;'>".number_format($acutotala,2,'.',',')."</p></th>
+				</tfoot>
+				</table>";
+		$html .="	</div></body>
+				</html>
+				<script>
+					$('#imprime').click(function (){
+						$('div.PrintArea').printArea();
+	}				);
+				</script>";				
 		echo $html;
 	}
 	

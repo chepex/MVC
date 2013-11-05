@@ -91,8 +91,7 @@ class pb_definicion_ctas_banco extends DBAbstractModel {
 							   DEF_CTAS.CTA_4,
 							   DEF_CTAS.CTA_5,
 							   DEF_CTAS.TIPO_APLICACION,
-							   DESAPP.DESCRIPCION_DESTINO
-								|| ' REF.'
+								' REF.'
 								|| PB_PRESTAMOS.REF_PRESTAMO
 								|| ' '
 								|| BANCOS.NOM_CORTO
