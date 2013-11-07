@@ -7,15 +7,14 @@ session_start();
 require_once('../core/db_abstract_model.php');
 
 
-class pb_detallerecibos extends DBAbstractModel {
+class pb_ncprestamos extends DBAbstractModel {
 
 
 
     ############################### PROPIEDADES ################################
     public $COD_CIA;
-    public $COD_DETRECIBO;
-    public $COD_RECIBO;
-    public $COD_CUOTA;
+    public $COD_PRESTAMO;
+    public $COD_DETNOTA;
     public $CTA_1; 
     public $CTA_2;
     public $CTA_3; 
@@ -28,7 +27,7 @@ class pb_detallerecibos extends DBAbstractModel {
     ############################### ATRIBUTOS ################################
         public function atributos()
     {
-        $masx= array('COD_CIA','COD_DETRECIBO','COD_RECIBO','COD_CUOTA','CTA_1','CTA_2','CTA_3','CTA_4','CTA_5','CONCEPTO','CARGO','ABONO');
+        $masx= array('COD_CIA','COD_PRESTAMO','COD_DETNOTA','CTA_1','CTA_2','CTA_3','CTA_4','CTA_5','CONCEPTO','CARGO','ABONO');
         $masx=implode($masx, ",");
         return $masx;
     }
@@ -47,7 +46,7 @@ class pb_detallerecibos extends DBAbstractModel {
 
         public function tableName()
     {
-        return 'pb_detallerecibos';
+        return 'pb_ncprestamos';
     }
     
     public function Modulo()
@@ -71,44 +70,31 @@ class pb_detallerecibos extends DBAbstractModel {
    #Devuelve el Valor de la Secuencia para el siguente correlativo de la tabla pb_detallerecibos
     public function nextval_seq(){
 		$this->rows=array();
-		$this->query="SELECT SEQ_PBDETRECIBOS.NEXTVAL FROM DUAL";
+		$this->query="SELECT SEQ_PBNCPRESTAMO.NEXTVAL FROM DUAL";
 		$this->get_results_from_query();
         return $this->rows[0]['NEXTVAL'];
 	}
 	
-	public function listar_detrecibos($COD_CIA, $COD_RECIBO){
+	#Devuelve el Valor de la Secuencia para el siguente correlativo de la tabla pb_detallerecibos
+    public function listar_partidadesembolso($COD_CIA, $COD_PRESTAMO){
 		$this->rows=array();
-		$this->query="SELECT   DETRECI.CTA_1,
-							   DETRECI.CTA_2,
-							   DETRECI.CTA_3,
-							   DETRECI.CTA_4,
-							   DETRECI.CTA_5,
-							   DETRECI.CONCEPTO,
-							   DETRECI.CARGO,
-							   DETRECI.ABONO,
-							   BANCOS.NOM_BANCO,
-							   PB_RECIBOS.COD_DESGLOSE,
-							   PB_RECIBOS.COD_RECIBO,
-							   PB_RECIBOS.COD_CUENTA,
-							   PB_RECIBOS.SECUENCIA,
-							   PB_RECIBOS.TIPO_DOCUMENTO,
-							   PB_RECIBOS.VALOR_RECIBO,
-							   PB_RECIBOS.FECHA_RECIBO
-						FROM	PB_DETALLERECIBOS DETRECI
-							INNER JOIN
-								PB_RECIBOS
-									ON DETRECI.COD_CIA = PB_RECIBOS.COD_CIA
-										AND DETRECI.COD_RECIBO = PB_RECIBOS.COD_RECIBO
-							INNER JOIN
-								BANCOS
-									ON PB_RECIBOS.COD_CIA = BANCOS.COD_CIA
-										AND PB_RECIBOS.COD_BANCO = BANCOS.COD_BANCO
-						WHERE   DETRECI.COD_CIA = ".$COD_CIA." AND DETRECI.COD_RECIBO = ". $COD_RECIBO .
-						" ORDER BY DETRECI.COD_DETRECIBO";
+		$this->query="SELECT   COD_CIA,
+							   COD_PRESTAMO,
+							   COD_DETNOTA,
+							   CTA_1,
+							   CTA_2,
+							   CTA_3,
+							   CTA_4,
+							   CTA_5,
+							   CONCEPTO,
+							   CARGO,
+							   ABONO
+					  FROM   PB_NCPRESTAMOS
+						WHERE COD_CIA= ".$COD_CIA." AND COD_PRESTAMO=".$COD_PRESTAMO."
+						ORDER BY   COD_DETNOTA";
 		$this->get_results_from_query();
         return $this->rows;
 	}
-	
 	
 }
 ?>

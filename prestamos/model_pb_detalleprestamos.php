@@ -87,7 +87,7 @@ class pb_detalleprestamos extends DBAbstractModel {
 		$html.="<table class='table table-bordered' align='center'>
 				<thead>
 					<tr>
-						<th colspan='6'><center>Tabla de Amortizac&oacute;n Teorica</center></th>
+						<th colspan='6'><center>Tabla de Amortizaci&oacute;n Teorica</center></th>
 					</tr>
 					<tr>
 						<th>No. Cuota</th>
@@ -100,13 +100,14 @@ class pb_detalleprestamos extends DBAbstractModel {
 				</thead>
 				<tbody>";
 		for($i=0;$i<=$meses_plazo;$i++){
+			$valcuota = ($tipo_tabla == 0) ? $valor_cuota :  $monto_interes;
 			if($i==0){
 				$html.="<tr>
 							<td>".$i."</td>
 							<td>".number_format(0, 2, '.', ',')."</td>
 							<td>".number_format(0, 2, '.', ',')."</td>
 							<td>".number_format(round($saldo_capital,2), 2, '.', ',')."</td>
-							<td>".number_format(round($valor_cuota,2), 2, '.', ',')."</td>
+							<td>". number_format(round($valcuota,2), 2, '.', ',') ."</td>
 							<td>".$fecha->format('d/m/Y')."</td>
 						</tr>";
 			}elseif($meses_plazo<>$i){
@@ -115,16 +116,17 @@ class pb_detalleprestamos extends DBAbstractModel {
 							<td>".number_format(round($monto_interes,2), 2, '.', ',')."</td>
 							<td>".number_format(round($amortizacion_capital,2), 2, '.', ',')."</td>
 							<td>".number_format(round($saldo_capital,2), 2, '.', ',')."</td>
-							<td>".number_format(round($valor_cuota,2), 2, '.', ',')."</td>
+							<td>".number_format(round($valcuota,2), 2, '.', ',') ."</td>
 							<td>".$fecha->format('d/m/Y')."</td>
 						</tr>";
 			}else{
+				$valcuota = ($tipo_tabla == 0) ? $valor_cuota :  ($amortizacion_capital + $monto_interes);
 				 $html.="<tr>
 							<td>".$i."</td>
 							<td>".number_format(round($monto_interes,2), 2, '.', ',')."</td>
 							<td>".number_format(round($amortizacion_capital,2), 2, '.', ',')."</td>
 							<td>".number_format(round($saldo_capital,2), 2, '.', ',')."</td>
-							<td>".number_format(round($valor_cuota,2), 2, '.', ',')."</td>
+							<td>".number_format(round($valcuota,2), 2, '.', ',')."</td>
 							<td>".$fecha->format('d/m/Y')."</td>
 						</tr>";
 			}
@@ -206,9 +208,11 @@ class pb_detalleprestamos extends DBAbstractModel {
 		#1 indica Sabado
 		#2 indica dia de lunes a viernes
 		for($i=0;$i<=$meses_plazo;$i++){
+			unset($_REQUEST['VALOR_COUTA']);
+			$valcuota = ($tipo_tabla == 0) ? $valor_cuota :  $monto_interes;
 			if($i==0){
 				$_REQUEST['COD_CUOTA'] = $this->nextval_seq();
-				$_REQUEST['VALOR_COUTA'] = round($valor_cuota,2);
+				$_REQUEST['VALOR_CUOTA'] = round($valcuota,2);
 				$_REQUEST['TASA_INTERES'] = round($tasa_interes * 100,2);
 				$_REQUEST['VALOR_INTERES'] = 0;
 				$_REQUEST['VALOR_AMORTIZACION'] = 0;
@@ -218,7 +222,7 @@ class pb_detalleprestamos extends DBAbstractModel {
 				$_REQUEST['SALDO_CAPITALANT']=0;
 			}elseif($meses_plazo<>$i){
 				$_REQUEST['COD_CUOTA'] = $this->nextval_seq();
-				$_REQUEST['VALOR_COUTA'] = round($valor_cuota,2);
+				$_REQUEST['VALOR_CUOTA'] = round($valcuota,2);
 				$_REQUEST['TASA_INTERES'] = round($tasa_interes * 100,2);
 				$_REQUEST['VALOR_INTERES'] = round($monto_interes,2);
 				$_REQUEST['VALOR_AMORTIZACION'] = round($amortizacion_capital,2);
@@ -227,8 +231,9 @@ class pb_detalleprestamos extends DBAbstractModel {
 				$_REQUEST['NUMERO_CUOTA'] = $i;
 				$_REQUEST['SALDO_CAPITALANT']=$saldo_capitalant;
 			}else{
+				$valcuota = ($tipo_tabla == 0) ? $valor_cuota :  ($amortizacion_capital + $monto_interes);
 				$_REQUEST['COD_CUOTA'] = $this->nextval_seq();
-				$_REQUEST['VALOR_COUTA'] = round($valor_cuota,2);
+				$_REQUEST['VALOR_CUOTA'] = round($valcuota,2);
 				$_REQUEST['TASA_INTERES'] = round($tasa_interes * 100,2);
 				$_REQUEST['VALOR_INTERES'] = round($monto_interes,2);
 				$_REQUEST['VALOR_AMORTIZACION'] = round($amortizacion_capital,2);
@@ -349,8 +354,8 @@ class pb_detalleprestamos extends DBAbstractModel {
 								  PB_LINEASCREDITO.NUM_REFLINEA,
 								  PB_TIPOS_CREDITOS.DESCRIPCION_TIPOCREDITO,
 								  PB_DETALLEPRESTAMOS.NUMERO_CUOTA,
-								  PB_PRESTAMOS.VALOR_CUOTA,
-								  PB_PRESTAMOS.VALOR_CUOTA
+								  PB_DETALLEPRESTAMOS.VALOR_CUOTA,
+								  PB_DETALLEPRESTAMOS.VALOR_CUOTA
 								  - NVL (
 										SUM (PB_DETALLEPAGO.ABONO_INTERES)
 										+ SUM (PB_DETALLEPAGO.ABONO_AMORTIZACION),
@@ -405,7 +410,7 @@ class pb_detalleprestamos extends DBAbstractModel {
 											PB_DETALLEPRESTAMOS.COD_CUOTA,
 											PB_PRESTAMOS.REF_PRESTAMO,
 											PB_DETALLEPRESTAMOS.NUMERO_CUOTA,
-											PB_PRESTAMOS.VALOR_CUOTA,
+											PB_DETALLEPRESTAMOS.VALOR_CUOTA,
 											PB_DETALLEPRESTAMOS.FECHA_PAGO,
 											PB_DETALLEPRESTAMOS.SALDO_CAPITAlANT,
 											PB_DETALLEPRESTAMOS.VALOR_AMORTIZACION,

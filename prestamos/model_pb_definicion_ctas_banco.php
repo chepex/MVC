@@ -124,6 +124,38 @@ class pb_definicion_ctas_banco extends DBAbstractModel {
         return $this->rows;
 	}
 	
+	public function cuenta_corrientebanco($COD_CIA, $COD_BANCO){
+		$this->rows=array();
+		$this->query="SELECT   CTA_1,
+							   CTA_2,
+							   CTA_3,
+							   CTA_4,
+							   CTA_5,
+							   TIPO_APLICACION
+						FROM   PB_DEFINICION_CTAS_BANCO
+							WHERE   COD_CIA = ".$COD_CIA."
+									AND COD_DESTINOAPLICACION = 5 
+									AND COD_BANCO ='". $COD_BANCO."'";
+		$this->get_results_from_query();
+        return $this->rows;
+	}
+	
+	public function cuenta_desembolso($COD_CIA, $COD_BANCO, $COD_APLICACION){
+		$this->rows=array();
+		$this->query="SELECT   CTA_1,
+							   CTA_2,
+							   CTA_3,
+							   CTA_4,
+							   CTA_5,
+							   TIPO_APLICACION
+						FROM   PB_DEFINICION_CTAS_BANCO
+							WHERE   COD_CIA = ".$COD_CIA."
+									AND COD_DESTINOAPLICACION = ".$COD_APLICACION." 
+									AND COD_BANCO ='". $COD_BANCO."'";
+		$this->get_results_from_query();
+        return $this->rows;
+	}
+	
 	
 }
 ?>

@@ -5,14 +5,10 @@ error_reporting(E_ALL);
 ini_set("display_errors", 0);
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', 300);
-require_once('model_pb_recibos.php');
-require_once('model_pb_detallerecibos.php');
-require_once('model_pb_desglosepago.php');
-require_once('model_pb_definicion_ctas_banco.php');
-require_once('controller_pb_detallerecibos.php');
+require_once('model_pb_ncprestamos.php');
 require_once('../core/render_view_generic.php');
-#Controlador de pb_recibos
-class controller_pb_recibos extends pb_recibos{
+#Controlador de Requisicion
+class controller_pb_ncprestamos extends pb_ncprestamos{
 	
 	#Definicion de Titulos de Objetos Html
 	protected $diccionario = array(
@@ -22,16 +18,16 @@ class controller_pb_recibos extends pb_recibos{
                       'modificar'=>'Modificar Recibo',
                       'listar'=>'Lista de Recibo'),
 		'links_menu'=>array(
-						'VIEW_SET_USER'=>'prestamos/?ctl=controller_pb_recibos&act=set',
-						'VIEW_GET_USER'=>'prestamos/?ctl=controller_pb_recibos&act=buscar',
-						'VIEW_EDIT_USER'=>'prestamos/?ctl=controller_pb_recibos&act=modificar',
-						'VIEW_DELETE_USER'=>'prestamos/?ctl=controller_pb_recibos&act=borrar'),
+						'VIEW_SET_USER'=>'prestamos/?ctl=controller_pb_ncprestamos&act=set',
+						'VIEW_GET_USER'=>'prestamos/?ctl=controller_pb_ncprestamos&act=buscar',
+						'VIEW_EDIT_USER'=>'prestamos/?ctl=controller_pb_ncprestamos&act=modificar',
+						'VIEW_DELETE_USER'=>'prestamos/?ctl=controller_pb_ncprestamos&act=borrar'),
 		'form_actions'=>array(
-							'SET'=>'../prestamos/?ctl=controller_pb_recibos&act=insert',
-							'GET'=>'../prestamos/?ctl=controller_pb_recibos',
-        'DELETE'=>'../prestamos/?ctl=controller_pb_recibos&act=delete',
-        'EDIT'=>'../prestamos/?ctl=controller_pb_recibos&act=edit',
-        'GET_ALL'=>'../prestamos/?ctl=controller_pb_recibos&act=get_all'
+							'SET'=>'../prestamos/?ctl=controller_pb_ncprestamos&act=insert',
+							'GET'=>'../prestamos/?ctl=controller_pb_ncprestamos',
+        'DELETE'=>'../prestamos/?ctl=controller_pb_ncprestamos&act=delete',
+        'EDIT'=>'../prestamos/?ctl=controller_pb_ncprestamos&act=edit',
+        'GET_ALL'=>'../prestamos/?ctl=controller_pb_ncprestamos&act=get_all'
 		)
 	);
 	
@@ -99,7 +95,7 @@ class controller_pb_recibos extends pb_recibos{
 	
 	#Definicion de una instancia del Modelo del Controlador requisicion encabezado de la requisicion
 	public function set_obj() {
-		$obj = new pb_recibos();
+		$obj = new pb_ncprestamos();
 		return $obj;
 	}
 	
@@ -143,7 +139,7 @@ class controller_pb_recibos extends pb_recibos{
 	public function update(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$objlinea = $this->crea_objeto(array("pb_recibos linc","bancos ban","pb_estados edos","pb_tipos_creditos tipcre"),
+		/*$objlinea = $this->crea_objeto(array("pb_ncprestamos linc","bancos ban","pb_estados edos","pb_tipos_creditos tipcre"),
 										   array("linc.COD_ESTADO = edos.COD_ESTADO","linc.COD_CIA = ban.COD_CIA","linc.COD_BANCO = ban.COD_BANCO","linc.COD_CIA = tipcre.COD_CIA","linc.COD_TIPOCREDITO = tipcre.COD_TIPOCREDITO AND"),
 										   array("linc.COD_CIA=".$_REQUEST['COD_CIA'],"linc.COD_LINEA=".$_REQUEST['COD_LINEA'])
 										   );
@@ -182,118 +178,22 @@ class controller_pb_recibos extends pb_recibos{
 	
 	public function insert(){
 		$parametros = $this->set_obj();
-		$desglosepago =  new pb_desglosepago();
-		$detrecibo = new controller_pb_detallerecibos();
-		$datadesglose = $desglosepago->listar_degloserecibo($_REQUEST['COD_DESGLOSE']);
-		$definicionctas = new pb_definicion_ctas_banco();
-		foreach($datadesglose as $desglose){
-			$_REQUEST['COD_CIA'] = $desglose['COD_CIA'];
-			$_REQUEST['COD_RECIBO'] = $this->nextval_seq();
-			$_REQUEST['COD_DESGLOSE'] = $desglose['COD_DESGLOSE'];
-			$_REQUEST['COD_BANCO'] = $desglose['COD_BANCO'];
-			$_REQUEST['TIPO_DOCUMENTO'] = $desglose['TIPO_DOCUMENTO'];
-			$_REQUEST['COD_CUENTA'] = $desglose['COD_CUENTA'];
-			$_REQUEST['SECUENCIA'] = $desglose['SECUENCIA'];
-			$_REQUEST['FECHA_RECIBO'] = $desglose['FECHA_PAGO'];
-			$_REQUEST['VALOR_RECIBO'] = $desglose['VALOR_RECIBO'];
-			$parametros->save(get_class($parametros));
-			$datadetdesglose = array();
-			$ctacorriente = $definicionctas->cuenta_corrientebanco($desglose['COD_CIA'], $desglose['COD_BANCO']);
-			$_REQUEST['COD_DETRECIBO'] = $detrecibo->nextval_seq();
-			//$_REQUEST['COD_CUOTA'] = $detdesglose['COD_CUOTA'];
-			$_REQUEST['CTA_1'] = $ctacorriente[0]['CTA_1'];
-			$_REQUEST['CTA_2'] = $ctacorriente[0]['CTA_2'];
-			$_REQUEST['CTA_3'] = $ctacorriente[0]['CTA_3'];
-			$_REQUEST['CTA_4'] = $ctacorriente[0]['CTA_4'];
-			$_REQUEST['CTA_5'] = $ctacorriente[0]['CTA_5'];
-			$_REQUEST['CONCEPTO'] = "CTA. CORRIENTE ". $desglose['COD_CUENTA'];
-			if($ctacorriente[0]['TIPO_APLICACION'] == "C"){
-				$_REQUEST['CARGO'] = $desglose['VALOR_RECIBO'];
-				$_REQUEST['ABONO'] = 0;
-			}elseif($ctacorriente[0]['TIPO_APLICACION'] == "A"){
-				$_REQUEST['CARGO'] = 0;
-				$_REQUEST['ABONO'] = $desglose['VALOR_RECIBO'];
-			}
-			$detrecibo->insert();
-			$datadetdesglose = $desglosepago->listar_detdegloserecibo($desglose['COD_DESGLOSE'], $desglose['COD_BANCO'], $desglose['TIPO_DOCUMENTO'] , $desglose['COD_CUENTA']);
-			foreach($datadetdesglose as $detdesglose){
-				if($detdesglose['VALOR_PROVISION'] > 0){
-					$obdefinicion = $definicionctas->view_cta($desglose['COD_CIA'], $detdesglose['COD_CUOTA'], 3);
-					$_REQUEST['COD_DETRECIBO'] = $detrecibo->nextval_seq();
-					$_REQUEST['COD_CUOTA'] = $detdesglose['COD_CUOTA'];
-					$_REQUEST['CTA_1'] = $obdefinicion[0]['CTA_1'];
-					$_REQUEST['CTA_2'] = $obdefinicion[0]['CTA_2'];
-					$_REQUEST['CTA_3'] = $obdefinicion[0]['CTA_3'];
-					$_REQUEST['CTA_4'] = $obdefinicion[0]['CTA_4'];
-					$_REQUEST['CTA_5'] = $obdefinicion[0]['CTA_5'];
-					$_REQUEST['CONCEPTO'] = $obdefinicion[0]['CONCEPTO'];
-					if($obdefinicion[0]['TIPO_APLICACION'] == "C"){
-						$_REQUEST['CARGO'] = $detdesglose['VALOR_PROVISION'];
-						$_REQUEST['ABONO'] = 0;
-					}elseif($obdefinicion[0]['TIPO_APLICACION'] == "A"){
-						$_REQUEST['CARGO'] = 0;
-						$_REQUEST['ABONO'] = $detdesglose['VALOR_PROVISION'];
-					}
-					$detrecibo->insert();
-				}
-				if($detdesglose['VALOR_GASTO'] > 0){
-					$obdefinicion = $definicionctas->view_cta($desglose['COD_CIA'], $detdesglose['COD_CUOTA'], 4);
-					$_REQUEST['COD_DETRECIBO'] = $detrecibo->nextval_seq();
-					$_REQUEST['COD_CUOTA'] = $detdesglose['COD_CUOTA'];
-					$_REQUEST['CTA_1'] = $obdefinicion[0]['CTA_1'];
-					$_REQUEST['CTA_2'] = $obdefinicion[0]['CTA_2'];
-					$_REQUEST['CTA_3'] = $obdefinicion[0]['CTA_3'];
-					$_REQUEST['CTA_4'] = $obdefinicion[0]['CTA_4'];
-					$_REQUEST['CTA_5'] = $obdefinicion[0]['CTA_5'];
-					$_REQUEST['CONCEPTO'] = $obdefinicion[0]['CONCEPTO'];
-					if($obdefinicion[0]['TIPO_APLICACION'] == "C"){
-						$_REQUEST['CARGO'] = $detdesglose['VALOR_GASTO'];
-						$_REQUEST['ABONO'] = 0;
-					}elseif($obdefinicion[0]['TIPO_APLICACION'] == "A"){
-						$_REQUEST['CARGO'] = 0;
-						$_REQUEST['ABONO'] = $detdesglose['VALOR_GASTO'];
-					}
-					$detrecibo->insert();
-				}
-				if($detdesglose['VALOR_CAPITAL'] > 0){
-					$obdefinicion = $definicionctas->view_cta($desglose['COD_CIA'], $detdesglose['COD_CUOTA'], 2);
-					$_REQUEST['COD_DETRECIBO'] = $detrecibo->nextval_seq();
-					$_REQUEST['COD_CUOTA'] = $detdesglose['COD_CUOTA'];
-					$_REQUEST['CTA_1'] = $obdefinicion[0]['CTA_1'];
-					$_REQUEST['CTA_2'] = $obdefinicion[0]['CTA_2'];
-					$_REQUEST['CTA_3'] = $obdefinicion[0]['CTA_3'];
-					$_REQUEST['CTA_4'] = $obdefinicion[0]['CTA_4'];
-					$_REQUEST['CTA_5'] = $obdefinicion[0]['CTA_5'];
-					$_REQUEST['CONCEPTO'] = $obdefinicion[0]['CONCEPTO'];
-					if($obdefinicion[0]['TIPO_APLICACION'] == "C"){
-						$_REQUEST['CARGO'] = $detdesglose['VALOR_CAPITAL'];
-						$_REQUEST['ABONO'] = 0;
-					}elseif($obdefinicion[0]['TIPO_APLICACION'] == "A"){
-						$_REQUEST['CARGO'] = 0;
-						$_REQUEST['ABONO'] = $detdesglose['VALOR_CAPITAL'];
-					}
-					$detrecibo->insert();
-				}
-				
-			}
-			/*$objcuota = $parametros->crea_objeto(array("pb_detalleprestamos"),"", array("COD_CIA=".$_SESSION['cod_cia'], "COD_CUOTA=".$_REQUEST['COD_CUOTA']));
-			//Se Crea Un Objeto con el pb_detallepago, Sumando el valor de interes pagado, para ser comparado con el valor correspondiente a pagar para la cuota
-			$objpago = $parametros->crea_objeto(array("pb_detallepago"),"", array("COD_CIA=".$_SESSION['cod_cia'], "COD_CUOTA=".$_REQUEST['COD_CUOTA']), array("nvl(sum(pb_detallepago.ABONO_INTERES),0) VALOR_INTERES"));*/
-		}
+		$parametros->save(get_class($parametros));
 	}
 	
 	public function get_all($mensaje=''){
 		$parametros = $this->set_obj();
-		$obvista = new view_Parametros();
+		/*$obvista = new view_Parametros();
 		$_REQUEST["filtro"]="NO";
-		$mcampos = array($parametros->tableName().".COD_CIA",$parametros->tableName().".COD_RECIBO",
-						 $parametros->tableName().".COD_DESGLOSE","BANCOS.NOM_BANCO",
-						 $parametros->tableName().".TIPO_DOCUMENTO",
-						 $parametros->tableName().".COD_CUENTA",$parametros->tableName().".SECUENCIA",
-						 $parametros->tableName().".FECHA_RECIBO",$parametros->tableName().".VALOR_RECIBO");
+		$mcampos = array($parametros->tableName().".COD_CIA",$parametros->tableName().".COD_LINEA",
+						 $parametros->tableName().".NUM_REFLINEA","BANCOS.NOM_BANCO",
+						 "PB_TIPOS_CREDITOS.DESCRIPCION_TIPOCREDITO",$parametros->tableName().".TECHO_LINEA","PB_ESTADOS.DESCRIPCION_ESTADO",
+						 $parametros->tableName().".FECHA_APERTURA",$parametros->tableName().".FECHA_VENCIMIENTO",
+						 $parametros->tableName().".DESTINO",$parametros->tableName().".DESCRIPCION_FORMA_PAGO",
+						 $parametros->tableName().".DESCRIPCION_GARANTIAS",$parametros->tableName().".MOTIVOS_CADUCIDAD");
         $masx=implode($mcampos, ",");
 		$data = $parametros->lis2(get_class($parametros), 3, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros),"", array("update"=>"style='display:none;'", "delete"=>"style='display:none;'", "set"=>"style='display:none;'"));
+		$rendertable = $parametros->render_table_crud(get_class($parametros),"", array("view"=>"style='display:none;'"));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html); 
@@ -301,60 +201,30 @@ class controller_pb_recibos extends pb_recibos{
 		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
 		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
 		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
-		$obvista->retornar_vista();
+		$obvista->retornar_vista();*/
 	}
 	
 	public function view(){
 		$parametros = $this->set_obj();
-		$detrecibo = new pb_detallerecibos();
-		$datadetrecibos = $detrecibo->listar_detrecibos($_REQUEST['COD_CIA'],$_REQUEST['COD_RECIBO']);
-		$html .="
-				<html>
-					<head>
-							<title>Recibo de Prestamos Bancarion No. ".$datadetrecibos[0]['COD_RECIBO']."</title>
-							<link rel='stylesheet' type='text/css' href='../site_media/css/bootstrap/css/bootstrap.css'/>
-							<script src='../site_media/js/jquery.js'></script>
-							<script src='../site_media/js/jquery.PrintArea.js'></script>
-					</head>
-					<body>
-						<center>
-							<a class='btn btn-primary' href='#' id='imprime' style='margin-top:1%;'><i class='icon-print icon-white'></i>&nbsp;Imprimir Recibo</a>
-							<a class='btn btn-primary' href='?ctl=".$_REQUEST['ctl']."&act=get_all' style='margin-top:1%;'><i class='icon-th-list icon-white'></i>&nbsp;Regresar Lista Recibos</a>
-						</center>
-						<div id='pb_recibo' class='PrintArea'>
-						<table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:10px; width:40%; margin-top:3%;' align='center'>
-							<tr>
-								<th colspan='4'><center>RECIBO DE PAGO</center></th>
-							</tr>
-							<tr>
-								<th>Recibo No.: ".$datadetrecibos[0]['COD_RECIBO']."</th>
-								<th>Banco: ".$datadetrecibos[0]['NOM_BANCO']."</th>
-								<th>Tipo Doc.: ".$datadetrecibos[0]['TIPO_DOCUMENTO']."</th>
-								<th>Fecha: ".$datadetrecibos[0]['FECHA_RECIBO']."</th>
-							</tr>
-							<tr>
-								<th>Cuenta: ".$datadetrecibos[0]['COD_CUENTA']."</th>
-								<th>Chequera: ".$datadetrecibos[0]['SECUENCIA']." </th>
-								<th colspan='2'>Valor: ".number_format($datadetrecibos[0]['VALOR_RECIBO'],2,'.',',')."</th>
-							</tr>
-						</table>";
-			$html .="<table class='table table table-bordered' border='0.5px' bordercolor='#585858' style='font-size:10px;' align='center'>
+		$partidadesembolso = $this->listar_partidadesembolso($_REQUEST['COD_CIA'], $_REQUEST['COD_PRESTAMO']);
+		$acucargo=0;
+		$acuabono=0;
+		$html .="<table class='table table table-bordered' border='0.5px' bordercolor='#585858' style='font-size:10px;' align='center'>
 						<thead>
 						<tr>
-							<th>CTA 1</th>
-							<th>CTA 2</th>
-							<th>CTA 3</th>
-							<th>CTA 4</th>
-							<th>CTA 5</th>
+							<th colspan='8'>Partida de Desembolso</th>
+						</tr>
+						<tr>
+							<th>CTA_1</th>
+							<th>CTA_2</th>
+							<th>CTA_3</th>
+							<th>CTA_4</th>
+							<th>CTA_5</th>
 							<th>CONCEPTO</th>
 							<th>CARGO</th>
 							<th>ABONO</th>
-						</tr>
-						</thead>
-						<tbody>";
-			$acutotalc = 0;
-			$acutotala = 0;
-			foreach ($datadetrecibos as $mks){
+						</tr></thead><tbody>";
+			foreach ($partidadesembolso as $mks){
 					$html .= "<tr class='tfl'>
 									<td>
 										".$mks["CTA_1"]."
@@ -373,32 +243,30 @@ class controller_pb_recibos extends pb_recibos{
 									</td>
 									<td>
 										".$mks["CONCEPTO"]."
-									</td>	
+									</td>
 									<td>
-										<p style='float:right;'>".number_format($mks["CARGO"],2,'.',',')."</p>
-									</td>	
+										".number_format($mks["CARGO"],2,'.',',')."
+									</td>
 									<td>
-										<p style='float:right;'>".number_format($mks["ABONO"],2,'.',',')."</p>
+										".number_format($mks["ABONO"],2,'.',',')."
 									</td>									
 							  </tr>";
-							  $acutotalc = $acutotalc + $mks["CARGO"];
-							  $acutotala = $acutotala + $mks["ABONO"];
+							  $acucargo = number_format($acucargo + $mks["CARGO"],2,'.','');
+							  $acuabono = number_format($acuabono + $mks["ABONO"],2,'.','');
 			}
 		$html .= "</tbody>
-				<tfoot>
-					<th colspan='6'><p style='float:right;'>TOTAL</p></th>
-					<th><p style='float:right;'>".number_format($acutotalc,2,'.',',')."</p></th>
-					<th><p style='float:right;'>".number_format($acutotala,2,'.',',')."</p></th>
-				</tfoot>
+				  <tfoot>
+						<tr>
+							<th colspan='6'>
+								<p style='float:right'>TOTAL:</p>
+							</th>
+							<th>".number_format($acucargo,2,'.',',')."</th>
+							<th>".number_format($acuabono,2,'.',',')."</th>
+						</tr>
+					</tfoot>
 				</table>";
-		$html .="	</div></body>
-				</html>
-				<script>
-					$('#imprime').click(function (){
-						$('div.PrintArea').printArea();
-	}				);
-				</script>";				
-		echo $html;
+		$data= array("tblpartidadese"=>$html);
+		echo json_encode($data);
 	}
 	
 	public function view_rpt(){

@@ -6,8 +6,10 @@ ini_set("display_errors", 0);
 ini_set('memory_limit', '-1');
 ini_set('max_execution_time', 300);
 require_once('controller_pb_detalleprestamos.php');
+require_once('controller_pb_ncprestamos.php');
 require_once('controller_pb_bancos.php');
 require_once('model_pb_prestamos.php');
+require_once('model_pb_definicion_ctas_banco.php');
 require_once('../core/render_view_generic.php');
 #Controlador de Requisicion
 class controller_pb_prestamos extends pb_prestamos{
@@ -114,7 +116,7 @@ class controller_pb_prestamos extends pb_prestamos{
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		$lstestados = $parametros->get_lsoption("pb_estados", array("COD_ESTADO"=>"","DESCRIPCION_ESTADO"=>""));
+		$lstestados = $parametros->get_lsoption("pb_estados", array("COD_ESTADO"=>"","DESCRIPCION_ESTADO"=>""), array("COD_ESTADO >" => "2"));
 		$lstbancos = $parametros->get_lsoption("bancos", array("COD_BANCO"=>"","NOM_BANCO"=>""), array("COD_CIA"=>$_SESSION['cod_cia']));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['agregar'], $obvista->html);
@@ -191,7 +193,66 @@ class controller_pb_prestamos extends pb_prestamos{
 		$detprestamo = new controller_pb_detalleprestamos();
 		$parametros->save(get_class($parametros));
 		$detprestamo->Guardar_tablaamortizacion();
+		$definicionctas = new pb_definicion_ctas_banco();
+		$partidaprestamo = new controller_pb_ncprestamos();
+		$lineacredito = $this->crea_objeto(
+											array("pb_lineascredito", "pb_tipos_creditos"),
+											array("pb_lineascredito.cod_cia = pb_tipos_creditos.cod_cia", "pb_lineascredito.COD_TIPOCREDITO = pb_tipos_creditos.COD_TIPOCREDITO AND"),
+											array("pb_lineascredito.COD_CIA=".$_REQUEST['COD_CIA'],"pb_lineascredito.COD_LINEA=".$_REQUEST['COD_LINEA'])
+											);
+		$banco = $this->crea_objeto(array("BANCOS"),
+									"",
+									array("COD_CIA=".$_REQUEST['COD_CIA'],"COD_BANCO=".$_REQUEST['COD_BANCO'])
+									);
+		$ctacorriente = $definicionctas->cuenta_corrientebanco($_REQUEST['COD_CIA'], $_REQUEST['COD_BANCO']);
+		$_REQUEST['COD_DETNOTA'] = $partidaprestamo->nextval_seq();
+		$_REQUEST['CTA_1'] = $ctacorriente[0]['CTA_1'];
+		$_REQUEST['CTA_2'] = $ctacorriente[0]['CTA_2'];
+		$_REQUEST['CTA_3'] = $ctacorriente[0]['CTA_3'];
+		$_REQUEST['CTA_4'] = $ctacorriente[0]['CTA_4'];
+		$_REQUEST['CTA_5'] = $ctacorriente[0]['CTA_5'];
+		$_REQUEST['CONCEPTO'] = "CTA. CORRIENTE";
+		if($ctacorriente[0]['TIPO_APLICACION'] == 'C'){
+			$_REQUEST['CARGO'] = $_REQUEST['MONTO_APROBADO'];
+			$_REQUEST['ABONO'] = 0;
+		}elseif($ctacorriente[0]['TIPO_APLICACION'] == 'A'){
+			$_REQUEST['CARGO'] = 0;
+			$_REQUEST['ABONO'] = $_REQUEST['MONTO_APROBADO'];
+		}
+		$partidaprestamo->insert();
+				
+		if($lineacredito[0]['DESCRIPCION_TIPOCREDITO']=='DEC'){
+			$ctadesembolso = $definicionctas->cuenta_desembolso($_REQUEST['COD_CIA'], $_REQUEST['COD_BANCO'], 7);
+			$TIPO_CRED='DEC';
+		}elseif($lineacredito[0]['DESCRIPCION_TIPOCREDITO']=='ROT'){
+			$ctadesembolso = $definicionctas->cuenta_desembolso($_REQUEST['COD_CIA'], $_REQUEST['COD_BANCO'], 6);
+			$TIPO_CRED='ROT';
+		}elseif($lineacredito[0]['DESCRIPCION_TIPOCREDITO']=='CC'){
+			$ctadesembolso = $definicionctas->cuenta_desembolso($_REQUEST['COD_CIA'], $_REQUEST['COD_BANCO'], 8);
+			$TIPO_CRED='CC';
+		}else{
+			$ctadesembolso = $definicionctas->cuenta_desembolso($_REQUEST['COD_CIA'], $_REQUEST['COD_BANCO'], 6);
+		}
+		
+		$_REQUEST['COD_DETNOTA'] = $partidaprestamo->nextval_seq();
+		$_REQUEST['CTA_1'] = $ctadesembolso[0]['CTA_1'];
+		$_REQUEST['CTA_2'] = $ctadesembolso[0]['CTA_2'];
+		$_REQUEST['CTA_3'] = $ctadesembolso[0]['CTA_3'];
+		$_REQUEST['CTA_4'] = $ctadesembolso[0]['CTA_4'];
+		$_REQUEST['CTA_5'] = $ctadesembolso[0]['CTA_5'];
+		$_REQUEST['CONCEPTO'] = "DESEMB. REF. ".$_REQUEST['REF_PRESTAMO']. " ". $banco[0]['NOM_CORTO'] . " " . $TIPO_CRED;
+		if($ctadesembolso[0]['TIPO_APLICACION'] == 'C'){
+			$_REQUEST['CARGO'] = $_REQUEST['MONTO_APROBADO'];
+			$_REQUEST['ABONO'] = 0;
+		}elseif($ctadesembolso[0]['TIPO_APLICACION'] == 'A'){
+			$_REQUEST['CARGO'] = 0;
+			$_REQUEST['ABONO'] = $_REQUEST['MONTO_APROBADO'];
+		}
+		$partidaprestamo->insert();
+	
+		
 		echo$this->msg="<h4>Se ha Completado la Transaccion!</h4>";
+		
 		
 	}
 	
@@ -221,35 +282,125 @@ class controller_pb_prestamos extends pb_prestamos{
 	public function view(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$detreq = new controller_reqdet();
-		//$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL', 'NOM_DEPTO','FECHA_ING','FECHA_AUTORIZADO','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','DESCRIPCION_PRIORIDAD');
-        $mcampos = array($parametros->tableName().'.COD_CIA',
-						 $parametros->tableName().'.NUM_REQ',
-						 $parametros->tableName().'.CODDEPTO_SOL',
-						 'DEPARTAMENTOS.NOM_DEPTO',
-						 $parametros->tableName().'.FECHA_ING',
-						 $parametros->tableName().'.FECHA_AUTORIZADO',
-						 $parametros->tableName().'.OBSERVACIONES',
-						 $parametros->tableName().'.PROYECTO',
-						 $parametros->tableName().'.ANIO',
-						 $parametros->tableName().'.COD_CAT',
-						 $parametros->tableName().'.TIPO_REQ',
-						 'PRIORIDADES.DESCRIPCION_PRIORIDAD'
-						);
-        $masx=implode($mcampos, ",");
-		$data = $parametros->lis2(get_class($parametros), 1, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("delete"=>"style='display:none;'","update"=>"style='display:none;'","view"=>"style='display:none;'","set"=>"style='display:none;'"));
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html);  
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
-		$obvista->html = str_replace('{formulario_details}', '', $obvista->html);
-		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
-		$obvista->retornar_vista();
-		$detreq->get_all();*/
-		
+		$datatable = $parametros->lista_tblamorteorica($_REQUEST['COD_CIA'], $_REQUEST['COD_PRESTAMO']);
+		$html .="
+				<html>
+					<head>
+							<title>Tabla de Amortizaci&oacute;n Teorica Prestamo: ".$datadetrecibos[0]['REF_PRESTAMO']."</title>
+							<link rel='stylesheet' type='text/css' href='../site_media/css/bootstrap/css/bootstrap.css'/>
+							<script src='../site_media/js/jquery.js'></script>
+							<script src='../site_media/js/jquery.PrintArea.js'></script>
+					</head>
+					<body>
+						<center>
+							<a class='btn btn-primary' href='?ctl=".$_REQUEST['ctl']."&act=get_all' style='margin-top:1%;'><i class='icon-th-list icon-white'></i>&nbsp;Regresar Lista Prestamos</a>
+							<a class='btn btn-primary' id='btpartida' href='#' style='margin-top:1%;'><i class='icon-eye-open icon-white'></i>&nbsp;Ver Partida de Desembolso</a>
+						</center>
+						<div id='pb_tbamortizacion' class='PrintArea'>
+						<table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:10px;margin-top:3%;' align='center'>
+							<thead>
+								<tr>
+									<th colspan='14'><center>Tabla de Amortizaci&oacute;n teorica</center></th>
+								</tr>
+								<tr>
+									<th>Num. Cuota</th>
+									<th>Referencia</th>
+									<th>Cr&eacute;dito</th>
+									<th>Bco.</th>
+									<th>Monto</th>
+									<th>Plazo</th>
+									<th>Apertura</th>
+									<th>F.Vcto.</th>
+									<th>F.Pago</th>
+									<th>%</th>
+									<th>Abono K</th>
+									<th>Interes N</th>
+									<th>Cuota</th>
+									<th>Saldo Capital</th>
+								</tr>
+							</thead><tbody>";
+						foreach ($datatable as $mks){
+							$html .= "<tr class='tfl'>
+										<td>
+											".$mks["NUMERO_CUOTA"]."
+										</td>
+										 <td>
+											".$mks["REF_PRESTAMO"]."
+										</td>
+										<td>
+											".$mks["DESCRIPCION_TIPOCREDITO"]."
+										</td>
+										<td>
+											".$mks["NOM_BANCO"]."
+										</td>
+										<td>
+											".number_format($mks["MONTO_APROBADO"],2,'.',',')."
+										</td>
+										<td>
+											".$mks["PLAZO"]."
+										</td>
+										<td>
+											".$mks["FECHA_APERTURA"]."
+										</td>	
+										 <td>
+											".$mks["FECHA_VENCIMIENTO"]."
+										</td>
+										<td>
+											".$mks["FECHA_PAGO"]."
+										</td>
+										<td>
+											".$mks["TASA_INTERES"]."
+										</td>
+										<td>
+											".number_format($mks["VALOR_AMORTIZACION"],2,'.',',')."
+										</td>
+										<td>
+											".number_format($mks["VALOR_INTERES"],2,'.',',')."
+										</td>
+										<td>
+											".number_format($mks["VALOR_CUOTA"],2,'.',',')."
+										</td>		
+										<td>
+											".number_format($mks["SALDO_CAPITAL"],2,'.',',')."
+										</td>								
+									</tr>";
+			
+					}	
+				$html.="</tbody></table>";
+		$html .="	</div>
+					<br/><br/><br/>
+					<input type='hidden' id='COD_CIA' name='COD_CIA' value='".$_REQUEST['COD_CIA']."' />
+					<input type='hidden' id='COD_PRESTAMO' name='COD_PRESTAMO' value='".$_REQUEST['COD_PRESTAMO']."' />
+					<div id='partidadesembolso'></div>
+					</body>
+				</html>
+				<script>
+					$('#imprime').click(function (){
+						$('div.PrintArea').printArea();
+					});
+					
+					$('#btpartida').click(function (){
+						$.ajax({
+							url : 'index.php?ctl=controller_pb_ncprestamos&COD_CIA='+ $('#COD_CIA').val() + '&COD_PRESTAMO=' + $('#COD_PRESTAMO').val(),     
+							data : { act : 'view' },
+							type : 'POST',     
+							success : 
+								function(resp) {
+									var mivar = $.parseJSON(resp);
+									$('#partidadesembolso').empty();
+									$('#partidadesembolso').fadeOut('slow').fadeIn('slow').html(mivar.tblpartidadese);
+								},
+							error : 
+								function(xhr, status) {
+									alert('Disculpe, existió un problema');
+								},     
+							complete : function(xhr, status) {	
+							
+							}
+						});
+					});
+				</script>";				
+		echo $html;
 	}
 	
 	public function view_detprestamo(){
