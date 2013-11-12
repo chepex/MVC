@@ -50,8 +50,7 @@ class pb_prestamos extends DBAbstractModel {
          return $masx;                
     }
 
-
-     public function tableName(){
+    public function tableName(){
         return 'pb_prestamos';
     }
     
@@ -83,7 +82,7 @@ class pb_prestamos extends DBAbstractModel {
 		return $lstprestamos;
 	}
 	
-	
+	#Devuelve un array con la tabla de amortizacion teorica del prestamo
 	public function lista_tblamorteorica($COD_CIA, $COD_PRESTAMO){
 		$this->rows=array();
 		$this->query="SELECT   PB_DETALLEPRESTAMOS.NUMERO_CUOTA,
@@ -123,7 +122,52 @@ class pb_prestamos extends DBAbstractModel {
         return $this->rows;
 	}
 	
-	#Devuelve Un Arreglo con los pagos a Realizarse en el periodo de las fechas en el paramtro.
+	#Devuelve un array con la tabla de amortizacion real, los pagos realizados
+	public function lista_tblamorreal($COD_CIA, $COD_PRESTAMO){
+		$this->rows=array();
+		$this->query="SELECT   PB_DETALLEPRESTAMOS.NUMERO_CUOTA,
+							   PB_PRESTAMOS.REF_PRESTAMO,
+							   PB_TIPOS_CREDITOS.DESCRIPCION_TIPOCREDITO,
+							   BANCOS.NOM_BANCO,
+							   PB_PRESTAMOS.MONTO_APROBADO,
+							   PB_PRESTAMOS.PLAZO,
+							   PB_PRESTAMOS.FECHA_APERTURA,
+							   PB_PRESTAMOS.FECHA_VENCIMIENTO,
+							   PB_DETALLEPAGO.FECHA_PAGO,
+							   PB_PRESTAMOS.TASA_INTERES,
+							   PB_DETALLEPAGO.ABONO_AMORTIZACION,
+							   PB_DETALLEPAGO.ABONO_INTERES,
+							   PB_PRESTAMOS.VALOR_CUOTA,
+							   PB_DETALLEPRESTAMOS.SALDO_CAPITALANT
+						FROM   PB_DETALLEPRESTAMOS
+							INNER JOIN
+								PB_DETALLEPAGO
+									ON PB_DETALLEPAGO.COD_CIA = PB_DETALLEPRESTAMOS.COD_CIA
+										AND PB_DETALLEPAGO.COD_CUOTA = PB_DETALLEPRESTAMOS.COD_CUOTA
+							INNER JOIN
+								PB_PRESTAMOS
+									ON PB_DETALLEPRESTAMOS.COD_CIA = PB_PRESTAMOS.COD_CIA
+										AND PB_DETALLEPRESTAMOS.COD_PRESTAMO =
+								PB_PRESTAMOS.COD_PRESTAMO
+							INNER JOIN
+								PB_LINEASCREDITO
+									ON PB_PRESTAMOS.COD_CIA = PB_LINEASCREDITO.COD_CIA
+										AND PB_PRESTAMOS.COD_LINEA = PB_LINEASCREDITO.COD_LINEA
+							INNER JOIN
+								PB_TIPOS_CREDITOS
+									ON PB_LINEASCREDITO.COD_CIA = PB_TIPOS_CREDITOS.COD_CIA
+										AND PB_LINEASCREDITO.COD_TIPOCREDITO = PB_TIPOS_CREDITOS.COD_TIPOCREDITO
+							INNER JOIN
+								BANCOS
+									ON PB_PRESTAMOS.COD_CIA = BANCOS.COD_CIA
+										AND PB_PRESTAMOS.COD_BANCO = BANCOS.COD_BANCO
+						WHERE   PB_DETALLEPAGO.COD_CIA = ".$COD_CIA." AND PB_DETALLEPRESTAMOS.COD_PRESTAMO = ".$COD_PRESTAMO."
+						ORDER BY PB_DETALLEPAGO.FECHA_PAGO";
+		$this->get_results_from_query();
+        return $this->rows;
+	}
+	
+	#Devuelve Un Arreglo con los pagos a Realizarse en el periodo de las fechas en el parametro.
 	public function proyeccionsaldos($FECHA_INICIAL, $FECHA_FINAL,$BANCO=0){
 		if($BANCO != 0){
 			$CONDICION=" AND DPRES.FECHA_PAGO BETWEEN '".$FECHA_INICIAL."' AND '".$FECHA_FINAL."'

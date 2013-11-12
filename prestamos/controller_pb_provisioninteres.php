@@ -8,7 +8,7 @@ ini_set('max_execution_time', 300);
 require_once('model_pb_provisioninteres.php');
 require_once('model_pb_detalleprestamos.php');
 require_once('../core/render_view_generic.php');
-#Controlador de Requisicion
+#Controlador de pb_provisioninteres
 class controller_pb_provisioninteres extends pb_provisioninteres{
 	
 	#Definicion de Titulos de Objetos Html
@@ -95,14 +95,14 @@ class controller_pb_provisioninteres extends pb_provisioninteres{
 		}
 	}
 	
-	#Definicion de una instancia del Modelo del Controlador requisicion encabezado de la requisicion
+	#Definicion de una instancia del Modelo del Controlador pb_provisioninteres
 	public function set_obj() {
 		$obj = new pb_provisioninteres();
 		return $obj;
 	}
 	
 	
-	#Método que dibuja el formulario para la insercion del encabezado de la Requisicion
+	#Método que dibuja el formulario para la insercion del pb_provisioninteres
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -120,7 +120,6 @@ class controller_pb_provisioninteres extends pb_provisioninteres{
 	#Método generico definido en el controlador, no se utiliza
 	public function get(){
 		$parametros = $this->set_obj();
-		//echo $parametros->get_options();
 	}
 	
 	#Método que elimina el detalle de la requisicion, sino tiene detalle

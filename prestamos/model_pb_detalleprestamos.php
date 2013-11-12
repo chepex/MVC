@@ -458,11 +458,11 @@ class pb_detalleprestamos extends DBAbstractModel {
             return $this->rows ;
     }
     
+    #Método que calcula los intereses para un monto y un periodo de tiempo
     public function calculoInteres($saldo_capitalx, $tasa_interesx, $fecpagant, $fecnuvpag, $anio){
 		$monto_interes = ($saldo_capitalx * ($tasa_interesx) * ($this->diferencia_dias($fecpagant, $fecnuvpag))) / $this->es_bisiesto($anio);
 		return $monto_interes;
 	}
-	
 	
 }
 ?>

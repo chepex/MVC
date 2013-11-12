@@ -9,7 +9,7 @@ require_once('model_pb_historicotasaicuota.php');
 require_once('controller_pb_detalleprestamos.php');
 require_once('controller_pb_prestamos.php');
 require_once('../core/render_view_generic.php');
-#Controlador de Requisicion
+#Controlador de pb_historicotasaicuota
 class controller_pb_historicotasaicuota extends pb_historicotasaicuota{
 	
 	#Definicion de Titulos de Objetos Html
@@ -105,21 +105,11 @@ class controller_pb_historicotasaicuota extends pb_historicotasaicuota{
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['agregar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('agregar',get_class($parametros)), $obvista->html);
-		$obvista->html = str_replace('{codcia}', $_SESSION['cod_cia'] , $obvista->html);
-		$obvista->html = str_replace('{descia}', $_SESSION['nom_cia'] , $obvista->html);
-		$obvista->html = str_replace('{COD_TIPOCREDITO}',$this->nextval_seq(), $obvista->html);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->retornar_vista();*/
 	}
 	
 	#Método generico definido en el controlador, no se utiliza
 	public function get(){
 		$parametros = $this->set_obj();
-		//echo $parametros->get_options();
 	}
 	
 	#Método que elimina el detalle de la requisicion, sino tiene detalle
@@ -132,25 +122,10 @@ class controller_pb_historicotasaicuota extends pb_historicotasaicuota{
 	public function update(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$objtipocreditos = $this->crea_objeto(array("pb_historicotasaicuota"),"",array("COD_CIA=".$_REQUEST['COD_CIA'],"COD_TIPOCREDITO=".$_REQUEST['COD_TIPOCREDITO']));
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['modificar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('modificar',get_class($parametros)), $obvista->html);
-		$obvista->html = str_replace('{mensaje}', ' ', $obvista->html);
-		$obvista->html = str_replace('{codcia}', $_SESSION['cod_cia'] , $obvista->html);
-		$obvista->html = str_replace('{descia}', $_SESSION['nom_cia'] , $obvista->html);
-		$obvista->html = str_replace('{COD_TIPOCREDITO}', $objtipocreditos[0]['COD_TIPOCREDITO'], $obvista->html);
-		$obvista->html = str_replace('{DESCRIPCION_TIPOCREDITO}', $objtipocreditos[0]['DESCRIPCION_TIPOCREDITO'], $obvista->html);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->retornar_vista();*/
 	}
 	
 	public function edit(){
 		$parametros = $this->set_obj();
-		/*$obvista = new view_Parametros();
-		$parametros->update(get_class($parametros));
-		$this->msg=$parametros->mensaje; */
 	}
 	
 	public function insert(){
@@ -168,17 +143,6 @@ class controller_pb_historicotasaicuota extends pb_historicotasaicuota{
 	public function get_all($mensaje=''){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$_REQUEST["filtro"]="NO";
-		$data = $parametros->lis(get_class($parametros), 0, "0");
-		$rendertable = $parametros->render_table_crud(get_class($parametros),"", array("view"=>"style='display:none;'"));
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html); 
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
-		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
-		$obvista->retornar_vista();*/
 	}
 	
 	public function view(){

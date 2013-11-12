@@ -101,182 +101,60 @@ class controller_pb_detallepago extends pb_detallepago{
 	}
 	
 	
-	#Método que dibuja el formulario para la insercion de detalle de pagos
+	#Método que dibuja el formulario para la insercion de detalle de pagos, no se utiliza
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$lstestados = $parametros->get_lsoption("pb_estados", array("COD_ESTADO"=>"","DESCRIPCION_ESTADO"=>""));
-		$lstbancos = $parametros->get_lsoption("pb_bancos", array("COD_BANCO"=>"","NOMBRE_CORTO"=>""), array("COD_CIA"=>$_SESSION['cod_cia']));
-		$lstlineas = $parametros->get_lsoption("pb_lineascredito", array("COD_LINEA"=>"","NUM_REFLINEA"=>""), array("COD_CIA"=>$_SESSION['cod_cia']));
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['agregar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('agregar',get_class($parametros)), $obvista->html);
-		$obvista->html = str_replace('{COD_PRESTAMO}',$this->nextval_seq(), $obvista->html);
-		$obvista->html = str_replace('{codcia}', $_SESSION['cod_cia'] , $obvista->html);
-		$obvista->html = str_replace('{descia}', $_SESSION['nom_cia'] , $obvista->html);
-		$obvista->html = str_replace('{COD_ESTADO}', $lstestados , $obvista->html);
-		$obvista->html = str_replace('{COD_BANCO}', $lstbancos , $obvista->html);
-		$obvista->html = str_replace('{COD_LINEA}', $lstlineas , $obvista->html);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->retornar_vista();*/
 	}
 	
 	#Método generico definido en el controlador, no se utiliza
 	public function get(){
 		$parametros = $this->set_obj();
-		/*$objcuota = $parametros->crea_objeto(array($this->tableName()),'',array("COD_CIA=".$_SESSION['cod_cia'],"COD_PRESTAMO=".$_REQUEST['COD_PRESTAMO'],"NUMERO_CUOTA=".$_REQUEST['NUMERO_CUOTA']));
-		$dataArray=array("VALOR_CUOTA"=>$objcuota[0]['VALOR_CUOTA'],
-				   "TASA_INTERES"=>$objcuota[0]['TASA_INTERES'],
-				   "VALOR_INTERES"=>$objcuota[0]['VALOR_INTERES'],
-				   "VALOR_AMORTIZACION"=>$objcuota[0]['VALOR_AMORTIZACION'],
-				   "SALDO_CAPITAL"=>$objcuota[0]['SALDO_CAPITAL'],
-				   "COD_CUOTA"=>$objcuota[0]['COD_CUOTA']
-				   );
-		echo json_encode($dataArray);*/
 	}
 	
-	#Método que elimina el detalle de la requisicion, sino tiene detalle
+	#Método que elimina el detalle de pago, no se utiliza
 	public function delete(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$parametros->delete(get_class($parametros));
-		$this->msg=$parametros->mensaje;*/
 	}
 	
+	#Método generico que permite dibujar formulario para actualizacion, no se utiliza
 	public function update(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$objlinea = $this->crea_objeto(array("pb_lineascredito linc","pb_bancos ban","pb_estados edos","pb_tipos_creditos tipcre"),
-										   array("linc.COD_ESTADO = edos.COD_ESTADO","linc.COD_CIA = ban.COD_CIA","linc.COD_BANCO = ban.COD_BANCO","linc.COD_CIA = tipcre.COD_CIA","linc.COD_TIPOCREDITO = tipcre.COD_TIPOCREDITO AND"),
-										   array("linc.COD_CIA=".$_REQUEST['COD_CIA'],"linc.COD_LINEA=".$_REQUEST['COD_LINEA'])
-										   );
-		$lstestados = $parametros->get_lsoption("pb_estados", array("COD_ESTADO"=>"","DESCRIPCION_ESTADO"=>""),array("COD_ESTADO"=>$objlinea[0]['COD_ESTADO']));
-		$lstbancos = $parametros->get_lsoption("pb_bancos", array("COD_BANCO"=>"","NOMBRE_CORTO"=>""), array("COD_CIA"=>$_SESSION['cod_cia'],"COD_BANCO"=>$objlinea[0]['COD_BANCO']));
-		$lsttipocre = $parametros->get_lsoption("pb_tipos_creditos", array("COD_TIPOCREDITO"=>"","DESCRIPCION_TIPOCREDITO"=>""), array("COD_CIA"=>$_SESSION['cod_cia'],"COD_TIPOCREDITO"=>$objlinea[0]['COD_TIPOCREDITO']));
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['modificar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('modificar',get_class($parametros)), $obvista->html);
-		$obvista->html = str_replace('{mensaje}', ' ', $obvista->html);
-		$obvista->html = str_replace('{codcia}', $_SESSION['cod_cia'] , $obvista->html);
-		$obvista->html = str_replace('{descia}', $_SESSION['nom_cia'] , $obvista->html);
-		$obvista->html = str_replace('{COD_LINEA}', $objlinea[0]['COD_LINEA'] , $obvista->html);
-		$obvista->html = str_replace('{NUM_REFLINEA}', $objlinea[0]['NUM_REFLINEA'] , $obvista->html);
-		$obvista->html = str_replace('{COD_TIPOCREDITO}', $lsttipocre , $obvista->html);
-		$obvista->html = str_replace('{TECHO_LINEA}', $objlinea[0]['TECHO_LINEA'], $obvista->html);
-		$obvista->html = str_replace('{FECHA_APERTURA}', $objlinea[0]['FECHA_APERTURA'], $obvista->html);
-		$obvista->html = str_replace('{FECHA_VENCIMIENTO}', $objlinea[0]['FECHA_VENCIMIENTO'], $obvista->html);
-		$obvista->html = str_replace('{DESTINO}', $objlinea[0]['DESTINO'], $obvista->html);
-		$obvista->html = str_replace('{DESCRIPCION_FORMA_PAGO}', $objlinea[0]['DESCRIPCION_FORMA_PAGO'], $obvista->html);
-		$obvista->html = str_replace('{DESCRIPCION_GARANTIAS}', $objlinea[0]['DESCRIPCION_GARANTIAS'], $obvista->html);
-		$obvista->html = str_replace('{MOTIVOS_CADUCIDAD}', $objlinea[0]['MOTIVOS_CADUCIDAD'], $obvista->html);
-		$obvista->html = str_replace('{COD_ESTADO}', $lstestados , $obvista->html);
-		$obvista->html = str_replace('{COD_BANCO}', $lstbancos , $obvista->html);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->retornar_vista();*/
 	}
 	
+	#Método generico, permite la edicion de registros, no se utiliza
 	public function edit(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$parametros->update(get_class($parametros));
-		$this->msg=$parametros->mensaje; */
 	}
 	
+	#Método generico para insercion de registros a traves del modelo, de detalle de pago
 	public function insert(){
 		$parametros = $this->set_obj();
-		//$prestamos = new controller_pb_prestamos();
 		$_REQUEST['COD_DETPAGO'] = $this->nextval_seq();
-		//$_REQUEST['NUMERO_CUOTA'] = $_REQUEST['NUMERO_CUOTA'] - 1;
 		$parametros->save(get_class($parametros));
-		//$prestamos->view_detprestamo();
 	}
 	
+	#Método que devuelve una tabla CRUD no se utiliza
 	public function get_all($mensaje=''){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$_REQUEST["filtro"]="NO";
-		$data = $parametros->lis(get_class($parametros), 1, "0");
-		$rendertable = $parametros->render_table_crud(get_class($parametros));
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html); 
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
-		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
-		$obvista->retornar_vista();*/
 	}
 	
 	public function view(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$detreq = new controller_reqdet();
-		//$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL', 'NOM_DEPTO','FECHA_ING','FECHA_AUTORIZADO','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','DESCRIPCION_PRIORIDAD');
-        $mcampos = array($parametros->tableName().'.COD_CIA',
-						 $parametros->tableName().'.NUM_REQ',
-						 $parametros->tableName().'.CODDEPTO_SOL',
-						 'DEPARTAMENTOS.NOM_DEPTO',
-						 $parametros->tableName().'.FECHA_ING',
-						 $parametros->tableName().'.FECHA_AUTORIZADO',
-						 $parametros->tableName().'.OBSERVACIONES',
-						 $parametros->tableName().'.PROYECTO',
-						 $parametros->tableName().'.ANIO',
-						 $parametros->tableName().'.COD_CAT',
-						 $parametros->tableName().'.TIPO_REQ',
-						 'PRIORIDADES.DESCRIPCION_PRIORIDAD'
-						);
-        $masx=implode($mcampos, ",");
-		$data = $parametros->lis2(get_class($parametros), 1, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("delete"=>"style='display:none;'","update"=>"style='display:none;'","view"=>"style='display:none;'","set"=>"style='display:none;'"));
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html);  
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
-		$obvista->html = str_replace('{formulario_details}', '', $obvista->html);
-		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
-		$obvista->retornar_vista();
-		$detreq->get_all();*/
-		
 	}
 	
 	public function view_rpt(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$_REQUEST[$parametros->tableName().".COD_CIA"] = $_SESSION['cod_cia']; 
-		$_REQUEST[$parametros->tableName().".ANIO"] = date('Y');//2012;
-		//$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL','NOM_DEPTO','FECHA_ING','FECHA_AUTORIZADO','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','DESCRIPCION_PRIORIDAD');
-        $mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.CODDEPTO_SOL','DEPARTAMENTOS.NOM_DEPTO',$parametros->tableName().'.FECHA_ING',$parametros->tableName().'.FECHA_AUTORIZADO',$parametros->tableName().'.OBSERVACIONES',$parametros->tableName().'.PROYECTO',$parametros->tableName().'.ANIO',$parametros->tableName().'.COD_CAT',$parametros->tableName().'.TIPO_REQ','PRIORIDADES.DESCRIPCION_PRIORIDAD');
-        $masx=implode($mcampos, ",");
-		$data = $parametros->lis2(get_class($parametros), 2, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros));
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html); 
-		$obvista->html = str_replace('{formulario_details}', '', $obvista->html);  
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
-		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
-		$obvista->retornar_vista();*/
 	}
 	
 	public function get_ajax(){
 		$parametros = $this->set_obj();
-		/*if(isset($_REQUEST['COD_CAT']) && isset($_REQUEST['PROYECTO'])){
-			$lstproducto = $parametros->get_lsoption("PRODUCTOS", array("COD_PROD"=>"","NOMBRE"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "COD_CAT"=>"'".$_REQUEST['COD_CAT']."'"));
-			$presupuestoxcategoria= $parametros->disponibleporcategoria();
-			if($presupuestoxcategoria[0]['SALDO'] > 0){
-				$msjpresupuesto="";
-			}else{
-				$msjpresupuesto="Para la categoria Seleccionada, no dispone de Presupuesto! Categoria No.".$_REQUEST['COD_CAT'] ." saldo: " . $presupuestoxcategoria[0]['SALDO'];
-			}
-			$json_array=array("lstproducto"=>$lstproducto ,"msjpresupuesto"=>$msjpresupuesto,"valorsaldo"=>$presupuestoxcategoria[0]['SALDO']);
-			echo json_encode($json_array);	
-		}*/		
 	}
 
 }

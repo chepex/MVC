@@ -11,7 +11,7 @@ require_once('controller_pb_bancos.php');
 require_once('model_pb_prestamos.php');
 require_once('model_pb_definicion_ctas_banco.php');
 require_once('../core/render_view_generic.php');
-#Controlador de Requisicion
+#Controlador de pb_prestamos
 class controller_pb_prestamos extends pb_prestamos{
 	
 	#Definicion de Titulos de Objetos Html
@@ -105,14 +105,14 @@ class controller_pb_prestamos extends pb_prestamos{
 		}
 	}
 	
-	#Definicion de una instancia del Modelo del Controlador requisicion encabezado de la requisicion
+	#Definicion de una instancia del Modelo del Controlador pb_prestamos
 	public function set_obj() {
 		$obj = new pb_prestamos();
 		return $obj;
 	}
 	
 	
-	#Método que dibuja el formulario para la insercion del encabezado de la Requisicion
+	#Método que dibuja el formulario para la insercion del pb_prestamos
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -283,10 +283,11 @@ class controller_pb_prestamos extends pb_prestamos{
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
 		$datatable = $parametros->lista_tblamorteorica($_REQUEST['COD_CIA'], $_REQUEST['COD_PRESTAMO']);
+		$dataamorreal = $parametros->lista_tblamorreal($_REQUEST['COD_CIA'], $_REQUEST['COD_PRESTAMO']);
 		$html .="
 				<html>
 					<head>
-							<title>Tabla de Amortizaci&oacute;n Teorica Prestamo: ".$datadetrecibos[0]['REF_PRESTAMO']."</title>
+							<title>Tablas de Amortizaci&oacute;n Prestamo: ".$datadetrecibos[0]['REF_PRESTAMO']."</title>
 							<link rel='stylesheet' type='text/css' href='../site_media/css/bootstrap/css/bootstrap.css'/>
 							<script src='../site_media/js/jquery.js'></script>
 							<script src='../site_media/js/jquery.PrintArea.js'></script>
@@ -294,13 +295,13 @@ class controller_pb_prestamos extends pb_prestamos{
 					<body>
 						<center>
 							<a class='btn btn-primary' href='?ctl=".$_REQUEST['ctl']."&act=get_all' style='margin-top:1%;'><i class='icon-th-list icon-white'></i>&nbsp;Regresar Lista Prestamos</a>
-							<a class='btn btn-primary' id='btpartida' href='#' style='margin-top:1%;'><i class='icon-eye-open icon-white'></i>&nbsp;Ver Partida de Desembolso</a>
+							<a class='btn btn-primary' id='btpartida' href='#partidadesembolso' style='margin-top:1%;'><i class='icon-eye-open icon-white'></i>&nbsp;Ver Partida de Desembolso</a>
 						</center>
 						<div id='pb_tbamortizacion' class='PrintArea'>
 						<table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:10px;margin-top:3%;' align='center'>
 							<thead>
 								<tr>
-									<th colspan='14'><center>Tabla de Amortizaci&oacute;n teorica</center></th>
+									<th colspan='14'><center><h4>Tabla de Amortizaci&oacute;n Te&oacute;rica</h4></center></th>
 								</tr>
 								<tr>
 									<th>Num. Cuota</th>
@@ -368,8 +369,86 @@ class controller_pb_prestamos extends pb_prestamos{
 					}	
 				$html.="</tbody></table>";
 		$html .="	</div>
-					<br/><br/><br/>
-					<input type='hidden' id='COD_CIA' name='COD_CIA' value='".$_REQUEST['COD_CIA']."' />
+					<br/>";
+		$html .= "<div id='pb_tbamortizacionreal' class='PrintArea'>
+						<table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:10px;margin-top:3%;' align='center'>
+							<thead>
+								<tr>
+									<th colspan='14'><center><h4>Tabla de Amortizaci&oacute;n Real</h4></center></th>
+								</tr>
+								<tr>
+									<th>Num. Cuota</th>
+									<th>Referencia</th>
+									<th>Cr&eacute;dito</th>
+									<th>Bco.</th>
+									<th>Monto</th>
+									<th>Plazo</th>
+									<th>Apertura</th>
+									<th>F.Vcto.</th>
+									<th>F.Pago</th>
+									<th>%</th>
+									<th>Abono K</th>
+									<th>Interes N</th>
+									<th>Cuota</th>
+									<th>Saldo Capital</th>
+								</tr>
+							</thead><tbody>";
+					$acuamortizacion = 0;
+					foreach ($dataamorreal as $mks){
+							$acuamortizacion = $acuamortizacion + $mks["ABONO_AMORTIZACION"];
+							$saldo_capital = $mks["SALDO_CAPITALANT"] - $acuamortizacion;
+							$html .= "<tr class='tfl'>
+										<td>
+											".$mks["NUMERO_CUOTA"]."
+										</td>
+										 <td>
+											".$mks["REF_PRESTAMO"]."
+										</td>
+										<td>
+											".$mks["DESCRIPCION_TIPOCREDITO"]."
+										</td>
+										<td>
+											".$mks["NOM_BANCO"]."
+										</td>
+										<td>
+											".number_format($mks["MONTO_APROBADO"],2,'.',',')."
+										</td>
+										<td>
+											".$mks["PLAZO"]."
+										</td>
+										<td>
+											".$mks["FECHA_APERTURA"]."
+										</td>	
+										 <td>
+											".$mks["FECHA_VENCIMIENTO"]."
+										</td>
+										<td>
+											".$mks["FECHA_PAGO"]."
+										</td>
+										<td>
+											".$mks["TASA_INTERES"]."
+										</td>
+										<td>
+											".number_format($mks["ABONO_AMORTIZACION"],2,'.',',')."
+										</td>
+										<td>
+											".number_format($mks["ABONO_INTERES"],2,'.',',')."
+										</td>
+										<td>
+											".number_format($mks["VALOR_CUOTA"],2,'.',',')."
+										</td>		
+										<td>
+											".number_format($saldo_capital,2,'.',',')."
+										</td>								
+									</tr>";
+			
+					}	
+				$html.="</tbody></table>";
+		$html .="	</div>
+					<br/><br/><br/>";
+					
+					
+			$html.="<input type='hidden' id='COD_CIA' name='COD_CIA' value='".$_REQUEST['COD_CIA']."' />
 					<input type='hidden' id='COD_PRESTAMO' name='COD_PRESTAMO' value='".$_REQUEST['COD_PRESTAMO']."' />
 					<div id='partidadesembolso'></div>
 					</body>
@@ -551,9 +630,6 @@ class controller_pb_prestamos extends pb_prestamos{
 	public function viewproyeccion(){
 		$parametros = $this->set_obj();
 		$objproyeccion= $parametros->proyeccionsaldos($_REQUEST['FECHA_INI'],$_REQUEST['FECHA_FIN'],$_REQUEST['COD_BANCO']);	
-		/*echo"<pre>";
-			print_r($objproyeccion);
-		echo"</pre>";*/
 		$html ="<!DOCTYPE html>
 			<head>
 					<link rel='stylesheet' type='text/css' href='../site_media/css/bootstrap/css/bootstrap.css'/>

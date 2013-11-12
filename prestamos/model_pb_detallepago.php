@@ -18,12 +18,13 @@ class pb_detallepago extends DBAbstractModel {
     public $COD_CUOTA; 
     public $ABONO_INTERES; 
 	public $ABONO_AMORTIZACION;
+	public $FECHA_PAGO;
 
 
     ############################### ATRIBUTOS ################################
         public function atributos()
     {
-        $masx= array('COD_CIA','COD_DETPAGO','COD_DESGLOSE','COD_CUOTA','ABONO_INTERES','ABONO_AMORTIZACION');
+        $masx= array('COD_CIA','COD_DETPAGO','COD_DESGLOSE','COD_CUOTA','ABONO_INTERES','ABONO_AMORTIZACION','FECHA_PAGO');
         $masx=implode($masx, ",");
         return $masx;
     }

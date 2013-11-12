@@ -178,7 +178,7 @@ class controller_pb_bancos extends pb_bancos{
 						 $parametros->tableName().'.OBSERVACIONES',$parametros->tableName().'.NOM_CORTO');
         $masx=implode($mcampos, ",");
 		$data = $parametros->lis(get_class($parametros), 1, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros),"", array("view"=>"style='display:none;'"));
+		$rendertable = $parametros->render_table_crud(get_class($parametros),"", array("view"=>"style='display:none;'","update"=>"style='display:none;'","set"=>"style='display:none;'","delete"=>"style='display:none;'"));
 		$obvista->html = $obvista->get_template('template',get_class($parametros));
 		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
 		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html); 
@@ -198,46 +198,16 @@ class controller_pb_bancos extends pb_bancos{
 		if($_REQUEST['elemento']==3){
 			//retornar la lista de option de chequeras
 			echo $parametros->get_optionschequeras($_SESSION['cod_cia'], $_REQUEST['COD_BANCO'], $_REQUEST['COD_CUENTA']);
-		}
-		
-		
-		
+		}		
 	}
 	
 	public function view_rpt(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$_REQUEST[$parametros->tableName().".COD_CIA"] = $_SESSION['cod_cia']; 
-		$_REQUEST[$parametros->tableName().".ANIO"] = date('Y');//2012;
-		//$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL','NOM_DEPTO','FECHA_ING','FECHA_AUTORIZADO','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','DESCRIPCION_PRIORIDAD');
-        $mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.CODDEPTO_SOL','DEPARTAMENTOS.NOM_DEPTO',$parametros->tableName().'.FECHA_ING',$parametros->tableName().'.FECHA_AUTORIZADO',$parametros->tableName().'.OBSERVACIONES',$parametros->tableName().'.PROYECTO',$parametros->tableName().'.ANIO',$parametros->tableName().'.COD_CAT',$parametros->tableName().'.TIPO_REQ','PRIORIDADES.DESCRIPCION_PRIORIDAD');
-        $masx=implode($mcampos, ",");
-		$data = $parametros->lis2(get_class($parametros), 2, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros));
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html); 
-		$obvista->html = str_replace('{formulario_details}', '', $obvista->html);  
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
-		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
-		$obvista->retornar_vista();*/
 	}
 	
 	public function get_ajax(){
-		$parametros = $this->set_obj();
-		/*if(isset($_REQUEST['COD_CAT']) && isset($_REQUEST['PROYECTO'])){
-			$lstproducto = $parametros->get_lsoption("PRODUCTOS", array("COD_PROD"=>"","NOMBRE"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "COD_CAT"=>"'".$_REQUEST['COD_CAT']."'"));
-			$presupuestoxcategoria= $parametros->disponibleporcategoria();
-			if($presupuestoxcategoria[0]['SALDO'] > 0){
-				$msjpresupuesto="";
-			}else{
-				$msjpresupuesto="Para la categoria Seleccionada, no dispone de Presupuesto! Categoria No.".$_REQUEST['COD_CAT'] ." saldo: " . $presupuestoxcategoria[0]['SALDO'];
-			}
-			$json_array=array("lstproducto"=>$lstproducto ,"msjpresupuesto"=>$msjpresupuesto,"valorsaldo"=>$presupuestoxcategoria[0]['SALDO']);
-			echo json_encode($json_array);	
-		}*/		
+		$parametros = $this->set_obj();		
 	}
 
 }

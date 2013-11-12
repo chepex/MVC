@@ -7,7 +7,7 @@ ini_set('memory_limit', '-1');
 ini_set('max_execution_time', 300);
 require_once('model_pb_estados.php');
 require_once('../core/render_view_generic.php');
-#Controlador de Requisicion
+#Controlador de pb_estados
 class controller_pb_estados extends pb_estados{
 	
 	#Definicion de Titulos de Objetos Html
@@ -94,14 +94,14 @@ class controller_pb_estados extends pb_estados{
 		}
 	}
 	
-	#Definicion de una instancia del Modelo del Controlador requisicion encabezado de la requisicion
+	#Definicion de una instancia del Modelo del Controlador pb_estados
 	public function set_obj() {
 		$obj = new pb_estados();
 		return $obj;
 	}
 	
 	
-	#Método que dibuja el formulario para la insercion del encabezado de la Requisicion
+	#Método que dibuja el formulario para la insercion de pb_estados
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();

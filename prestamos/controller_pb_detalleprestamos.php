@@ -7,7 +7,7 @@ ini_set('memory_limit', '-1');
 ini_set('max_execution_time', 300);
 require_once('model_pb_detalleprestamos.php');
 require_once('../core/render_view_generic.php');
-#Controlador de Requisicion
+#Controlador de pb_detalleprestamos
 class controller_pb_detalleprestamos extends pb_detalleprestamos{
 	
 	#Definicion de Titulos de Objetos Html
@@ -101,7 +101,7 @@ class controller_pb_detalleprestamos extends pb_detalleprestamos{
 	}
 	
 	
-	#Método que dibuja el formulario para la insercion del encabezado de la Requisicion
+	#Método que dibuja el formulario para la insercion del detalle de prestamos
 	public function set(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -122,7 +122,7 @@ class controller_pb_detalleprestamos extends pb_detalleprestamos{
 		$obvista->retornar_vista();
 	}
 	
-	#Método generico definido en el controlador, no se utiliza
+	#Método generico definido en el controlador, de vuelve un conjunto de campos del detalle de prestamos
 	public function get(){
 		$parametros = $this->set_obj();
 		$objcuota = $parametros->crea_objeto(array($this->tableName()),'',array("COD_CIA=".$_SESSION['cod_cia'],"COD_PRESTAMO=".$_REQUEST['COD_PRESTAMO'],"NUMERO_CUOTA=".$_REQUEST['NUMERO_CUOTA']));
@@ -133,13 +133,10 @@ class controller_pb_detalleprestamos extends pb_detalleprestamos{
 				   "SALDO_CAPITAL"=>$objcuota[0]['SALDO_CAPITAL'],
 				   "COD_CUOTA"=>$objcuota[0]['COD_CUOTA']
 				   );
-		/*echo"<pre>";
-			print_r($dataArray);
-		echo"</pre>";*/
 		echo json_encode($dataArray);
 	}
 	
-	#Método que elimina el detalle de la requisicion, sino tiene detalle
+	#Método que elimina el detalle del detalle del prestamo
 	public function delete(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
@@ -211,71 +208,16 @@ class controller_pb_detalleprestamos extends pb_detalleprestamos{
 	public function view(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$detreq = new controller_reqdet();
-		//$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL', 'NOM_DEPTO','FECHA_ING','FECHA_AUTORIZADO','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','DESCRIPCION_PRIORIDAD');
-        $mcampos = array($parametros->tableName().'.COD_CIA',
-						 $parametros->tableName().'.NUM_REQ',
-						 $parametros->tableName().'.CODDEPTO_SOL',
-						 'DEPARTAMENTOS.NOM_DEPTO',
-						 $parametros->tableName().'.FECHA_ING',
-						 $parametros->tableName().'.FECHA_AUTORIZADO',
-						 $parametros->tableName().'.OBSERVACIONES',
-						 $parametros->tableName().'.PROYECTO',
-						 $parametros->tableName().'.ANIO',
-						 $parametros->tableName().'.COD_CAT',
-						 $parametros->tableName().'.TIPO_REQ',
-						 'PRIORIDADES.DESCRIPCION_PRIORIDAD'
-						);
-        $masx=implode($mcampos, ",");
-		$data = $parametros->lis2(get_class($parametros), 1, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros),'',array("delete"=>"style='display:none;'","update"=>"style='display:none;'","view"=>"style='display:none;'","set"=>"style='display:none;'"));
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html);  
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
-		$obvista->html = str_replace('{formulario_details}', '', $obvista->html);
-		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
-		$obvista->retornar_vista();
-		$detreq->get_all();*/
 		
 	}
 	
 	public function view_rpt(){
 		$parametros = $this->set_obj();
 		$obvista = new view_Parametros();
-		/*$_REQUEST[$parametros->tableName().".COD_CIA"] = $_SESSION['cod_cia']; 
-		$_REQUEST[$parametros->tableName().".ANIO"] = date('Y');//2012;
-		//$mcampos = array('COD_CIA','NUM_REQ','CODDEPTO_SOL','NOM_DEPTO','FECHA_ING','FECHA_AUTORIZADO','OBSERVACIONES','PROYECTO','ANIO','COD_CAT','TIPO_REQ','DESCRIPCION_PRIORIDAD');
-        $mcampos = array($parametros->tableName().'.COD_CIA',$parametros->tableName().'.NUM_REQ',$parametros->tableName().'.CODDEPTO_SOL','DEPARTAMENTOS.NOM_DEPTO',$parametros->tableName().'.FECHA_ING',$parametros->tableName().'.FECHA_AUTORIZADO',$parametros->tableName().'.OBSERVACIONES',$parametros->tableName().'.PROYECTO',$parametros->tableName().'.ANIO',$parametros->tableName().'.COD_CAT',$parametros->tableName().'.TIPO_REQ','PRIORIDADES.DESCRIPCION_PRIORIDAD');
-        $masx=implode($mcampos, ",");
-		$data = $parametros->lis2(get_class($parametros), 2, $masx);
-		$rendertable = $parametros->render_table_crud(get_class($parametros));
-		$obvista->html = $obvista->get_template('template',get_class($parametros));
-		$obvista->html = str_replace('{subtitulo}', $this->diccionario['subtitle']['listar'], $obvista->html);
-		$obvista->html = str_replace('{formulario}', $obvista->get_template('listar',get_class($parametros)), $obvista->html); 
-		$obvista->html = str_replace('{formulario_details}', '', $obvista->html);  
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['form_actions']);
-		$obvista->html = $obvista->render_dinamic_data($obvista->html, $this->diccionario['links_menu']);
-		$obvista->html = str_replace('{Detalle}', $rendertable, $obvista->html);
-		$obvista->html = str_replace('{mensaje}', $mensaje, $obvista->html);
-		$obvista->retornar_vista();*/
 	}
 	
 	public function get_ajax(){
-		$parametros = $this->set_obj();
-		/*if(isset($_REQUEST['COD_CAT']) && isset($_REQUEST['PROYECTO'])){
-			$lstproducto = $parametros->get_lsoption("PRODUCTOS", array("COD_PROD"=>"","NOMBRE"=>""), array("COD_CIA"=>$_SESSION['cod_cia'], "COD_CAT"=>"'".$_REQUEST['COD_CAT']."'"));
-			$presupuestoxcategoria= $parametros->disponibleporcategoria();
-			if($presupuestoxcategoria[0]['SALDO'] > 0){
-				$msjpresupuesto="";
-			}else{
-				$msjpresupuesto="Para la categoria Seleccionada, no dispone de Presupuesto! Categoria No.".$_REQUEST['COD_CAT'] ." saldo: " . $presupuestoxcategoria[0]['SALDO'];
-			}
-			$json_array=array("lstproducto"=>$lstproducto ,"msjpresupuesto"=>$msjpresupuesto,"valorsaldo"=>$presupuestoxcategoria[0]['SALDO']);
-			echo json_encode($json_array);	
-		}*/		
+		$parametros = $this->set_obj();	
 	}
 
 }
