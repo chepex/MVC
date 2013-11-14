@@ -187,7 +187,7 @@ class controller_pb_lineascredito extends pb_lineascredito{
 		$_REQUEST["filtro"]="NO";
 		$mcampos = array($parametros->tableName().".COD_CIA",$parametros->tableName().".COD_LINEA",
 						 $parametros->tableName().".NUM_REFLINEA","BANCOS.NOM_BANCO",
-						 "PB_TIPOS_CREDITOS.DESCRIPCION_TIPOCREDITO",$parametros->tableName().".TECHO_LINEA","PB_ESTADOS.DESCRIPCION_ESTADO",
+						 "PB_TIPOS_CREDITOS.DESCRIPCION_TIPOCREDITO","TO_CHAR (".$parametros->tableName().".TECHO_LINEA, '9G999G999G999D99')","PB_ESTADOS.DESCRIPCION_ESTADO",
 						 $parametros->tableName().".FECHA_APERTURA",$parametros->tableName().".FECHA_VENCIMIENTO",
 						 $parametros->tableName().".DESTINO",$parametros->tableName().".DESCRIPCION_FORMA_PAGO",
 						 $parametros->tableName().".DESCRIPCION_GARANTIAS",$parametros->tableName().".MOTIVOS_CADUCIDAD");

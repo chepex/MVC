@@ -92,6 +92,18 @@ class pb_provisioninteres extends DBAbstractModel {
 		$this->get_results_from_query();
         return $this->rows;
 	}
+	
+	public function verificarprovision($COD_CIA, $MES_PROVISION, $ANIO_PROVISION){
+		$this->rows=array();
+		$this->query="SELECT   COUNT ( * ), PROVISION_CERRADA
+						FROM   PB_PROVISIONINTERES
+							WHERE   MES_PROVISION = '".$MES_PROVISION."' 
+									AND ANIO_PROVISION = '".$ANIO_PROVISION."'
+									AND COD_CIA = ". $COD_CIA ."
+						GROUP BY PROVISION_CERRADA";
+		$this->get_results_from_query();
+        return $this->rows;
+	}
 		
 	
 }

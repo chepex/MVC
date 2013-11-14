@@ -167,10 +167,6 @@
 							$('#imprime').removeClass( "btn-primary" ).addClass( "btn" );
 							$('#btnliscuotas').removeClass( "btn-primary" ).addClass( "btn" );
 							$('#btn-save-enc').removeClass( "btn-primary" ).addClass( "btn" );
-							/*$('#btn-save-det').removeAttr("disabled");
-							
-							$('#btn-save-det').removeClass( "btn" ).addClass( "btn btn-primary" ); 
-							$('#formulario-details').toggle();*/
 						},
 				error : 
 						function(xhr, status) {
@@ -194,21 +190,6 @@
 		var num_fila= $(this).attr("NUMID");
 		$('#btn_addx_'+num_fila).removeAttr("disabled");
 		$("#btn-save-enc").css("display","inline");
-		/*if($("#MONTO_DISP_PAGO").val().length > 0 && $("#MONTO_DISP_PAGO").val() > 0){
-			var disponible = parseFloat($("#MONTO_DISP_PAGO").val());
-			var cuota = $(this).attr("VALOR_CUOTA");
-			var num_chk = $(this).attr("NUM_CHK");
-			if(disponible >= cuota){
-				disponible = disponible - cuota;
-				$("#MONTO_DISP_PAGO").val(disponible.toFixed(2));
-			}else{
-				$("#ABONO_CUOTA_"+ num_chk).val(disponible.toFixed(2));
-				disponible =disponible - disponible;
-				$("#MONTO_DISP_PAGO").val(disponible.toFixed(2));
-			}
-			
-		}
-		//alert($(this).attr("VALOR_CUOTA"));*/
 	});
 	
 	$(".addx").live("click",function(){

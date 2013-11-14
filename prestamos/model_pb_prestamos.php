@@ -228,5 +228,23 @@ class pb_prestamos extends DBAbstractModel {
             return $this->rows ;
     }
 	
+	#Devuelve un Arreglo con los pagos a vencer
+	public function pagosxvencer($FECHA_INICIAL, $FECHA_FINAL){
+		$this->rows = array();
+		 $this->query = "SELECT   REF_PRESTAMO,
+								  NUMERO_CUOTA,
+								  VALOR_CUOTA,
+								  SALDO_CUOTA,
+								  VALOR_INTERES,
+								  VALOR_AMORTIZACION,
+								  FECHA_PAGO,
+								  SALDO_CAPITALANT
+						FROM   VWSALDO_CUOTAS
+						WHERE   FECHA_PAGO BETWEEN '".$FECHA_INICIAL."' AND '".$FECHA_FINAL."'
+							AND SALDO_CUOTA <> 0
+						ORDER BY   FECHA_PAGO";
+            $this->get_results_from_query();
+        return $this->rows ;
+	}
 }
 ?>

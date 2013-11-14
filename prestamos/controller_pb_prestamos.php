@@ -264,7 +264,7 @@ class controller_pb_prestamos extends pb_prestamos{
 						 $parametros->tableName().".REF_PRESTAMO","BANCOS.NOM_BANCO",
 						 $parametros->tableName().".FECHA_APERTURA",$parametros->tableName().".FECHA_VENCIMIENTO",
 						 $parametros->tableName().".PLAZO",$parametros->tableName().".TASA_INTERES",
-						 $parametros->tableName().".MONTO_APROBADO",$parametros->tableName().".VALOR_CUOTA",
+						 "TO_CHAR (".$parametros->tableName().".MONTO_APROBADO, '9G999G999D99')","TO_CHAR (".$parametros->tableName().".VALOR_CUOTA, '9G999G999D99')",
 						 "PB_ESTADOS.DESCRIPCION_ESTADO","PB_LINEASCREDITO.NUM_REFLINEA");
         $masx=implode($mcampos, ",");
 		$data = $parametros->lis2(get_class($parametros), 3, $masx);
@@ -370,6 +370,7 @@ class controller_pb_prestamos extends pb_prestamos{
 				$html.="</tbody></table>";
 		$html .="	</div>
 					<br/>";
+	if(count($dataamorreal) > 0){
 		$html .= "<div id='pb_tbamortizacionreal' class='PrintArea'>
 						<table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:10px;margin-top:3%;' align='center'>
 							<thead>
@@ -446,7 +447,7 @@ class controller_pb_prestamos extends pb_prestamos{
 				$html.="</tbody></table>";
 		$html .="	</div>
 					<br/><br/><br/>";
-					
+	 }		
 					
 			$html.="<input type='hidden' id='COD_CIA' name='COD_CIA' value='".$_REQUEST['COD_CIA']."' />
 					<input type='hidden' id='COD_PRESTAMO' name='COD_PRESTAMO' value='".$_REQUEST['COD_PRESTAMO']."' />
@@ -709,6 +710,54 @@ class controller_pb_prestamos extends pb_prestamos{
 		$parametros = $this->set_obj();
 		$detprestamo = new controller_pb_detalleprestamos();
 		echo$detprestamo->generar_tablaamortizacion();
+	}
+	
+	public function pagosavencer(){
+		$diadehoy = date('d/m/Y');//"15/10/2013";
+		$fecha =  str_replace('/', '-', $diadehoy);
+		$hoymasquince = new DateTime(date('Y-m-d',strtotime($fecha)));
+		$hoymasquince->modify('+15 day');
+		$dataarray = $this->pagosxvencer($diadehoy, $hoymasquince->format('d/m/Y'));
+		$html .="<br/><br/><table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:12px;'>
+					<thead>
+						<tr>
+							<th colspan='8'><center><h4>Pagos Pr&oacute;ximos a vencer, entre el: ".$diadehoy." y el ".$hoymasquince->format('d/m/Y')."</h4></center></th>
+						</tr>
+						<tr>
+							<th>Referencia</th>
+							<th>Num. Cuota</th>
+							<th>Valor Cuota</th>
+							<th>Saldo Cuota</th>
+							<th>Interes</th>
+							<th>Amortizacion</th>
+							<th>Fecha Pago</th>
+							<th>Saldo Capital</th>
+						</tr>
+					</thead>
+					<tbody>";
+		foreach($dataarray as $pagopendiente){
+			$html .="<tr>
+						<td>".$pagopendiente['REF_PRESTAMO']."</td>
+						<td>".$pagopendiente['NUMERO_CUOTA']."</td>
+						<td>".number_format($pagopendiente['VALOR_CUOTA'],2,'.',',')."</td>
+						<td>".number_format($pagopendiente['SALDO_CUOTA'],2,'.',',')."</td>
+						<td>".number_format($pagopendiente['VALOR_INTERES'],2,'.',',')."</td>
+						<td>".number_format($pagopendiente['VALOR_AMORTIZACION'],2,'.',',')."</td>
+						<td>".$pagopendiente['FECHA_PAGO']."</td>
+						<td>".number_format($pagopendiente['SALDO_CAPITALANT'],2,'.',',')."</td>
+					</tr>";
+					$acucuota = $acucuota + $pagopendiente['SALDO_CUOTA'];
+		}
+		$html .="</tbody>
+				<tfoot>
+					<tr>
+						<th colspan='3'><p style='float:right;'>Saldo por Pagar</p></th>
+						<th colspan='5'>".number_format($acucuota,2,'.',',')."</th>
+					</tr>
+				</tfoot>
+				</table>";
+		return $html;
+		//echo"<font color='red'><h1>dia de hoy:".$diadehoy."<br/>dentro de 15 dia:".$hoymasquince->format('d/m/Y')."</h1></font>";
 	}
 
 }
