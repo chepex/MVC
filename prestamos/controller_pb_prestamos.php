@@ -715,16 +715,30 @@ class controller_pb_prestamos extends pb_prestamos{
 	public function pagosavencer(){
 		$diadehoy = date('d/m/Y');//"15/10/2013";
 		$fecha =  str_replace('/', '-', $diadehoy);
+		$hoy = new DateTime(date('Y-m-d',strtotime($fecha)));
+		$dentrodecinco = new DateTime(date('Y-m-d',strtotime($fecha)));
+		$dentrodediez = new DateTime(date('Y-m-d',strtotime($fecha)));
 		$hoymasquince = new DateTime(date('Y-m-d',strtotime($fecha)));
+		$dentrodecinco->modify('+5 day');
+		$dentrodediez->modify('+10 day');
 		$hoymasquince->modify('+15 day');
 		$dataarray = $this->pagosxvencer($diadehoy, $hoymasquince->format('d/m/Y'));
-		$html .="<br/><br/><table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:12px;'>
+		$html .="<br/><br/>
+		<style>
+			.colorrojo{
+				background-color:#FF0000;
+				font-color: #FFFFFF;
+			}
+		</style>
+		<table class='table' border='0.5px' bordercolor='#585858' style='font-size:12px;'>
 					<thead>
 						<tr>
 							<th colspan='8'><center><h4>Pagos Pr&oacute;ximos a vencer, entre el: ".$diadehoy." y el ".$hoymasquince->format('d/m/Y')."</h4></center></th>
 						</tr>
 						<tr>
 							<th>Referencia</th>
+							<th>Banco</th>
+							<th>Tipo Cred.</th>
 							<th>Num. Cuota</th>
 							<th>Valor Cuota</th>
 							<th>Saldo Cuota</th>
@@ -736,8 +750,20 @@ class controller_pb_prestamos extends pb_prestamos{
 					</thead>
 					<tbody>";
 		foreach($dataarray as $pagopendiente){
-			$html .="<tr>
+			$fecha_pago = new DateTime(date('Y-m-d',strtotime($pagopendiente['FECHA_PAGO'])));
+			if(($fecha_pago->format('d/m/Y') <= $dentrodecinco->format('d/m/Y')) and ($fecha_pago->format('d/m/Y') >= $hoy->format('d/m/Y'))){
+				$classtr = "class='error'";
+			}elseif(($fecha_pago->format('d/m/Y') > $dentrodecinco->format('d/m/Y')) and ($fecha_pago->format('d/m/Y') <= $dentrodediez->format('d/m/Y')) and ($fecha_pago->format('d/m/Y') >= $hoy->format('d/m/Y'))){
+				$classtr = "class='warning'";
+			}elseif(($fecha_pago->format('d/m/Y') > $dentrodediez->format('d/m/Y')) and ($fecha_pago->format('d/m/Y') <= $hoymasquince->format('d/m/Y')) and ($fecha_pago->format('d/m/Y') >= $hoy->format('d/m/Y'))){
+				$classtr = "class='success'";
+			}elseif($fecha_pago->format('d/m/Y') < $hoy->format('d/m/Y')){
+				$classtr = "class='colorrojo'";
+			}
+			$html .="<tr ".$classtr.">
 						<td>".$pagopendiente['REF_PRESTAMO']."</td>
+						<td>".$pagopendiente['NOM_CORTO']."</td>
+						<td>".$pagopendiente['DESCRIPCION_TIPOCREDITO']."</td>
 						<td>".$pagopendiente['NUMERO_CUOTA']."</td>
 						<td>".number_format($pagopendiente['VALOR_CUOTA'],2,'.',',')."</td>
 						<td>".number_format($pagopendiente['SALDO_CUOTA'],2,'.',',')."</td>
@@ -751,13 +777,12 @@ class controller_pb_prestamos extends pb_prestamos{
 		$html .="</tbody>
 				<tfoot>
 					<tr>
-						<th colspan='3'><p style='float:right;'>Saldo por Pagar</p></th>
-						<th colspan='5'>".number_format($acucuota,2,'.',',')."</th>
+						<th colspan='5'><p style='float:right;'>Saldo por Pagar</p></th>
+						<th colspan='3'>".number_format($acucuota,2,'.',',')."</th>
 					</tr>
 				</tfoot>
 				</table>";
 		return $html;
-		//echo"<font color='red'><h1>dia de hoy:".$diadehoy."<br/>dentro de 15 dia:".$hoymasquince->format('d/m/Y')."</h1></font>";
 	}
 
 }

@@ -232,6 +232,8 @@ class pb_prestamos extends DBAbstractModel {
 	public function pagosxvencer($FECHA_INICIAL, $FECHA_FINAL){
 		$this->rows = array();
 		 $this->query = "SELECT   REF_PRESTAMO,
+								  NOM_CORTO,
+								  DESCRIPCION_TIPOCREDITO,
 								  NUMERO_CUOTA,
 								  VALOR_CUOTA,
 								  SALDO_CUOTA,
@@ -240,7 +242,7 @@ class pb_prestamos extends DBAbstractModel {
 								  FECHA_PAGO,
 								  SALDO_CAPITALANT
 						FROM   VWSALDO_CUOTAS
-						WHERE   FECHA_PAGO BETWEEN '".$FECHA_INICIAL."' AND '".$FECHA_FINAL."'
+						WHERE   FECHA_PAGO <= '".$FECHA_FINAL."'
 							AND SALDO_CUOTA <> 0
 						ORDER BY   FECHA_PAGO";
             $this->get_results_from_query();

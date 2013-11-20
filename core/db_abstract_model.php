@@ -31,8 +31,10 @@ abstract class DBAbstractModel {
 			$this->error= "No se realizó la conexión";
 			die('Aun no ha iniciado session');
 		}
+		$usuario= $_SESSION['usuario'];
+		$clave =  $_SESSION['clave'];
 		$db = ADONewConnection('oci8'); 
-		$db->Connect(self::$db_host, self::$db_user,  self::$db_pass,  self::$db_name);
+		$db->Connect(self::$db_host, $usuario,  $clave,  self::$db_name);
 		$db->debug = $this->debug;
 		if (!$db){
 			$this->error= "No se realizó la conexión";
