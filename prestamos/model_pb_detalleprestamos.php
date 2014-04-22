@@ -159,6 +159,7 @@ class pb_detalleprestamos extends DBAbstractModel {
 				}elseif($findesemana==1){
 					$fecha->modify('-1 day');
 				}
+				$findesemana = 2;
 			}
 	
 			//$monto_interes= ($saldo_capital * $tasa_interes * ($this->diferencia_dias($fecha_anterior, $fecha->format('d/m/Y')))) / $this->es_bisiesto($fecha->format('Y'));
@@ -272,6 +273,7 @@ class pb_detalleprestamos extends DBAbstractModel {
 					}elseif($findesemana==1){
 						$fecha->modify('-1 day');
 					}
+					$findesemana = 2;
 				}
 	
 				//$monto_interes= ($saldo_capital * $tasa_interes * ($this->diferencia_dias($fecha_anterior, $fecha->format('d/m/Y')))) / $this->es_bisiesto($fecha->format('Y'));

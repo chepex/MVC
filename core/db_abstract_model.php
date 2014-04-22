@@ -690,7 +690,11 @@ abstract class DBAbstractModel {
 	 * 
 	 * */
 	public function diferencia_dias($fecha1, $fecha2){
-		//defino fecha 1
+		$this->rows=array();
+		$this->query="SELECT TO_DATE('".$fecha2."') - TO_DATE('".$fecha1."') DIFERENCIA_DIAS  FROM DUAL";
+		$this->get_results_from_query();
+		$dias_diferencia = $this->rows[0]['DIFERENCIA_DIAS'];
+		/*//defino fecha 1
 		$explode_fecha1= explode("/",$fecha1);
 		$ano1 = $explode_fecha1[2];
 		$mes1 = $explode_fecha1[1];
@@ -717,7 +721,7 @@ abstract class DBAbstractModel {
 		$dias_diferencia = abs($dias_diferencia);
 
 		//quito los decimales a los días de diferencia
-		$dias_diferencia = floor($dias_diferencia);
+		$dias_diferencia = floor($dias_diferencia);*/
 
 		return $dias_diferencia; 
 	}
