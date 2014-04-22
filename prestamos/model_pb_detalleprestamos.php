@@ -117,7 +117,7 @@ class pb_detalleprestamos extends DBAbstractModel {
 							<td>".number_format(round($amortizacion_capital,2), 2, '.', ',')."</td>
 							<td>".number_format(round($saldo_capital,2), 2, '.', ',')."</td>
 							<td>".number_format(round($valcuota,2), 2, '.', ',') ."</td>
-							<td>".$fecha->format('d/m/Y')."</td>
+							<td>".$fecha->format('d/m/Y'). "-X-". $this->diferencia_dias($fecha_anterior, $fecha->format('d/m/Y')) ."</td>
 						</tr>";
 			}else{
 				$valcuota = ($tipo_tabla == 0) ? $valor_cuota :  ($amortizacion_capital + $monto_interes);
@@ -150,9 +150,12 @@ class pb_detalleprestamos extends DBAbstractModel {
 				}elseif($findesemana==1){
 					$fecha->modify('-1 day');
 				}
-				
 			}else{
-				$fecha->modify('+30 day');
+					if(date_format($fecha,'m')=="02"){
+						$fecha->modify('+28 day');
+					}else{
+						$fecha->modify('+30 day');
+					}
 				$findesemana = $this->es_findesemana($fecha->format('Y-m-d'));
 				if($findesemana==0){
 					$fecha->modify('-2 day');
@@ -266,7 +269,11 @@ class pb_detalleprestamos extends DBAbstractModel {
 					}
 					
 				}else{
-					$fecha->modify('+30 day');
+					if(date_format($fecha,'m')=="02"){
+						$fecha->modify('+28 day');
+					}else{
+						$fecha->modify('+30 day');
+					}
 					$findesemana = $this->es_findesemana($fecha->format('Y-m-d'));
 					if($findesemana==0){
 						$fecha->modify('-2 day');
