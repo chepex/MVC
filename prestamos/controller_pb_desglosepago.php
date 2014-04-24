@@ -140,16 +140,17 @@ class controller_pb_desglosepago extends pb_desglosepago{
 		$_REQUEST['COD_CIA'] = $_SESSION['cod_cia'];
 		$_REQUEST['COD_DETDESGLOSE'] = $this->nextval_seqdet();
 		
-		$objcuota = $parametros->crea_objeto(array("pb_detalleprestamos"),"", array("COD_CIA=".$_SESSION['cod_cia'], "COD_CUOTA=".$_REQUEST['COD_CUOTA']));
+		$INTERES_AFECHA = $_REQUEST['INTERES_AFECHA'];
+		//$objcuota = $parametros->crea_objeto(array("pb_detalleprestamos"),"", array("COD_CIA=".$_SESSION['cod_cia'], "COD_CUOTA=".$_REQUEST['COD_CUOTA']));
 		$objprovision = $parametros->crea_objeto(array("pb_provisioninteres"),"", array("COD_CIA=".$_SESSION['cod_cia'], "COD_CUOTA=".$_REQUEST['COD_CUOTA']), array("pb_provisioninteres.VALOR_PROVISION"));
 		$objpagado = $parametros->crea_objeto(array("pb_desglosepago"),"", array("COD_CIA=".$_SESSION['cod_cia'], "COD_CUOTA=".$_REQUEST['COD_CUOTA']), array("nvl(sum(pb_desglosepago.VALOR_PROVISION),0) ABONOS_PROVISION", "nvl(sum(pb_desglosepago.VALOR_GASTO),0) ABONOS_GASTO", "nvl(sum(pb_desglosepago.VALOR_CAPITAL),0) ABONOS_CAPITAL"));
 		$tinterespagado = $objpagado[0]['ABONOS_PROVISION'] + $objpagado[0]['ABONOS_GASTO'];
 		//Si en ningun desglose de pago se ha pagado interes, o no se ha realizado pagos para cuota
 		if($tinterespagado == 0){
 			//Si el lo abonado es mayor que el Valor de interes de la cuota
-			if($_REQUEST['VALOR_ABONO'] > $objcuota[0]['VALOR_INTERES']){
-				$_REQUEST['VALOR_CAPITAL'] =  $_REQUEST['VALOR_ABONO'] - $objcuota[0]['VALOR_INTERES'];
-				$_REQUEST['VALOR_GASTO'] = $objcuota[0]['VALOR_INTERES'] - $objprovision[0]['VALOR_PROVISION']; 
+			if($_REQUEST['VALOR_ABONO'] > $INTERES_AFECHA){
+				$_REQUEST['VALOR_CAPITAL'] =  $_REQUEST['VALOR_ABONO'] - $INTERES_AFECHA;
+				$_REQUEST['VALOR_GASTO'] = $INTERES_AFECHA - $objprovision[0]['VALOR_PROVISION']; 
 				$_REQUEST['VALOR_PROVISION'] = $objprovision[0]['VALOR_PROVISION']; 
 			//Si el valor a abonar es menor que el valor de los intereses, no se abona nada a capital
 			}else{
@@ -165,12 +166,12 @@ class controller_pb_desglosepago extends pb_desglosepago{
 				}
 			}
 		}else{
-			if($tinterespagado == $objcuota[0]['VALOR_INTERES']){
+			if($tinterespagado == $INTERES_AFECHA){
 				$_REQUEST['VALOR_CAPITAL'] = $_REQUEST['VALOR_ABONO'];
 				$_REQUEST['VALOR_GASTO'] = 0;
 				$_REQUEST['VALOR_PROVISION'] = 0;
 			}else{
-				$restaxpogarinteres = $objcuota[0]['VALOR_INTERES'] - $tinterespagado;
+				$restaxpogarinteres = $INTERES_AFECHA - $tinterespagado;
 				if($_REQUEST['VALOR_ABONO'] > $restaxpogarinteres){
 					$_REQUEST['VALOR_CAPITAL'] = $_REQUEST['VALOR_ABONO'] - $restaxpogarinteres ;
 					if($objpagado[0]['ABONOS_PROVISION'] == $objprovision[0]['VALOR_PROVISION']){

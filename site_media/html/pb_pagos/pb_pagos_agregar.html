@@ -64,7 +64,7 @@
 								</div>-->
 							</td>
 							<td>
-								<a class='btn btn-primary' href="#" id="imprime" style='display:none;float:right;'><i class='icon-print icon-white'></i>&nbsp;Imprimir Resumen</a>
+								<!--<a class='btn btn-primary' href="#" id="imprime" style='display:none;float:right;'><i class='icon-print icon-white'></i>&nbsp;Imprimir Resumen</a>-->
 								<br/>
 								<div id='resumenpago' class='PrintArea'></div>
 							</td>
@@ -203,11 +203,12 @@
 			var tipo_documento = $("#PAGOX_"+NUMCORRE).val();
 			var fecha_pago = $("#FECHA_PAGO").val();
 			var cod_desglose = $("#COD_DESGLOSE").val();
+			var valor_interes = parseFloat($("#VALINTERES_"+NUMCORRE).val());
 			var chequera='';
 			if(tipo_documento=='CH'){
 				chequera=$("#CHEQUERAX_"+NUMCORRE).val();
 			}
-			if(cuota==0 || pagobanco > cuota){
+			if(cuota==0){
 				$("#mensaje2").html("<h6>Cuota ya fue cubierta con el desglose de los pagos!<br/> &Oacute; Valor de Disponible del Banco es Mayor que Valor de la Cuota</h6>");
 				$("#mensaje2").focus();
 				$("#mensaje2").show('slow').delay(3000).fadeOut('slow');
@@ -216,7 +217,7 @@
 				return false;
 			}
 			$.ajax({
-				url : 'index.php?ctl=controller_pb_desglosepago&COD_CUOTA='+ cod_cuota + '&COD_BANCO='+ cod_banco + '&COD_CUENTA=' + cod_cuenta + '&TIPO_DOCUMENTO='+ tipo_documento + '&SECUENCIA='+ chequera + '&VALOR_ABONO='+pagobanco + '&FECHA_PAGO=' + fecha_pago + '&COD_DESGLOSE=' + cod_desglose + '&NUMID='+NUMCORRE ,     
+				url : 'index.php?ctl=controller_pb_desglosepago&COD_CUOTA='+ cod_cuota + '&COD_BANCO='+ cod_banco + '&COD_CUENTA=' + cod_cuenta + '&TIPO_DOCUMENTO='+ tipo_documento + '&SECUENCIA='+ chequera + '&VALOR_ABONO='+pagobanco + '&FECHA_PAGO=' + fecha_pago + '&COD_DESGLOSE=' + cod_desglose + '&NUMID='+NUMCORRE + '&INTERES_AFECHA=' + valor_interes ,     
 				data : { act : 'insert' },
 				type : 'POST',     
 				success : 
@@ -236,6 +237,9 @@
 			});
 			
 			var valorabono = parseFloat(cuota - pagobanco);
+			if(valorabono < 0){
+				valorabono = 0;
+			}
 			$("#XCUBRIR_"+NUMCORRE).val(valorabono.toFixed(2));
 			var pagobanco = parseFloat($("#DISPONBAN_"+NUMCORRE).val(0));
 			$("#DISPONBAN_"+NUMCORRE).focus();

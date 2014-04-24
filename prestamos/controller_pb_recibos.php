@@ -148,7 +148,7 @@ class controller_pb_recibos extends pb_recibos{
 			$_REQUEST['VALOR_RECIBO'] = $desglose['VALOR_RECIBO'];
 			$parametros->save(get_class($parametros));
 			$datadetdesglose = array();
-			$ctacorriente = $definicionctas->cuenta_corrientebanco($desglose['COD_CIA'], $desglose['COD_BANCO']);
+			$ctacorriente = $definicionctas->cuenta_corrientebanco($desglose['COD_CIA'], $desglose['COD_BANCO'], 5);
 			$_REQUEST['COD_DETRECIBO'] = $detrecibo->nextval_seq();
 			//$_REQUEST['COD_CUOTA'] = $detdesglose['COD_CUOTA'];
 			$_REQUEST['CTA_1'] = $ctacorriente[0]['CTA_1'];

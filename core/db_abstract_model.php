@@ -279,7 +279,7 @@ abstract class DBAbstractModel {
 		}
 		
 			$xx=implode(",", $array);
-			$this->query="INSERT INTO ".$tabla."(".$campos.")VALUES(".$xx.")";					
+			$this->query="INSERT INTO ".$tabla."(".$campos.")VALUES(".$xx.")";				
 			$this->execute_single_query();			
 			if($this->error==""){
 				$this->mensaje= "Registro Insertado Correctamente";			

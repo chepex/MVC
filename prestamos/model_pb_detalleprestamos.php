@@ -5,6 +5,7 @@ session_start();
 ini_set("display_errors", 0);
 # Importar modelo de abstracción de base de datos
 require_once('../core/db_abstract_model.php');
+require_once('model_pb_saldos.php');
 
 
 class pb_detalleprestamos extends DBAbstractModel {
@@ -117,7 +118,7 @@ class pb_detalleprestamos extends DBAbstractModel {
 							<td>".number_format(round($amortizacion_capital,2), 2, '.', ',')."</td>
 							<td>".number_format(round($saldo_capital,2), 2, '.', ',')."</td>
 							<td>".number_format(round($valcuota,2), 2, '.', ',') ."</td>
-							<td>".$fecha->format('d/m/Y'). "-X-". $this->diferencia_dias($fecha_anterior, $fecha->format('d/m/Y')) ."</td>
+							<td>".$fecha->format('d/m/Y')."</td>
 						</tr>";
 			}else{
 				$valcuota = ($tipo_tabla == 0) ? $valor_cuota :  ($amortizacion_capital + $monto_interes);
@@ -224,6 +225,8 @@ class pb_detalleprestamos extends DBAbstractModel {
 				$_REQUEST['FECHA_PAGO']= $fecha->format('d/m/Y');
 				$_REQUEST['NUMERO_CUOTA']=0;
 				$_REQUEST['SALDO_CAPITALANT']=0;
+				$_REQUEST['FECHA_ULTPAGO']= $fecha->format('d/m/Y');
+				$this->save('pb_saldos');
 			}elseif($meses_plazo<>$i){
 				$_REQUEST['COD_CUOTA'] = $this->nextval_seq();
 				$_REQUEST['VALOR_CUOTA'] = round($valcuota,2);
@@ -355,80 +358,172 @@ class pb_detalleprestamos extends DBAbstractModel {
 	}
 	
 	#Consulta Base para Generar el detalle de las Cuotas Pendientes de Pago
-	public function listar_cuotas($FECHA_PAGO_INI, $FECHA_PAGO_FIN){
+	public function listar_cuotas($FECHA_PAGO_INI, $FECHA_PAGO_FIN, $FECHA_PAGO){
+		$anio = explode("/", $FECHA_PAGO);
 		 $this->rows = array();
-		 $this->query = "SELECT   PB_DETALLEPRESTAMOS.COD_CUOTA,
-								  PB_PRESTAMOS.REF_PRESTAMO,
-								  BANCOS.NOM_CORTO,
-								  PB_LINEASCREDITO.NUM_REFLINEA,
-								  PB_TIPOS_CREDITOS.DESCRIPCION_TIPOCREDITO,
-								  PB_DETALLEPRESTAMOS.NUMERO_CUOTA,
-								  PB_DETALLEPRESTAMOS.VALOR_CUOTA,
-								  PB_DETALLEPRESTAMOS.VALOR_CUOTA
-								  - NVL (
-										SUM (PB_DETALLEPAGO.ABONO_INTERES)
-										+ SUM (PB_DETALLEPAGO.ABONO_AMORTIZACION),
-											0
-										)
-										SALDO_CUOTA,
-								 PB_DETALLEPRESTAMOS.FECHA_PAGO,
-								 PB_DETALLEPRESTAMOS.SALDO_CAPITAlANT,
-								 CASE
-									WHEN PB_DETALLEPRESTAMOS.VALOR_AMORTIZACION
-										- NVL (SUM(PB_DETALLEPAGO.ABONO_AMORTIZACION), 0) <> 0
-									THEN
-										PB_DETALLEPRESTAMOS.VALOR_AMORTIZACION
-										- NVL (SUM (PB_DETALLEPAGO.ABONO_INTERES), 0)
-									ELSE
-										0
-								END VALOR_AMORTIZACION,
-								CASE
-									WHEN PB_DETALLEPRESTAMOS.VALOR_INTERES
-										- NVL (SUM(PB_DETALLEPAGO.ABONO_INTERES), 0) <> 0
-									THEN
-										PB_DETALLEPRESTAMOS.VALOR_INTERES
-										- NVL (SUM (PB_DETALLEPAGO.ABONO_INTERES), 0)
-									ELSE
-										0
-								END	VALOR_INTERES,
-								PB_DETALLEPRESTAMOS.SALDO_CAPITAL
-						FROM         pb_detalleprestamos
-								INNER JOIN
-									pb_prestamos
-										ON pb_detalleprestamos.cod_cia = pb_prestamos.COD_CIA
-											AND PB_DETALLEPRESTAMOS.COD_PRESTAMO =
-												pb_prestamos.COD_PRESTAMO
-								LEFT OUTER JOIN
-									PB_DETALLEPAGO
-										ON pb_detalleprestamos.COD_CIA = PB_DETALLEPAGO.COD_CIA
-											AND PB_DETALLEPRESTAMOS.COD_CUOTA = PB_DETALLEPAGO.COD_CUOTA
-								INNER JOIN
-									BANCOS
-										ON PB_PRESTAMOS.COD_CIA = BANCOS.COD_CIA
-											AND PB_PRESTAMOS.COD_BANCO = BANCOS.COD_BANCO
-								INNER JOIN
-									PB_LINEASCREDITO
-										ON PB_PRESTAMOS.COD_CIA = PB_LINEASCREDITO.COD_CIA
-											AND PB_PRESTAMOS.COD_LINEA = PB_LINEASCREDITO.COD_LINEA
-								INNER JOIN
-									PB_TIPOS_CREDITOS
-										ON PB_LINEASCREDITO.COD_CIA = PB_TIPOS_CREDITOS.COD_CIA
-											AND PB_LINEASCREDITO.COD_TIPOCREDITO = PB_TIPOS_CREDITOS.COD_TIPOCREDITO
-							WHERE   PB_DETALLEPRESTAMOS.NUMERO_CUOTA <> 0 AND PB_DETALLEPRESTAMOS.FECHA_PAGO BETWEEN  '".$FECHA_PAGO_INI."' AND '".$FECHA_PAGO_FIN."'
-								GROUP BY   pb_detalleprestamos.cod_prestamo,
-											PB_DETALLEPRESTAMOS.COD_CUOTA,
-											PB_PRESTAMOS.REF_PRESTAMO,
-											PB_DETALLEPRESTAMOS.NUMERO_CUOTA,
-											PB_DETALLEPRESTAMOS.VALOR_CUOTA,
-											PB_DETALLEPRESTAMOS.FECHA_PAGO,
-											PB_DETALLEPRESTAMOS.SALDO_CAPITAlANT,
-											PB_DETALLEPRESTAMOS.VALOR_AMORTIZACION,
-											PB_DETALLEPRESTAMOS.VALOR_INTERES,
-											PB_DETALLEPRESTAMOS.SALDO_CAPITAL,
-											BANCOS.NOM_CORTO,
-											PB_LINEASCREDITO.NUM_REFLINEA,
-											PB_TIPOS_CREDITOS.DESCRIPCION_TIPOCREDITO
-							ORDER BY   PB_DETALLEPRESTAMOS.FECHA_PAGO,pb_detalleprestamos.cod_prestamo, pb_detalleprestamos.numero_cuota";
+		 $this->query = "/* Formatted on 23/04/2014 12:51:51 p.m. (QP5 v5.115.810.9015) */
+  SELECT   PB_DETALLEPRESTAMOS.COD_CUOTA,
+           PB_PRESTAMOS.REF_PRESTAMO,
+           BANCOS.NOM_CORTO,
+           PB_LINEASCREDITO.NUM_REFLINEA,
+           PB_TIPOS_CREDITOS.DESCRIPCION_TIPOCREDITO,
+           PB_DETALLEPRESTAMOS.NUMERO_CUOTA,
+           (CASE
+               WHEN PB_DETALLEPRESTAMOS.VALOR_AMORTIZACION
+                    - NVL (SUM(PB_DETALLEPAGO.ABONO_AMORTIZACION), 0) <> 0
+               THEN
+                  PB_DETALLEPRESTAMOS.VALOR_AMORTIZACION
+                  - NVL (SUM (PB_DETALLEPAGO.ABONO_INTERES), 0)
+               ELSE
+                  0
+            END)
+           + (CASE
+                 WHEN ROUND (
+                         (PB_SALDOS.SALDO_CAPITAL
+                          * (PB_SALDOS.TASA_INTERES / 100)
+                          * (TRUNC (TO_DATE ('".$FECHA_PAGO."'))
+                             - TRUNC (PB_SALDOS.FECHA_ULTPAGO)))
+                         / ".$this->es_bisiesto($anio[2]).",
+                         2
+                      )
+                      - NVL (SUM(PB_DETALLEPAGO.ABONO_INTERES), 0) <> 0
+                 THEN
+                    ROUND (
+                       (PB_SALDOS.SALDO_CAPITAL
+                        * (PB_SALDOS.TASA_INTERES / 100)
+                        * (TRUNC (TO_DATE ('".$FECHA_PAGO."'))
+                           - TRUNC (PB_SALDOS.FECHA_ULTPAGO)))
+                       / ".$this->es_bisiesto($anio[2]).",
+                       2
+                    )
+                    - NVL (SUM (PB_DETALLEPAGO.ABONO_INTERES), 0)
+                 ELSE
+                    0
+              END)
+              VALOR_CUOTA,
+           ( (CASE
+                 WHEN PB_DETALLEPRESTAMOS.VALOR_AMORTIZACION
+                      - NVL (SUM(PB_DETALLEPAGO.ABONO_AMORTIZACION), 0) <> 0
+                 THEN
+                    PB_DETALLEPRESTAMOS.VALOR_AMORTIZACION
+                    - NVL (SUM (PB_DETALLEPAGO.ABONO_INTERES), 0)
+                 ELSE
+                    0
+              END)
+            + (CASE
+                  WHEN ROUND (
+                          (PB_SALDOS.SALDO_CAPITAL
+                           * (PB_SALDOS.TASA_INTERES / 100)
+                           * (TRUNC (TO_DATE ('".$FECHA_PAGO."'))
+                              - TRUNC (PB_SALDOS.FECHA_ULTPAGO)))
+                          / ".$this->es_bisiesto($anio[2]).",
+                          2
+                       )
+                       - NVL (SUM(PB_DETALLEPAGO.ABONO_INTERES), 0) <> 0
+                  THEN
+                     ROUND (
+                        (PB_SALDOS.SALDO_CAPITAL
+                         * (PB_SALDOS.TASA_INTERES / 100)
+                         * (TRUNC (TO_DATE ('".$FECHA_PAGO."'))
+                            - TRUNC (PB_SALDOS.FECHA_ULTPAGO)))
+                        / ".$this->es_bisiesto($anio[2]).",
+                        2
+                     )
+                     - NVL (SUM (PB_DETALLEPAGO.ABONO_INTERES), 0)
+                  ELSE
+                     0
+               END))
+           - NVL (
+                SUM (PB_DETALLEPAGO.ABONO_INTERES)
+                + SUM (PB_DETALLEPAGO.ABONO_AMORTIZACION),
+                0
+             )
+              SALDO_CUOTA,
+           PB_DETALLEPRESTAMOS.FECHA_PAGO,
+           CASE
+              WHEN PB_DETALLEPRESTAMOS.VALOR_AMORTIZACION
+                   - NVL (SUM(PB_DETALLEPAGO.ABONO_AMORTIZACION), 0) <> 0
+              THEN
+                 PB_DETALLEPRESTAMOS.VALOR_AMORTIZACION
+                 - NVL (SUM (PB_DETALLEPAGO.ABONO_INTERES), 0)
+              ELSE
+                 0
+           END
+              VALOR_AMORTIZACION,
+           CASE
+              WHEN (ROUND (
+                       (PB_SALDOS.SALDO_CAPITAL
+                        * (PB_SALDOS.TASA_INTERES / 100)
+                        * (TRUNC (TO_DATE ('".$FECHA_PAGO."'))
+                           - TRUNC (PB_SALDOS.FECHA_ULTPAGO)))
+                       / ".$this->es_bisiesto($anio[2]).",
+                       2
+                    ))
+                   - NVL (SUM(PB_DETALLEPAGO.ABONO_INTERES), 0) <> 0
+              THEN
+                 (ROUND (
+                     (PB_SALDOS.SALDO_CAPITAL * (PB_SALDOS.TASA_INTERES / 100)
+                      * (TRUNC (TO_DATE ('".$FECHA_PAGO."'))
+                         - TRUNC (PB_SALDOS.FECHA_ULTPAGO)))
+                     / ".$this->es_bisiesto($anio[2]).",
+                     2
+                  ))
+                 - NVL (SUM (PB_DETALLEPAGO.ABONO_INTERES), 0)
+              ELSE
+                 0
+           END
+              VALOR_INTERES,
+           PB_SALDOS.SALDO_CAPITAL
+    FROM                     pb_detalleprestamos
+                          INNER JOIN
+                             pb_prestamos
+                          ON pb_detalleprestamos.cod_cia = pb_prestamos.COD_CIA
+                             AND PB_DETALLEPRESTAMOS.COD_PRESTAMO =
+                                   pb_prestamos.COD_PRESTAMO
+                       LEFT OUTER JOIN
+                          PB_DETALLEPAGO
+                       ON pb_detalleprestamos.COD_CIA = PB_DETALLEPAGO.COD_CIA
+                          AND PB_DETALLEPRESTAMOS.COD_CUOTA =
+                                PB_DETALLEPAGO.COD_CUOTA
+                    INNER JOIN
+                       BANCOS
+                    ON PB_PRESTAMOS.COD_CIA = BANCOS.COD_CIA
+                       AND PB_PRESTAMOS.COD_BANCO = BANCOS.COD_BANCO
+                 INNER JOIN
+                    PB_LINEASCREDITO
+                 ON PB_PRESTAMOS.COD_CIA = PB_LINEASCREDITO.COD_CIA
+                    AND PB_PRESTAMOS.COD_LINEA = PB_LINEASCREDITO.COD_LINEA
+              INNER JOIN
+                 PB_TIPOS_CREDITOS
+              ON PB_LINEASCREDITO.COD_CIA = PB_TIPOS_CREDITOS.COD_CIA
+                 AND PB_LINEASCREDITO.COD_TIPOCREDITO =
+                       PB_TIPOS_CREDITOS.COD_TIPOCREDITO
+           INNER JOIN
+              PB_SALDOS
+           ON PB_SALDOS.COD_CIA = PB_PRESTAMOS.COD_CIA
+              AND PB_SALDOS.COD_PRESTAMO = PB_PRESTAMOS.COD_PRESTAMO
+   WHERE   PB_DETALLEPRESTAMOS.NUMERO_CUOTA <> 0
+           AND PB_DETALLEPRESTAMOS.FECHA_PAGO BETWEEN '".$FECHA_PAGO_INI."'
+                                                  AND  '".$FECHA_PAGO_FIN."'
+GROUP BY   pb_detalleprestamos.cod_prestamo,
+           PB_DETALLEPRESTAMOS.COD_CUOTA,
+           PB_PRESTAMOS.REF_PRESTAMO,
+           PB_DETALLEPRESTAMOS.NUMERO_CUOTA,
+           PB_DETALLEPRESTAMOS.VALOR_CUOTA,
+           PB_DETALLEPRESTAMOS.FECHA_PAGO,
+           PB_DETALLEPRESTAMOS.SALDO_CAPITAlANT,
+           PB_DETALLEPRESTAMOS.VALOR_AMORTIZACION,
+           PB_DETALLEPRESTAMOS.VALOR_INTERES,
+           PB_DETALLEPRESTAMOS.SALDO_CAPITAL,
+           BANCOS.NOM_CORTO,
+           PB_LINEASCREDITO.NUM_REFLINEA,
+           PB_TIPOS_CREDITOS.DESCRIPCION_TIPOCREDITO,
+           PB_SALDOS.SALDO_CAPITAL,
+           PB_SALDOS.TASA_INTERES,
+           PB_SALDOS.FECHA_ULTPAGO
+ORDER BY   PB_DETALLEPRESTAMOS.FECHA_PAGO,
+           pb_detalleprestamos.cod_prestamo,
+           pb_detalleprestamos.numero_cuota";
             $this->get_results_from_query();
             return $this->rows ;
     }

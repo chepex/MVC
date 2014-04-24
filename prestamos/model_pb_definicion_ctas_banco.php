@@ -124,7 +124,7 @@ class pb_definicion_ctas_banco extends DBAbstractModel {
         return $this->rows;
 	}
 	
-	public function cuenta_corrientebanco($COD_CIA, $COD_BANCO){
+	public function cuenta_corrientebanco($COD_CIA, $COD_BANCO, $COD_APLICACION){
 		$this->rows=array();
 		$this->query="SELECT   CTA_1,
 							   CTA_2,
@@ -134,7 +134,7 @@ class pb_definicion_ctas_banco extends DBAbstractModel {
 							   TIPO_APLICACION
 						FROM   PB_DEFINICION_CTAS_BANCO
 							WHERE   COD_CIA = ".$COD_CIA."
-									AND COD_DESTINOAPLICACION = 5 
+									AND COD_DESTINOAPLICACION = ".$COD_APLICACION." 
 									AND COD_BANCO ='". $COD_BANCO."'";
 		$this->get_results_from_query();
         return $this->rows;

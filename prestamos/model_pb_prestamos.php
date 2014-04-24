@@ -232,19 +232,17 @@ class pb_prestamos extends DBAbstractModel {
 	public function pagosxvencer($FECHA_INICIAL, $FECHA_FINAL){
 		$this->rows = array();
 		 $this->query = "SELECT   REF_PRESTAMO,
-								  NOM_CORTO,
-								  DESCRIPCION_TIPOCREDITO,
-								  NUMERO_CUOTA,
-								  VALOR_CUOTA,
-								  SALDO_CUOTA,
-								  VALOR_INTERES,
-								  VALOR_AMORTIZACION,
-								  FECHA_PAGO,
-								  SALDO_CAPITALANT
-						FROM   VWSALDO_CUOTAS
-						WHERE   FECHA_PAGO <= '".$FECHA_FINAL."'
-							AND SALDO_CUOTA <> 0
-						ORDER BY   FECHA_PAGO";
+									NOM_CORTO,
+									DESCRIPCION_TIPOCREDITO,
+									NUMERO_CUOTA,
+									VALOR_CUOTA,
+									VALOR_INTERES,
+									VALOR_AMORTIZACION,
+									FECHA_PAGO, SALDO_CAPITAL
+							FROM   VWSALDO_CUOTAS
+								WHERE   FECHA_PAGO <= '".$FECHA_FINAL."'
+										AND SALDO_CAPITAL <> 0
+							ORDER BY   FECHA_PAGO DESC";
             $this->get_results_from_query();
         return $this->rows ;
 	}

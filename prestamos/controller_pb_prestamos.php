@@ -204,7 +204,7 @@ class controller_pb_prestamos extends pb_prestamos{
 									"",
 									array("COD_CIA=".$_REQUEST['COD_CIA'],"COD_BANCO=".$_REQUEST['COD_BANCO'])
 									);
-		$ctacorriente = $definicionctas->cuenta_corrientebanco($_REQUEST['COD_CIA'], $_REQUEST['COD_BANCO']);
+		$ctacorriente = $definicionctas->cuenta_corrientebanco($_REQUEST['COD_CIA'], $_REQUEST['COD_BANCO'], 1);
 		$_REQUEST['COD_DETNOTA'] = $partidaprestamo->nextval_seq();
 		$_REQUEST['CTA_1'] = $ctacorriente[0]['CTA_1'];
 		$_REQUEST['CTA_2'] = $ctacorriente[0]['CTA_2'];
@@ -487,7 +487,7 @@ class controller_pb_prestamos extends pb_prestamos{
 		$parametros = $this->set_obj();
 		$bancos = new controller_pb_bancos();
 		$objdetprestamo = new pb_detalleprestamos();
-		$arraydetprestamo = $objdetprestamo->listar_cuotas($_REQUEST['FECHA_PAGO_FILTROI'], $_REQUEST['FECHA_PAGO_FILTROF'] );
+		$arraydetprestamo = $objdetprestamo->listar_cuotas($_REQUEST['FECHA_PAGO_FILTROI'], $_REQUEST['FECHA_PAGO_FILTROF'], $_REQUEST['FECHA_PAGO'] );
 		$arrayresumenpago = $objdetprestamo->resumen_porpagar($_REQUEST['FECHA_PAGO_FILTROI'], $_REQUEST['FECHA_PAGO_FILTROF']);
 		$lstbancos= $bancos->get();
 		$html .="<table class='table table-striped tbl' border='0.5px' bordercolor='#585858' style='font-size:8.5px;width:50%;'>
@@ -516,7 +516,6 @@ class controller_pb_prestamos extends pb_prestamos{
 							<th>Saldo Capital Actual</th>
 							<th>Amortizacion Cuota</th>
 							<th>Interes Cuota</th>
-							<th>Sal.Cap. Despues de Pago</th>
 							<th>Valor Cuota</th>
 							<th>Saldo Cuota</th>
 							<th>Abono Cuota</th>
@@ -534,10 +533,9 @@ class controller_pb_prestamos extends pb_prestamos{
 									<td>".$mks["DESCRIPCION_TIPOCREDITO"]."</td>
 									<td>".$mks["NUMERO_CUOTA"]."</td>
 									<td>".$mks["FECHA_PAGO"]."</td>
-									<td>".number_format($mks["SALDO_CAPITALANT"],2,'.',',')."</td>
+									<td>".number_format($mks["SALDO_CAPITAL"],2,'.',',')."</td>
 									<td>".number_format($mks["VALOR_AMORTIZACION"],2,'.',',')."</td>
 									<td>".number_format($mks["VALOR_INTERES"],2,'.',',')."</td>
-									<td>".number_format($mks["SALDO_CAPITAL"],2,'.',',')."</td>
 									<td>".number_format($mks["VALOR_CUOTA"],2,'.',',')."</td>
 									<td>".number_format($mks["SALDO_CUOTA"],2,'.',',')."</td>
 									<td>
@@ -562,6 +560,7 @@ class controller_pb_prestamos extends pb_prestamos{
 									</td>
 									<td>
 										<input type='text' class='input-small' required='' id='DISPONBAN_".$i."' name='DISPONBAN_".$i."' value='0'  />
+										<input type='hidden' class='input-small' required='' id='VALINTERES_".$i."' name='VALINTERES_".$i."' value='".$mks["VALOR_INTERES"]."'  />
 										<button id='btn_addx_".$i."' class='addx btn btn-primary' title='Agregar Monto' NUMID='".$i."' COD_CUOTA='".$mks["COD_CUOTA"]."' disabled='disabled'><i class='icon-plus-sign icon-white'></i></button>
 									</td>
 									<td>
@@ -576,7 +575,7 @@ class controller_pb_prestamos extends pb_prestamos{
 				}
 			}
 		$html .= "</table><script>$('.chzn-select').chosen();</script>";
-		$html2.="<table class='table table-hover tbl' border='0.5px' bordercolor='#585858' style='font-size:10px;width:100%;'>
+		/*$html2.="<table class='table table-hover tbl' border='0.5px' bordercolor='#585858' style='font-size:10px;width:100%;'>
 						<thead>
 						<tr>
 							<th colspan='3'>
@@ -610,7 +609,7 @@ class controller_pb_prestamos extends pb_prestamos{
 							$i++;
 							$acuresumen = $acuresumen + $resumenpago["A_PAGAR"];
 			}
-			$html2 .= "</tbody><tfoot><tr><th>&nbsp;</th><th>TOTAL A PAGAR:</th><th>".number_format($acuresumen,2,'.',',')."</th></tr></tfoot></table>";
+			$html2 .= "</tbody><tfoot><tr><th>&nbsp;</th><th>TOTAL A PAGAR:</th><th>".number_format($acuresumen,2,'.',',')."</th></tr></tfoot></table>";*/
 		$data= array("tblcuotas"=>$html,"tblresumen"=>$html2);
 		echo json_encode($data);
 	}
@@ -741,7 +740,6 @@ class controller_pb_prestamos extends pb_prestamos{
 							<th>Tipo Cred.</th>
 							<th>Num. Cuota</th>
 							<th>Valor Cuota</th>
-							<th>Saldo Cuota</th>
 							<th>Interes</th>
 							<th>Amortizacion</th>
 							<th>Fecha Pago</th>
@@ -766,19 +764,18 @@ class controller_pb_prestamos extends pb_prestamos{
 						<td>".$pagopendiente['DESCRIPCION_TIPOCREDITO']."</td>
 						<td>".$pagopendiente['NUMERO_CUOTA']."</td>
 						<td>".number_format($pagopendiente['VALOR_CUOTA'],2,'.',',')."</td>
-						<td>".number_format($pagopendiente['SALDO_CUOTA'],2,'.',',')."</td>
 						<td>".number_format($pagopendiente['VALOR_INTERES'],2,'.',',')."</td>
 						<td>".number_format($pagopendiente['VALOR_AMORTIZACION'],2,'.',',')."</td>
 						<td>".$pagopendiente['FECHA_PAGO']."</td>
-						<td>".number_format($pagopendiente['SALDO_CAPITALANT'],2,'.',',')."</td>
+						<td>".number_format($pagopendiente['SALDO_CAPITAL'],2,'.',',')."</td>
 					</tr>";
 					$acucuota = $acucuota + $pagopendiente['SALDO_CUOTA'];
 		}
 		$html .="</tbody>
 				<tfoot>
 					<tr>
-						<th colspan='5'><p style='float:right;'>Saldo por Pagar</p></th>
-						<th colspan='3'>".number_format($acucuota,2,'.',',')."</th>
+						<th colspan='5'><p style='float:right;'></p></th>
+						<th colspan='3'></th>
 					</tr>
 				</tfoot>
 				</table>";

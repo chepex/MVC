@@ -171,6 +171,8 @@ class controller_pb_pagos extends pb_pagos{
 				//Se Recupera el Codigo de la Cuota del value de los Checkbox a pagar
 				$_REQUEST['COD_CUOTA']= $_REQUEST[$NOMBRE_CAMPO];
 				//Se Crea Un Objeto con el pb_detalleprestamos, que es la proyeccicon de pago, para saber cual es el valor de interes a pagar de la cuota
+				
+				$INTERES_AFECHA = $_REQUEST['VALINTERES_'.$i];
 				$objcuota = $parametros->crea_objeto(array("pb_detalleprestamos"),"", array("COD_CIA=".$_SESSION['cod_cia'], "COD_CUOTA=".$_REQUEST['COD_CUOTA']));
 				//Se Crea Un Objeto con el pb_detallepago, Sumando el valor de interes pagado, para ser comparado con el valor correspondiente a pagar para la cuota
 				$objpago = $parametros->crea_objeto(array("pb_detallepago"),"", array("COD_CIA=".$_SESSION['cod_cia'], "COD_CUOTA=".$_REQUEST['COD_CUOTA']), array("nvl(sum(pb_detallepago.ABONO_INTERES),0) VALOR_INTERES"));
@@ -179,10 +181,10 @@ class controller_pb_pagos extends pb_pagos{
 				//si no se ha abonado nada de intereses
 				if($objpago[0]['VALOR_INTERES'] == 0 ){
 					//si el valor abonado es mayor, que el valor de los intereses
-					if($VALOR_PAGO > $objcuota[0]['VALOR_INTERES']){
-						$VALOR_AMORTIZACION = $VALOR_PAGO - $objcuota[0]['VALOR_INTERES'];
+					if($VALOR_PAGO > $INTERES_AFECHA){
+						$VALOR_AMORTIZACION = $VALOR_PAGO - $INTERES_AFECHA;
 						$_REQUEST['ABONO_AMORTIZACION'] = $VALOR_AMORTIZACION ;
-						$_REQUEST['ABONO_INTERES'] = $objcuota[0]['VALOR_INTERES'];
+						$_REQUEST['ABONO_INTERES'] = $INTERES_AFECHA;
 					}else{
 						$_REQUEST['ABONO_AMORTIZACION'] = 0;
 						$_REQUEST['ABONO_INTERES'] = $VALOR_PAGO;
@@ -190,12 +192,12 @@ class controller_pb_pagos extends pb_pagos{
 				//sino, si ya se abono a interes 
 				}else{
 					//si lo pagado de intereses es igual al valor correspondiente de la cuota(si ya se cubrieron los intereses) se abona todo a la amortizacion
-					if($objpago[0]['VALOR_INTERES'] == $objcuota[0]['VALOR_INTERES']){
+					if($objpago[0]['VALOR_INTERES'] == $INTERES_AFECHA){
 						$_REQUEST['ABONO_AMORTIZACION'] = $VALOR_PAGO;
 						$_REQUEST['ABONO_INTERES'] = 0;
 					//sino se abona a intereses lo que resta
 					}else{
-						$restaxpogarinteres = $objcuota[0]['VALOR_INTERES'] - $objpago[0]['VALOR_INTERES'];
+						$restaxpogarinteres = $INTERES_AFECHA - $objpago[0]['VALOR_INTERES'];
 						if($VALOR_PAGO > $restaxpogarinteres){
 							$VALOR_AMORTIZACION = $VALOR_PAGO - $restaxpogarinteres;
 							$_REQUEST['ABONO_AMORTIZACION'] = $VALOR_AMORTIZACION ;
@@ -211,6 +213,8 @@ class controller_pb_pagos extends pb_pagos{
 			}
 		}
 		$recibos->insert();
+		$this->query="UPDATE pb_saldos SET FECHA_ULTPAGO = '".$_REQUEST['FECHA_PAGO']."', SALDO_CAPITAL = SALDO_CAPITAL - ".$_REQUEST['ABONO_AMORTIZACION']."  WHERE COD_CIA = ".$_REQUEST['COD_CIA']." AND COD_PRESTAMO = ". $objcuota[0]['COD_PRESTAMO'];
+		$this->execute_single_query();
 		//Se invoca la Lista de Cuotas a pagar, para ver el efecto de lo realizado
 		$prestamo->view_detprestamo();
 		
