@@ -240,7 +240,7 @@ class pb_prestamos extends DBAbstractModel {
 									VALOR_AMORTIZACION,
 									FECHA_PAGO, SALDO_CAPITAL
 							FROM   VWSALDO_CUOTAS
-								WHERE   FECHA_PAGO <= '".$FECHA_FINAL."'
+								WHERE   FECHA_PAGO between '".$FECHA_INICIAL."' and '".$FECHA_FINAL."'
 										AND SALDO_CAPITAL <> 0
 							ORDER BY   FECHA_PAGO DESC";
             $this->get_results_from_query();
